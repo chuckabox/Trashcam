@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "TrashLife",
+    "slug": "trashlife",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.trashlife.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "TrashLife uses the camera to detect and scan trash items."
+      }
+    },
+    "android": {
+      "package": "com.trashlife.app",
+      "permissions": ["android.permission.CAMERA"]
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow TrashLife to access your camera to scan trash."
+        }
+      ]
+    ]
+  }
+}
