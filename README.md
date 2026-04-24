@@ -54,7 +54,6 @@ You point your phone at a piece of trash. The app:
 | Waste diary (local, persistent) | ✅ |
 | Dashboard: totals, material pie chart, top items | ✅ |
 | Local recycling location lookup | 🔜 (UI placeholder, wire to Google Places or Earth911 API) |
-| Leaderboard / social | 🔜 (Firebase) |
 | Pro tier / payments | 🔜 |
 
 ---
@@ -298,7 +297,6 @@ const text = await recognizeText(crop.uri);
 **Weeks 4–6:**
 - [ ] Firebase Auth + Firestore sync (so diary follows the user across devices)
 - [ ] Local recycling lookup (Google Places or Earth911 API, query by material + lat/lng)
-- [ ] Leaderboard (friends via phone contacts)
 - [ ] Pro paywall (`revenuecat`)
 
 **Weeks 7+:**
