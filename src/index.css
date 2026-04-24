@@ -2,15 +2,53 @@
 @tailwind components;
 @tailwind utilities;
 
-*, *::before, *::after {
-  box-sizing: border-box;
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color: #0a0a0a;
-  color: #fafafa;
-  font-family: system-ui, -apple-system, sans-serif;
 }
+
+body {
+  background: #020503;
+  color: #ddefd8;
+  font-family: 'Syne', sans-serif;
+}
+
+/* ── Desktop: render as phone ── */
+@media (min-width: 640px) {
+  body {
+    background: #020503;
+    background-image:
+      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(181,242,61,0.07) 0%, transparent 100%);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+  }
+
+  #root {
+    width: 393px;
+    min-height: 100vh;
+    position: relative;
+    background: #060a08;
+    box-shadow:
+      -1px 0 0 rgba(181,242,61,0.07),
+       1px 0 0 rgba(181,242,61,0.07),
+       0 0 100px rgba(0,0,0,0.9);
+  }
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #1c2d20; border-radius: 2px; }
+
+/* ── Selection ── */
+::selection { background: rgba(181,242,61,0.25); }

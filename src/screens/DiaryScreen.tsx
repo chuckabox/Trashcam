@@ -1,102 +1,154 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { clearScans, loadScans } from '../services/storage'
+import { scoreScan, CONDITION_LABEL, CONDITION_COLOR, CONDITION_BADGE_VARIANT } from '../services/degradationScore'
 import type { ScanResult } from '../types'
-import { Card } from '../components/ui/card'
-import { Button } from '../components/ui/button'
+import { Badge } from '../components/ui/badge'
+import { Tabs } from '../components/ui/tabs'
+
+const FILTER_TABS = [
+  { id: 'all', label: 'All' },
+  { id: 'recyclable', label: 'Recycle' },
+  { id: 'landfill', label: 'Landfill' },
+  { id: 'urgent', label: 'Urgent' },
+]
 
 export default function DiaryScreen() {
   const navigate = useNavigate()
   const [scans, setScans] = useState<ScanResult[]>([])
   const [refreshing, setRefreshing] = useState(false)
+  const [search, setSearch] = useState('')
+  const [filter, setFilter] = useState('all')
 
   const refresh = useCallback(async () => {
     setRefreshing(true)
-    const list = await loadScans()
-    setScans(list)
+    setScans(await loadScans())
     setRefreshing(false)
   }, [])
 
-  useEffect(() => {
-    refresh()
-  }, [refresh])
+  useEffect(() => { refresh() }, [refresh])
 
   const handleClear = () => {
     if (!window.confirm('Clear all scan history on this device?')) return
     clearScans().then(() => setScans([]))
   }
 
-  if (scans.length === 0 && !refreshing) {
-    return (
-      <div className="flex h-screen flex-col items-center justify-center gap-3 bg-background">
-        <span className="text-6xl">📔</span>
-        <p className="text-xl font-bold text-foreground">No scans yet</p>
-        <p className="text-sm text-muted-foreground">Your scanned items appear here.</p>
-        <Button className="mt-2" onClick={() => navigate('/')}>
-          Start Scanning
-        </Button>
-      </div>
-    )
-  }
+  const filtered = useMemo(() => {
+    let result = scans
+    if (search.trim()) {
+      const q = search.toLowerCase()
+      result = result.filter((s) => s.info.displayName.toLowerCase().includes(q))
+    }
+    if (filter === 'recyclable') result = result.filter((s) => s.info.recyclable === 'recyclable')
+    else if (filter === 'landfill') result = result.filter((s) => s.info.recyclable === 'landfill')
+    else if (filter === 'urgent') result = result.filter((s) => scoreScan(s).score >= 61)
+    return result
+  }, [scans, search, filter])
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-lg px-4 py-6">
-        <div className="mb-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-foreground">
-            Waste Diary ({scans.length})
-          </h1>
-          <div className="flex gap-2">
-            <Button size="sm" variant="ghost" onClick={() => navigate('/')}>
-              ← Scanner
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              className="text-destructive hover:text-destructive"
-              onClick={handleClear}
-            >
-              Clear
-            </Button>
+      <div className="mx-auto max-w-lg px-4 pb-6 pt-6 space-y-4">
+
+        {/* Header */}
+        <div className="flex items-end justify-between">
+          <div>
+            <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">TrashLife</p>
+            <h1 className="text-2xl font-800 text-foreground">
+              Diary
+              <span className="ml-2 font-mono text-base font-normal text-muted-foreground">({scans.length})</span>
+            </h1>
           </div>
+          {scans.length > 0 && (
+            <button
+              onClick={handleClear}
+              className="pb-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground hover:text-destructive transition-colors"
+            >
+              Clear all
+            </button>
+          )}
         </div>
 
+        {/* Search */}
+        <div className="relative">
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" width="14" height="14"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+          </svg>
+          <input
+            type="text"
+            placeholder="Search items…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full rounded-lg border border-border bg-card pl-9 pr-4 py-2.5 font-mono text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/40 transition-colors"
+          />
+        </div>
+
+        <Tabs tabs={FILTER_TABS} active={filter} onChange={setFilter} />
+
+        {/* Content */}
         {refreshing && scans.length === 0 ? (
-          <p className="text-center text-muted-foreground">Loading…</p>
+          <p className="py-10 text-center font-mono text-[10px] uppercase tracking-widest text-muted-foreground animate-blink">Loading</p>
+        ) : scans.length === 0 ? (
+          <div className="flex flex-col items-center gap-3 py-24 text-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full border border-border">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                strokeWidth="1.5" className="text-muted-foreground" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+              </svg>
+            </div>
+            <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">No scans yet</p>
+            <p className="text-sm text-muted-foreground">Your scanned items will appear here.</p>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="flex flex-col items-center gap-2 py-16 text-center">
+            <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">No matches</p>
+          </div>
         ) : (
           <div className="space-y-2">
-            {scans.map((item) => (
-              <button
-                key={item.id}
-                className="w-full text-left"
-                onClick={() => navigate('/results', { state: { scan: item } })}
-              >
-                <Card className="flex items-center gap-3 p-3 hover:border-border/60 transition-colors">
-                  {item.photoUri ? (
-                    <img
-                      src={item.photoUri}
-                      alt=""
-                      className="h-14 w-14 flex-shrink-0 rounded-lg object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-lg bg-secondary">
-                      <span className="text-2xl">{item.info.emoji}</span>
+            {filtered.map((item) => {
+              const { score, condition } = scoreScan(item)
+              return (
+                <button
+                  key={item.id}
+                  className="w-full text-left group"
+                  onClick={() => navigate('/results', { state: { scan: item } })}
+                >
+                  <div className="flex items-center gap-3 rounded-lg border border-border bg-card p-3 transition-colors group-hover:border-border/60">
+                    {/* Thumbnail */}
+                    {item.photoUri ? (
+                      <img src={item.photoUri} alt="" className="h-12 w-12 shrink-0 rounded-md object-cover" />
+                    ) : (
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-secondary">
+                        <span className="text-xl">{item.info.emoji}</span>
+                      </div>
+                    )}
+
+                    {/* Info */}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-1">
+                        <p className="truncate text-sm font-semibold text-foreground">{item.info.displayName}</p>
+                        <Badge label={CONDITION_LABEL[condition]} variant={CONDITION_BADGE_VARIANT[condition]} />
+                      </div>
+                      <p className="mt-0.5 font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
+                        {new Date(item.timestamp).toLocaleDateString()} · {item.info.material}
+                      </p>
+                      {/* Score bar */}
+                      <div className="mt-1.5 h-0.5 w-full overflow-hidden rounded-full bg-secondary">
+                        <div className="h-full rounded-full transition-all"
+                          style={{ width: `${score}%`, backgroundColor: CONDITION_COLOR[condition] }} />
+                      </div>
                     </div>
-                  )}
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-semibold text-foreground">
-                      {item.info.displayName}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(item.timestamp).toLocaleDateString()} · {item.info.material}
-                    </p>
+
+                    {/* Score */}
+                    <div className="shrink-0 text-right">
+                      <p className="font-mono text-sm font-bold" style={{ color: CONDITION_COLOR[condition] }}>{score}</p>
+                      <p className="font-mono text-[9px] text-muted-foreground">{Math.round(item.detection.confidence * 100)}%</p>
+                    </div>
                   </div>
-                  <span className="font-bold text-primary">
-                    {Math.round(item.detection.confidence * 100)}%
-                  </span>
-                </Card>
-              </button>
-            ))}
+                </button>
+              )
+            })}
           </div>
         )}
       </div>
