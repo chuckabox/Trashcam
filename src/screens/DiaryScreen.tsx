@@ -1,10 +1,13 @@
 import { useCallback, useState } from 'react';
-import { View, Text, FlatList, Pressable, StyleSheet, Image, RefreshControl, Alert } from 'react-native';
+import { View, FlatList, Image, RefreshControl, Alert, Pressable } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation';
 import { clearScans, loadScans } from '../services/storage';
 import type { ScanResult } from '../types';
+import { Card } from '../components/ui/card';
+import { Text } from '../components/ui/text';
+import { Button } from '../components/ui/button';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'Diary'>;
 
@@ -42,74 +45,51 @@ export default function DiaryScreen() {
 
   if (scans.length === 0) {
     return (
-      <View style={[styles.container, styles.empty]}>
-        <Text style={styles.emptyEmoji}>📔</Text>
-        <Text style={styles.emptyTitle}>No scans yet</Text>
-        <Text style={styles.emptySub}>Your scanned items appear here.</Text>
+      <View className="flex-1 items-center justify-center gap-2 bg-background">
+        <Text className="text-6xl">📔</Text>
+        <Text className="text-xl font-bold">No scans yet</Text>
+        <Text className="text-sm text-muted-foreground">Your scanned items appear here.</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={scans}
-        keyExtractor={(s) => s.id}
-        contentContainerStyle={styles.list}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor="#22c55e" />}
-        ListHeaderComponent={
-          <View style={styles.header}>
-            <Text style={styles.title}>Waste Diary ({scans.length})</Text>
-            <Pressable onPress={handleClear}>
-              <Text style={styles.clear}>Clear</Text>
-            </Pressable>
-          </View>
-        }
-        renderItem={({ item }) => (
-          <Pressable style={styles.row} onPress={() => nav.navigate('Results', { scan: item })}>
+    <FlatList
+      className="flex-1 bg-background"
+      data={scans}
+      keyExtractor={(s) => s.id}
+      contentContainerStyle={{ padding: 16, gap: 8 }}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor="#22c55e" />
+      }
+      ListHeaderComponent={
+        <View className="mb-3 flex-row items-center justify-between">
+          <Text className="text-2xl font-bold">Waste Diary ({scans.length})</Text>
+          <Button size="sm" variant="ghost" label="Clear" onPress={handleClear} textClassName="text-destructive" />
+        </View>
+      }
+      renderItem={({ item }) => (
+        <Pressable onPress={() => nav.navigate('Results', { scan: item })}>
+          <Card className="flex-row items-center gap-3 p-3">
             {item.photoUri ? (
-              <Image source={{ uri: item.photoUri }} style={styles.thumb} />
+              <Image source={{ uri: item.photoUri }} className="h-14 w-14 rounded-lg" />
             ) : (
-              <View style={[styles.thumb, styles.emojiThumb]}>
-                <Text style={{ fontSize: 28 }}>{item.info.emoji}</Text>
+              <View className="h-14 w-14 items-center justify-center rounded-lg bg-secondary">
+                <Text className="text-2xl">{item.info.emoji}</Text>
               </View>
             )}
-            <View style={{ flex: 1 }}>
-              <Text style={styles.name}>{item.info.displayName}</Text>
-              <Text style={styles.meta}>
+            <View className="flex-1">
+              <Text className="font-semibold">{item.info.displayName}</Text>
+              <Text className="text-xs text-muted-foreground">
                 {new Date(item.timestamp).toLocaleDateString()} · {item.info.material}
               </Text>
             </View>
-            <Text style={styles.conf}>{Math.round(item.detection.confidence * 100)}%</Text>
-          </Pressable>
-        )}
-      />
-    </View>
+            <Text className="font-bold text-primary">
+              {Math.round(item.detection.confidence * 100)}%
+            </Text>
+          </Card>
+        </Pressable>
+      )}
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0a0a0a' },
-  empty: { alignItems: 'center', justifyContent: 'center', gap: 8 },
-  emptyEmoji: { fontSize: 64 },
-  emptyTitle: { color: '#fafafa', fontSize: 20, fontWeight: '700' },
-  emptySub: { color: '#a1a1aa' },
-  list: { padding: 16, gap: 8 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
-  title: { color: '#fafafa', fontSize: 22, fontWeight: '700' },
-  clear: { color: '#ef4444', fontWeight: '600' },
-  row: {
-    flexDirection: 'row',
-    gap: 12,
-    padding: 12,
-    backgroundColor: '#18181b',
-    borderRadius: 12,
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  thumb: { width: 52, height: 52, borderRadius: 8, backgroundColor: '#27272a' },
-  emojiThumb: { alignItems: 'center', justifyContent: 'center' },
-  name: { color: '#fafafa', fontSize: 15, fontWeight: '600' },
-  meta: { color: '#a1a1aa', fontSize: 12, marginTop: 2 },
-  conf: { color: '#22c55e', fontWeight: '700' },
-});

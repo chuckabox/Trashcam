@@ -1,4 +1,6 @@
-import { Pressable, Text, StyleSheet, View, ActivityIndicator } from 'react-native';
+import { Pressable, ActivityIndicator, View } from 'react-native';
+import { Text } from './ui/text';
+import { cn } from '../lib/utils';
 
 interface Props {
   confidence: number;
@@ -8,71 +10,40 @@ interface Props {
 }
 
 export function SnapButton({ confidence, ready, busy, onPress }: Props) {
-  const confidencePct = Math.round(confidence * 100);
+  const pct = Math.round(confidence * 100);
+
   return (
-    <View style={styles.wrap}>
-      <Text style={styles.hint}>
-        {busy
-          ? 'Processing…'
-          : ready
-            ? `Confident ${confidencePct}% — snap it!`
-            : confidence > 0
-              ? `Detecting… ${confidencePct}%`
-              : 'Point at a trash item'}
-      </Text>
+    <View className="items-center gap-3">
+      <View className="rounded-full bg-black/60 px-4 py-1">
+        <Text className="text-sm font-semibold text-white">
+          {busy
+            ? 'Processing…'
+            : ready
+              ? `Confident ${pct}% — snap it!`
+              : confidence > 0
+                ? `Detecting… ${pct}%`
+                : 'Point at trash'}
+        </Text>
+      </View>
       <Pressable
         onPress={onPress}
         disabled={busy}
-        style={({ pressed }) => [
-          styles.btn,
-          ready && styles.btnReady,
-          pressed && styles.btnPressed,
-        ]}
+        className={cn(
+          'h-20 w-20 items-center justify-center rounded-full border-4 active:opacity-80',
+          ready ? 'border-primary' : 'border-white',
+        )}
       >
         {busy ? (
-          <ActivityIndicator color="#0a0a0a" />
+          <ActivityIndicator color="#22c55e" />
         ) : (
-          <View style={[styles.inner, ready && styles.innerReady]} />
+          <View
+            className={cn(
+              'h-14 w-14 rounded-full',
+              ready ? 'bg-primary' : 'bg-white',
+            )}
+          />
         )}
       </Pressable>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  wrap: {
-    alignItems: 'center',
-    gap: 12,
-  },
-  hint: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-    textShadowColor: 'rgba(0,0,0,0.8)',
-    textShadowRadius: 3,
-  },
-  btn: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    borderWidth: 4,
-    borderColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  btnReady: {
-    borderColor: '#22c55e',
-  },
-  btnPressed: {
-    transform: [{ scale: 0.95 }],
-  },
-  inner: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#fff',
-  },
-  innerReady: {
-    backgroundColor: '#22c55e',
-  },
-});

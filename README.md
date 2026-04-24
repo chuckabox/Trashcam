@@ -1,97 +1,77 @@
 # TrashLife
 
-**A mobile app that points your camera at trash, identifies it with YOLO, and tells you how long it takes to decompose and how to dispose of it.**
+**Point your phone at a piece of trash. Real YOLOv8 tells you what it is. The app tells you how long it takes to decompose and how to dispose of it.**
 
-This repo is an **MVP skeleton** — fully functional UI and data flow, with a **mock YOLO detector** that generates plausible detections so you can drive the whole app end-to-end on a real device today. Swap in a real TFLite model when you're ready (see [YOLO Model Swap-In](#yolo-model-swap-in)).
+- **Real-time YOLOv8 on-device** (TFLite, ~3 MB, COCO 80-class) via [`react-native-fast-tflite`](https://github.com/mrousavy/react-native-fast-tflite) + [`react-native-vision-camera`](https://github.com/mrousavy/react-native-vision-camera).
+- **shadcn-style UI** using [`react-native-reusables`](https://github.com/mrzachnugent/react-native-reusables)-flavored components + [NativeWind](https://www.nativewind.dev) (Tailwind for React Native).
+- **48-item degradation database** (material, decomposition time, CO₂, water, toxicity, disposal tip).
+- **Local-first** waste diary + dashboard (AsyncStorage, no server).
 
 ---
 
 ## Table of Contents
 
-1. [What This App Does](#what-this-app-does)
-2. [Features](#features)
-3. [Architecture](#architecture)
-4. [Project Structure](#project-structure)
-5. [Tech Stack](#tech-stack)
-6. [Getting Started](#getting-started)
-7. [YOLO Model Swap-In](#yolo-model-swap-in)
-8. [OCR Swap-In](#ocr-swap-in)
-9. [Degradation Database](#degradation-database)
+1. [What You'll See](#what-youll-see)
+2. [Architecture](#architecture)
+3. [Project Structure](#project-structure)
+4. [Tech Stack](#tech-stack)
+5. [Getting Started](#getting-started) ← **READ THIS**
+6. [How Real YOLO Is Wired](#how-real-yolo-is-wired)
+7. [COCO → Trash Class Mapping](#coco--trash-class-mapping)
+8. [Training Your Own Trash Model](#training-your-own-trash-model)
+9. [Troubleshooting](#troubleshooting)
 10. [Roadmap](#roadmap)
-11. [Monetization](#monetization)
-12. [Performance Targets](#performance-targets)
 
 ---
 
-## What This App Does
+## What You'll See
 
-You point your phone at a piece of trash. The app:
+1. Launch app → camera opens, model loads (~1 sec on first run).
+2. Point at a water bottle / can / banana / laptop — bounding boxes appear in real time with class + confidence.
+3. Confidence ≥ 60% → snap button glows green.
+4. Tap it → capture, save, navigate to results.
+5. Results card shows: photo, material, decomposition time, CO₂/water/toxicity, disposal tip.
+6. Diary + Dashboard aggregate all your scans.
 
-1. Runs **real-time YOLO object detection** on the camera feed, drawing bounding boxes around trash items with the class name + confidence %.
-2. When confidence crosses **80%**, the snap button glows — tap to capture.
-3. The captured frame is run through **OCR** (brand, expiry, recycling codes).
-4. The detected class is cross-referenced against the **degradation database** to show:
-   - Material category (plastic, metal, glass, paper, organic, etc.)
-   - Estimated decomposition time (days to millennia)
-   - CO₂ footprint, water footprint, toxicity
-   - Recyclable / compostable / landfill / hazardous classification
-   - Specific disposal instructions
-5. The scan is logged to the **waste diary** (local AsyncStorage).
-6. The **dashboard** aggregates scans into KPIs, a material-breakdown pie chart, and a top-items list.
-
----
-
-## Features
-
-| Feature | Status |
-|---|---|
-| Real-time bounding box overlay on live camera | ✅ (mock detector, see swap-in) |
-| Snap on confidence ≥ 80% | ✅ |
-| Photo capture + thumbnail | ✅ |
-| OCR on captured photo | 🔌 stubbed (returns mock labels — swap in MLKit or Claude Vision) |
-| Degradation database (48 items) | ✅ |
-| Results card with material / decomposition / CO₂ / water / toxicity / disposal tip | ✅ |
-| Waste diary (local, persistent) | ✅ |
-| Dashboard: totals, material pie chart, top items | ✅ |
-| Local recycling location lookup | 🔜 (UI placeholder, wire to Google Places or Earth911 API) |
-| Pro tier / payments | 🔜 |
+**The live detector uses YOLOv8n pretrained on COCO** (80 classes). Out of the box it works great on `bottle`, `cup`, `banana`, `apple`, `pizza`, `cell phone`, `laptop`, `book`, `toothbrush`, etc. — items that overlap with the trash database. For full trash-specific detection (styrofoam, aluminum cans, cigarette butts, diapers, batteries…) you fine-tune on a trash dataset — see [Training Your Own Trash Model](#training-your-own-trash-model).
 
 ---
 
 ## Architecture
 
 ```
-                      ┌─────────────────────────┐
-                      │   ScannerScreen         │
-                      │   (expo-camera)         │
-                      └──────────┬──────────────┘
-                                 │ frames
-                       ┌─────────▼────────┐
-                       │   useYolo hook   │
-                       │  (polling 200ms) │
-                       └─────────┬────────┘
-                                 │ Detection[]
-              ┌──────────────────┼──────────────────┐
-              ▼                  ▼                  ▼
-   BoundingBoxOverlay     SnapButton          takePictureAsync
-     (SVG-less, RN        (confidence %,       (on tap)
-      absolute Views)      ready state)
-                                                    │
-                                                    ▼
-                                            useOcr hook
-                                            (recognizeText)
-                                                    │
-                                                    ▼
-                                       lookup(yoloClass) → DegradationInfo
-                                                    │
-                                                    ▼
-                                        saveScan(ScanResult) → AsyncStorage
-                                                    │
-                                                    ▼
-                                        nav.navigate('Results', { scan })
+┌─────────────────────────────┐
+│ ScannerScreen               │
+│ vision-camera <Camera> view │
+└────────────┬────────────────┘
+             │ every Nth frame (worklet)
+             ▼
+┌─────────────────────────────────────────┐
+│ useYolo hook                            │
+│  1. resize frame → 640×640 float32 RGB  │ (vision-camera-resize-plugin)
+│  2. model.runSync([input])              │ (react-native-fast-tflite)
+│  3. parseYoloOutput() → NMS             │ (worklet-safe, no sort closures)
+│  4. Worklets.createRunOnJS → React state│
+└────────────┬────────────────────────────┘
+             │ Detection[] on JS thread
+             ▼
+      BoundingBoxOverlay       SnapButton (glows if conf ≥ 0.6)
+                                    │ tap
+                                    ▼
+                           camera.takePhoto()
+                                    │
+                                    ▼
+                            useOcr (stub)
+                                    │
+                                    ▼
+                    lookup(COCO→trash class) → DegradationInfo
+                                    │
+                                    ▼
+                         saveScan → AsyncStorage
+                                    │
+                                    ▼
+                            navigate('Results')
 ```
-
-Data flow is **one-way, local-first**: every scan goes to `AsyncStorage` immediately. The dashboard and diary both read from `loadScans()` on focus. No server is required for the MVP.
 
 ---
 
@@ -99,232 +79,283 @@ Data flow is **one-way, local-first**: every scan goes to `AsyncStorage` immedia
 
 ```
 emmanual/
-├── App.tsx                       # Root, wraps RootNavigator
-├── app.json                      # Expo config (camera permissions)
-├── package.json
-├── tsconfig.json
-├── babel.config.js
-├── assets/
-│   └── models/                   # Drop YOLOv8 TFLite model here
+├── App.tsx                          # Dark-mode wrapper, NativeWind boot, PortalHost
+├── app.json                         # Expo config + vision-camera plugin
+├── babel.config.js                  # nativewind + worklets-core + reanimated plugins
+├── metro.config.js                  # NativeWind transformer + .tflite assetExt
+├── tailwind.config.js               # shadcn-style theme tokens
+├── global.css                       # CSS variables (dark palette)
+├── assets/models/
+│   ├── yolov8n.tflite               # ← 3.17 MB real YOLOv8 model (COCO-80)
+│   ├── coco-labels.txt              # Reference: 80 class names
+│   └── yolov8n.pt                   # PyTorch original (for re-export/fine-tune)
 ├── src/
-│   ├── navigation/
-│   │   └── index.tsx             # Stack: Scanner → Results, Diary, Dashboard
-│   ├── screens/
-│   │   ├── ScannerScreen.tsx     # Live camera + YOLO overlay + snap
-│   │   ├── ResultsScreen.tsx     # Degradation details + actions
-│   │   ├── DiaryScreen.tsx       # Scan history list
-│   │   └── DashboardScreen.tsx   # Totals + pie chart + top items
+│   ├── lib/utils.ts                 # cn() — clsx + tailwind-merge
 │   ├── components/
+│   │   ├── ui/                      # shadcn-style primitives
+│   │   │   ├── button.tsx           # CVA variants: default/destructive/outline/secondary/ghost
+│   │   │   ├── card.tsx             # Card + Header/Title/Description/Content/Footer
+│   │   │   ├── badge.tsx            # success/warning/danger variants
+│   │   │   ├── progress.tsx
+│   │   │   └── text.tsx
 │   │   ├── BoundingBoxOverlay.tsx
-│   │   ├── ResultsCard.tsx
-│   │   └── SnapButton.tsx
+│   │   ├── SnapButton.tsx
+│   │   └── ResultsCard.tsx
 │   ├── hooks/
-│   │   ├── useYolo.ts            # Polls detector, returns Detection[]
-│   │   └── useOcr.ts             # Async OCR trigger
+│   │   ├── useYolo.ts               # Frame processor + fast-tflite inference
+│   │   └── useOcr.ts                # Stub (swap for MLKit or Claude Vision)
 │   ├── services/
-│   │   ├── detection.ts          # YOLO stub (replace with TFLite)
-│   │   ├── ocr.ts                # OCR stub (replace with MLKit/Claude)
-│   │   ├── degradation.ts        # Lookup from JSON
-│   │   └── storage.ts            # AsyncStorage wrapper + stats
-│   ├── data/
-│   │   └── degradation.json      # 48-item degradation database
-│   └── types/
-│       └── index.ts              # Shared TS types
+│   │   ├── detection.ts             # parseYoloOutput + NMS (worklet-safe)
+│   │   ├── cocoClasses.ts           # 80 COCO names + COCO_TO_TRASH map
+│   │   ├── degradation.ts
+│   │   ├── ocr.ts
+│   │   └── storage.ts
+│   ├── data/degradation.json
+│   ├── types/index.ts
+│   ├── navigation/index.tsx
+│   └── screens/
+│       ├── ScannerScreen.tsx
+│       ├── ResultsScreen.tsx
+│       ├── DiaryScreen.tsx
+│       └── DashboardScreen.tsx
 ```
 
 ---
 
 ## Tech Stack
 
-- **React Native** 0.74 + **Expo SDK 51** (managed workflow; prebuild when native modules are added)
-- **TypeScript** strict mode
-- **expo-camera** for the live preview + capture
-- **@react-navigation/native-stack** for routing
-- **@react-native-async-storage/async-storage** for persistent diary
-- **react-native-chart-kit** + **react-native-svg** for the dashboard pie chart
-- **react-native-fast-tflite** (to be added at swap-in time) for on-device YOLO inference
+| Layer | Package | Version |
+|---|---|---|
+| Runtime | React Native | 0.74.5 |
+| Framework | Expo | ~51.0.28 (with `expo-dev-client`, prebuild required) |
+| Camera + frame processors | react-native-vision-camera | ^4.5 |
+| Frame resize to 640×640 | vision-camera-resize-plugin | ^3.2 |
+| ML runtime | react-native-fast-tflite | ^1.4 |
+| Worklet bridge | react-native-worklets-core | ^1.3 |
+| Animation / worklets | react-native-reanimated | ~3.10 |
+| UI | NativeWind (Tailwind for RN) | ^4.1 |
+| UI primitives | @rn-primitives/slot, portal | ^1.1 |
+| Variants | class-variance-authority | ^0.7 |
+| Icons | lucide-react-native | ^0.454 |
+| Navigation | @react-navigation/native-stack | ^6.11 |
+| Storage | @react-native-async-storage/async-storage | 1.23 |
+| Charts | react-native-chart-kit | ^6.12 |
 
 ---
 
 ## Getting Started
 
+> ⚠️ **This project does NOT run in Expo Go.** It uses native modules (vision-camera, fast-tflite, worklets-core) that are not included in Expo Go. You **must** build a dev client.
+
 ### Prerequisites
-- Node 18+
-- A physical device (iOS or Android) — camera does not work in simulators
-- **Expo Go** app installed from the App Store / Play Store
 
-### Install & run
+- **Node 18+** and **npm** (or yarn/pnpm)
+- **Android Studio** ([download](https://developer.android.com/studio)) with:
+  - Android SDK (latest)
+  - Android SDK Platform-Tools
+  - An Android Virtual Device (emulator) OR a physical Android phone with USB debugging enabled
+- **JDK 17** (Android Studio usually ships one — verify with `java -version`)
+- **Git**
+
+### First-time setup
 
 ```bash
+# 1. Install JS deps
 npm install
+
+# 2. Generate native iOS/Android projects (one-time)
+npx expo prebuild --clean
+
+# 3. Build & install on Android
+npx expo run:android
+```
+
+First build takes **5–10 minutes** (downloads Gradle, compiles native libs). After that, JS changes hot-reload instantly.
+
+### Running after first build
+
+```bash
+# Terminal 1: Metro bundler
 npm start
+
+# Terminal 2: build + launch on device/emulator
+npm run android
 ```
 
-Scan the QR code with Expo Go (Android) or the Camera app (iOS). Grant camera permission when prompted.
+You only need `expo run:android` again when you add/remove native deps or change `app.json`.
 
-### What you'll see in the mock state
+### iOS
 
-The app will draw bounding boxes at random positions with random trash classes from the degradation database. The snap button will glow green when one of those mock detections crosses 80% confidence. Tap it to snap and see the full flow: photo → OCR → results → saved to diary.
-
-This lets you build, test and iterate the **UX** before the model is ready.
-
----
-
-## YOLO Model Swap-In
-
-The app runs the whole flow end-to-end with a mock detector (`src/services/detection.ts → mockDetect`). To use a real on-device YOLO model:
-
-### 1. Get or train a model
-
-- **Easiest:** download a pre-trained YOLOv8 Nano from [Ultralytics](https://github.com/ultralytics/ultralytics) and fine-tune on **[TrashNet](https://github.com/garythung/trashnet)** or **[TACO](http://tacodataset.org/)**.
-- Classes to map to: `plastic_bottle`, `aluminum_can`, `cardboard_box`, `glass_bottle`, `paper`, `food_waste`, `styrofoam`, `battery`, etc. — every `yoloClass` string in [`src/data/degradation.json`](src/data/degradation.json).
-- Any class your model outputs that is **not** in `degradation.json` will fall back to the `unknown` entry.
-
-### 2. Export to TFLite
+iOS needs a Mac with Xcode installed. After `npx expo prebuild --clean`:
 
 ```bash
-# From your Python training environment
-yolo export model=yolov8n_trash.pt format=tflite int8=True
+npx expo run:ios
 ```
 
-Target model size: **< 10 MB**. Target FPS: **24+** on mid-range Android.
+---
 
-### 3. Drop into the app
+## How Real YOLO Is Wired
 
-Place the exported file at `assets/models/yolov8n_trash.tflite`.
+The key file is [src/hooks/useYolo.ts](src/hooks/useYolo.ts):
 
-### 4. Wire up `react-native-fast-tflite`
+```ts
+const model = useTensorflowModel(require('../../assets/models/yolov8n.tflite'));
+const { resize } = useResizePlugin();
+
+const frameProcessor = useFrameProcessor((frame) => {
+  'worklet';
+  // Throttle: 1 inference per 5 frames (~6 FPS at 30 FPS camera)
+  frameCounter.value = (frameCounter.value + 1) % 5;
+  if (frameCounter.value !== 0) return;
+  if (model.state !== 'loaded') return;
+
+  // Resize 1920×1080 camera frame → 640×640 float32 RGB
+  const resized = resize(frame, {
+    scale: { width: 640, height: 640 },
+    pixelFormat: 'rgb',
+    dataType: 'float32',
+  });
+
+  // Normalize 0..255 → 0..1
+  const input = new Float32Array(resized.length);
+  for (let i = 0; i < resized.length; i++) input[i] = resized[i] / 255.0;
+
+  // Run inference
+  const [output] = model.model!.runSync([input]);
+
+  // Parse + NMS (worklet-safe, all primitive JS)
+  const boxes = parseYoloOutput(output as Float32Array, 0.4);
+
+  // Ship results to JS thread for React state update
+  setDetectionsJS(boxes, bestConfidence);
+}, [model, resize]);
+```
+
+The YOLO output is `[1, 84, 8400]` (4 bbox coords + 80 class scores × 8400 anchors). The parser in [src/services/detection.ts](src/services/detection.ts) auto-detects layout (some exports transpose to `[1, 8400, 84]`), finds the best class per anchor, applies a confidence threshold, then runs IoU-based NMS.
+
+**Thresholds** (tune in `detection.ts`):
+
+- `DETECTION_CONFIDENCE_THRESHOLD = 0.4` — boxes below this are dropped.
+- `SNAP_CONFIDENCE_THRESHOLD = 0.6` — snap button glows green.
+- `NMS_IOU_THRESHOLD = 0.45` — overlapping duplicate boxes are merged.
+
+---
+
+## COCO → Trash Class Mapping
+
+The bundled YOLOv8n is trained on **COCO** (80 classes — persons, cars, household items, etc.). Many COCO classes map cleanly to trash classes in our degradation DB:
+
+| COCO ID | COCO name | → trash class |
+|---|---|---|
+| 39 | bottle | plastic_bottle |
+| 40 | wine glass | glass_bottle |
+| 41 | cup | plastic_cup |
+| 42–44 | fork / knife / spoon | plastic_utensils |
+| 45 | bowl | plastic_container |
+| 46 | banana | banana_peel |
+| 47 | apple | apple_core |
+| 48–55 | sandwich / orange / broccoli / carrot / hot dog / pizza / donut / cake | food_waste / pizza_box |
+| 63 | laptop | laptop |
+| 65 | remote | remote |
+| 67 | cell phone | phone |
+| 73 | book | magazine |
+| 79 | toothbrush | plastic_toothbrush |
+
+Everything else falls through to the `unknown` entry (which the UI filters out of snaps). Full map in [src/services/cocoClasses.ts](src/services/cocoClasses.ts).
+
+---
+
+## Training Your Own Trash Model
+
+COCO doesn't know what "styrofoam", "aluminum can", "cigarette butt", "diaper", or "battery" is. For full trash coverage, fine-tune YOLOv8n on a trash dataset:
+
+### 1. Install Ultralytics (Python)
 
 ```bash
-npm install react-native-fast-tflite
-npx expo prebuild          # one-time, generates android/ and ios/
-npx expo run:ios           # or run:android
+pip install ultralytics
 ```
 
-### 5. Replace `mockDetect` in [src/services/detection.ts](src/services/detection.ts)
+### 2. Pick a dataset
 
-Replace the function body with a real inference call. Sketch:
+- **[TACO](http://tacodataset.org/)** — 60 classes of litter in the wild, ~1,500 images
+- **[TrashNet](https://github.com/garythung/trashnet)** — 6 material classes, ~2,500 images
+- **[Roboflow Universe - Garbage](https://universe.roboflow.com/search?q=garbage)** — many trash datasets, auto-exports YOLO format
 
-```ts
-import { loadTensorflowModel } from 'react-native-fast-tflite';
+### 3. Fine-tune
 
-let model: Awaited<ReturnType<typeof loadTensorflowModel>> | null = null;
-
-export async function initModel() {
-  model = await loadTensorflowModel(require('../../assets/models/yolov8n_trash.tflite'));
-}
-
-export async function detect(frame: Uint8Array): Promise<Detection[]> {
-  if (!model) throw new Error('Model not loaded');
-  const [output] = await model.run([frame]);
-  return parseYoloOutput(output);   // you write this: NMS, class index → yoloClass string
-}
+```bash
+yolo train \
+    model=assets/models/yolov8n.pt \
+    data=path/to/trash-dataset/data.yaml \
+    epochs=50 \
+    imgsz=640
 ```
 
-Then flip `useYolo.ts` from a `setInterval(mockDetect)` to the camera's `onFrame` callback.
+### 4. Export to TFLite
 
-### 6. Tune thresholds
-
-Both live in `src/services/detection.ts`:
-
-```ts
-export const DETECTION_CONFIDENCE_THRESHOLD = 0.6;  // draw box
-export const SNAP_CONFIDENCE_THRESHOLD = 0.8;       // green snap button
+```bash
+yolo export model=runs/detect/train/weights/best.pt format=tflite
 ```
+
+### 5. Swap in
+
+- Replace `assets/models/yolov8n.tflite` with `best_float32.tflite`.
+- Update [src/services/cocoClasses.ts](src/services/cocoClasses.ts):
+  - Replace `COCO_CLASSES` with your new class list.
+  - Replace `COCO_TO_TRASH` with an identity map if your class names already match `yoloClass` in `degradation.json`.
+- Update `NUM_CLASSES` in `detection.ts`.
+- Rebuild: `npm run android`.
 
 ---
 
-## OCR Swap-In
+## Troubleshooting
 
-The OCR layer is in [src/services/ocr.ts](src/services/ocr.ts) as `recognizeText(imageUri)`. Two realistic paths:
+**`yolov8n.tflite` not found at runtime**
 
-**A) On-device (free, private):** `@react-native-ml-kit/text-recognition`
+- Confirm the file is in `assets/models/`.
+- Confirm `metro.config.js` has `config.resolver.assetExts.push('tflite')`.
+- Clean & rebuild: `npx expo prebuild --clean && npm run android`.
 
-```ts
-import TextRecognition from '@react-native-ml-kit/text-recognition';
-export async function recognizeText(uri: string) {
-  const result = await TextRecognition.recognize(uri);
-  return result.text || undefined;
-}
-```
+**Black camera screen**
 
-**B) Cloud (higher accuracy, costs money):** Claude Vision API — POST the base64 image to `/v1/messages` with an image content block, ask for any visible text back.
+- Check camera permission in phone settings → TrashLife → Permissions.
+- Make sure `isActive={!busy}` toggles back to true after snap.
 
-Crop the image to the YOLO bounding box first for better accuracy:
+**Crashes on launch (Android)**
 
-```ts
-import * as ImageManipulator from 'expo-image-manipulator';
-const crop = await ImageManipulator.manipulateAsync(uri, [{ crop: bboxInPixels }]);
-const text = await recognizeText(crop.uri);
-```
+- `Failed to load model`: the TFLite file is corrupt or wasn't bundled. Verify `ls assets/models/yolov8n.tflite` ≈ 3.17 MB. Re-download if needed.
+- `Worklets not installed`: make sure `react-native-worklets-core/plugin` is listed in `babel.config.js` plugins **before** `react-native-reanimated/plugin`.
 
----
+**NativeWind classes don't apply**
 
-## Degradation Database
+- Make sure `import './global.css'` is at the top of `App.tsx`.
+- Confirm `nativewind/metro` wraps the config in `metro.config.js`.
+- Restart Metro with `npm start -- --reset-cache`.
 
-[src/data/degradation.json](src/data/degradation.json) holds 48 common items. Each entry:
+**Model loads but no detections appear**
 
-```jsonc
-{
-  "id": "plastic_bottle",
-  "yoloClass": "plastic_bottle",          // must match your YOLO output label
-  "displayName": "Plastic Water Bottle (PET)",
-  "material": "plastic",
-  "decompositionYears": 450,
-  "co2KgPerItem": 0.08,
-  "waterLitersPerItem": 3.0,
-  "toxicity": "medium",
-  "recyclable": "recyclable",              // recyclable | compostable | landfill | hazardous
-  "disposalTip": "Rinse, remove cap and label, place in #1 PET recycling bin.",
-  "emoji": "🧴"
-}
-```
+- Point at something YOLO knows — a bottle, cup, phone, book. Random objects won't trigger.
+- Lower `DETECTION_CONFIDENCE_THRESHOLD` to `0.25` in `detection.ts` and rebuild to debug.
+- Check Metro logs for `YOLO model failed to load` errors.
 
-**To add items:** append to the JSON. The UI, dashboard and lookup pick them up automatically. Values are rough public-data estimates — replace with citations for production.
+**Expo Go doesn't work**
+
+- It won't — you need a dev client. Run `npm run android` (builds + installs the dev client).
 
 ---
 
 ## Roadmap
 
-**Weeks 1–3 (MVP — this repo):**
-- [x] RN/Expo scaffold, navigation, theme
-- [x] Live camera + bounding-box overlay
-- [x] Snap flow, local storage, diary, dashboard
-- [x] Degradation DB (48 items)
-- [ ] Real YOLOv8 TFLite model wired via `react-native-fast-tflite`
-- [ ] Real OCR (MLKit)
-
-**Weeks 4–6:**
-- [ ] Firebase Auth + Firestore sync (so diary follows the user across devices)
-- [ ] Local recycling lookup (Google Places or Earth911 API, query by material + lat/lng)
-- [ ] Pro paywall (`revenuecat`)
-
-**Weeks 7+:**
-- [ ] Batch mode (scan 10 items rapid-fire)
-- [ ] Carbon offset integration (Wren / Patch)
-- [ ] B2B audit tools (CSV export, bulk upload)
-- [ ] Active-learning: log misidentified scans, retrain model monthly
-
----
-
-## Monetization
-
-- **Free:** 5 scans/day, basic detection, dashboard.
-- **Pro — $7.99/mo:** unlimited scans, OCR, carbon reports, batch mode.
-- **B2B:** license the YOLO model + `/detect` API to waste-management companies, schools, municipalities for audits.
-
----
-
-## Performance Targets
-
-| Metric | Target | Current |
-|---|---|---|
-| YOLO detection latency | < 150 ms | mock: ~200 ms polling interval |
-| Detection accuracy (top-5 common trash) | ≥ 85% | model-dependent |
-| OCR accuracy (legible labels) | ≥ 80% | stubbed |
-| Snap → results screen | < 2 s | ~0.5 s (mock) |
-| Model size on disk | < 10 MB | n/a |
-| FPS on mid-range Android | 24+ | n/a |
+- [x] Real YOLOv8n TFLite on-device inference
+- [x] shadcn-style UI (NativeWind + reusables)
+- [x] 48-item degradation DB + dashboard + diary
+- [ ] Fine-tuned trash-specific model (TACO / TrashNet)
+- [ ] Real OCR (MLKit text-recognition)
+- [ ] Recycling location lookup (Google Places API)
+- [ ] Firebase sync (diary across devices)
+- [ ] Pro paywall (RevenueCat)
+- [ ] Batch mode
+- [ ] B2B audit CSV export
 
 ---
 

@@ -1,9 +1,11 @@
 import { useCallback, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
+import { View, ScrollView, useWindowDimensions } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { PieChart } from 'react-native-chart-kit';
 import { computeStats, loadScans } from '../services/storage';
 import type { DashboardStats, MaterialCategory } from '../types';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Text } from '../components/ui/text';
 
 const MATERIAL_COLORS: Record<MaterialCategory, string> = {
   plastic: '#ef4444',
@@ -31,10 +33,10 @@ export default function DashboardScreen() {
 
   if (!stats || stats.totalScans === 0) {
     return (
-      <View style={[styles.container, styles.empty]}>
-        <Text style={styles.emptyEmoji}>📊</Text>
-        <Text style={styles.emptyTitle}>No data yet</Text>
-        <Text style={styles.emptySub}>Scan a few items to see stats.</Text>
+      <View className="flex-1 items-center justify-center gap-2 bg-background">
+        <Text className="text-6xl">📊</Text>
+        <Text className="text-xl font-bold">No data yet</Text>
+        <Text className="text-sm text-muted-foreground">Scan a few items to see stats.</Text>
       </View>
     );
   }
@@ -50,67 +52,57 @@ export default function DashboardScreen() {
     }));
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Dashboard</Text>
+    <ScrollView className="flex-1 bg-background" contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 48 }}>
+      <Text className="text-2xl font-bold">Dashboard</Text>
 
-      <View style={styles.kpiRow}>
-        <Kpi label="Total Scans" value={`${stats.totalScans}`} />
-        <Kpi label="CO₂ Impact" value={`${stats.totalCo2Kg.toFixed(2)} kg`} />
+      <View className="flex-row gap-2">
+        <Kpi label="Scans" value={`${stats.totalScans}`} />
+        <Kpi label="CO₂" value={`${stats.totalCo2Kg.toFixed(2)} kg`} />
         <Kpi label="Water" value={`${stats.totalWaterLiters.toFixed(0)} L`} />
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Material Breakdown</Text>
-        <PieChart
-          data={pieData}
-          width={width - 64}
-          height={200}
-          accessor="count"
-          backgroundColor="transparent"
-          paddingLeft="8"
-          chartConfig={{
-            color: (opacity = 1) => `rgba(255,255,255,${opacity})`,
-          }}
-        />
-      </View>
+      <Card>
+        <CardHeader>
+          <CardTitle>Material Breakdown</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <PieChart
+            data={pieData}
+            width={width - 64}
+            height={200}
+            accessor="count"
+            backgroundColor="transparent"
+            paddingLeft="8"
+            chartConfig={{ color: (opacity = 1) => `rgba(255,255,255,${opacity})` }}
+          />
+        </CardContent>
+      </Card>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Top Items</Text>
-        {stats.topItems.map((item) => (
-          <View key={item.name} style={styles.topRow}>
-            <Text style={styles.topName}>{item.name}</Text>
-            <Text style={styles.topCount}>×{item.count}</Text>
-          </View>
-        ))}
-      </View>
+      <Card>
+        <CardHeader>
+          <CardTitle>Top Items</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {stats.topItems.map((item, idx) => (
+            <View
+              key={item.name}
+              className={`flex-row justify-between py-2 ${idx !== stats.topItems.length - 1 ? 'border-b border-border' : ''}`}
+            >
+              <Text>{item.name}</Text>
+              <Text className="font-bold text-primary">×{item.count}</Text>
+            </View>
+          ))}
+        </CardContent>
+      </Card>
     </ScrollView>
   );
 }
 
 function Kpi({ label, value }: { label: string; value: string }) {
   return (
-    <View style={styles.kpi}>
-      <Text style={styles.kpiLabel}>{label}</Text>
-      <Text style={styles.kpiValue}>{value}</Text>
-    </View>
+    <Card className="flex-1 p-3">
+      <Text className="text-xs uppercase text-muted-foreground">{label}</Text>
+      <Text className="mt-1 text-lg font-bold">{value}</Text>
+    </Card>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0a0a0a' },
-  content: { padding: 16, gap: 16, paddingBottom: 40 },
-  empty: { alignItems: 'center', justifyContent: 'center', gap: 8 },
-  emptyEmoji: { fontSize: 64 },
-  emptyTitle: { color: '#fafafa', fontSize: 20, fontWeight: '700' },
-  emptySub: { color: '#a1a1aa' },
-  title: { color: '#fafafa', fontSize: 24, fontWeight: '700' },
-  kpiRow: { flexDirection: 'row', gap: 8 },
-  kpi: { flex: 1, backgroundColor: '#18181b', padding: 12, borderRadius: 12 },
-  kpiLabel: { color: '#a1a1aa', fontSize: 11, textTransform: 'uppercase' },
-  kpiValue: { color: '#fafafa', fontSize: 18, fontWeight: '700', marginTop: 4 },
-  card: { backgroundColor: '#18181b', padding: 16, borderRadius: 12 },
-  cardTitle: { color: '#fafafa', fontSize: 16, fontWeight: '700', marginBottom: 12 },
-  topRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#27272a' },
-  topName: { color: '#fafafa', fontSize: 14 },
-  topCount: { color: '#22c55e', fontSize: 14, fontWeight: '700' },
-});

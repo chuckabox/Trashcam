@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -L -o assets/models/yolov8n_fp16.tflite \"https://huggingface.co/qualcomm/YOLOv8-Detection/resolve/main/YOLOv8-Detection.tflite\" --max-time 60 -w \"HTTP %{http_code} SIZE %{size_download}\\\\n\")",
+      "Bash(curl -L -o assets/models/yolov8n.tflite \"https://huggingface.co/Ultralytics/YOLOv8/resolve/main/yolov8n_float32.tflite\" --max-time 120 -w \"HTTP %{http_code} SIZE %{size_download}\\\\n\")",
+      "WebSearch",
+      "Bash(curl -L -o assets/models/yolov8n_float32.tflite \"https://huggingface.co/squantumengine/yolov8_saved_model/resolve/main/yolov8n_float32.tflite\" --max-time 180 -w \"\\\\nHTTP %{http_code} SIZE %{size_download}\\\\n\")",
+      "Bash(curl -L -o assets/models/yolov8n.tflite \"https://huggingface.co/qualcomm/YOLOv8-Detection/resolve/main/Yolo-v8-Detection.tflite\" --max-time 180 -w \"\\\\nHTTP %{http_code} SIZE %{size_download}\\\\n\")",
+      "Bash(curl -L -o assets/models/yolov8n.onnx \"https://huggingface.co/Xenova/yolov8n/resolve/main/onnx/model.onnx\" --max-time 180 -w \"\\\\nHTTP %{http_code} SIZE %{size_download}\\\\n\")",
+      "Bash(curl -L -o assets/models/yolov8n.pt \"https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8n.pt\" --max-time 180 -w \"\\\\nHTTP %{http_code} SIZE %{size_download}\\\\n\")",
+      "WebFetch(domain:github.com)",
+      "Bash(curl -L -o assets/models/yolov8n.tflite \"https://raw.githubusercontent.com/surendramaran/YOLOv8-TfLite-Object-Detector/main/app/src/main/assets/model.tflite\" --max-time 180 -w \"\\\\nHTTP %{http_code} SIZE %{size_download}\\\\n\")",
+      "Bash(curl -L \"https://raw.githubusercontent.com/surendramaran/YOLOv8-TfLite-Object-Detector/main/app/src/main/assets/labels.txt\" --max-time 30 -w \"\\\\nHTTP %{http_code}\\\\n\")",
+      "Bash(curl -L -o assets/models/coco-labels.txt \"https://raw.githubusercontent.com/surendramaran/YOLOv8-TfLite-Object-Detector/main/app/src/main/assets/labels.txt\" --max-time 30 -w \"\\\\nHTTP %{http_code} SIZE %{size_download}\\\\n\")"
+    ]
+  }
+}

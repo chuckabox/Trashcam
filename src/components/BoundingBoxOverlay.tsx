@@ -1,6 +1,8 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import type { Detection } from '../types';
 import { lookup } from '../services/degradation';
+import { Text } from './ui/text';
+import { cn } from '../lib/utils';
 
 interface Props {
   detections: Detection[];
@@ -10,24 +12,31 @@ interface Props {
 
 export function BoundingBoxOverlay({ detections, containerWidth, containerHeight }: Props) {
   return (
-    <View style={StyleSheet.absoluteFill} pointerEvents="none">
+    <View className="absolute inset-0" pointerEvents="none">
       {detections.map((d, i) => {
         const left = d.bbox.x * containerWidth;
         const top = d.bbox.y * containerHeight;
         const width = d.bbox.width * containerWidth;
         const height = d.bbox.height * containerHeight;
         const info = lookup(d.class);
-        const color = d.confidence >= 0.8 ? '#22c55e' : '#eab308';
+        const strong = d.confidence >= 0.6;
+
         return (
           <View
             key={i}
-            style={[
-              styles.box,
-              { left, top, width, height, borderColor: color },
-            ]}
+            style={{ left, top, width, height }}
+            className={cn(
+              'absolute rounded-md border-4',
+              strong ? 'border-primary' : 'border-yellow-400',
+            )}
           >
-            <View style={[styles.label, { backgroundColor: color }]}>
-              <Text style={styles.labelText}>
+            <View
+              className={cn(
+                'absolute -top-7 left-0 rounded-t-md px-2 py-1',
+                strong ? 'bg-primary' : 'bg-yellow-400',
+              )}
+            >
+              <Text className="text-xs font-bold text-black">
                 {info.emoji} {info.displayName} {Math.round(d.confidence * 100)}%
               </Text>
             </View>
@@ -37,24 +46,3 @@ export function BoundingBoxOverlay({ detections, containerWidth, containerHeight
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  box: {
-    position: 'absolute',
-    borderWidth: 3,
-    borderRadius: 4,
-  },
-  label: {
-    position: 'absolute',
-    top: -24,
-    left: -3,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  labelText: {
-    color: '#0a0a0a',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-});

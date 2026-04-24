@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, useWindowDimensions } from 'react-native';
-import { CameraView, useCameraPermissions } from 'expo-camera';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { View, useWindowDimensions, Platform, Linking } from 'react-native';
+import { Camera, useCameraDevice, useCameraPermission } from 'react-native-vision-camera';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import type { RootStackParamList } from '../navigation';
 import { useYolo } from '../hooks/useYolo';
 import { useOcr } from '../hooks/useOcr';
@@ -12,54 +13,42 @@ import { SNAP_CONFIDENCE_THRESHOLD } from '../services/detection';
 import { lookup } from '../services/degradation';
 import { saveScan } from '../services/storage';
 import type { ScanResult } from '../types';
+import { Button } from '../components/ui/button';
+import { Text } from '../components/ui/text';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'Scanner'>;
 
 export default function ScannerScreen() {
-  const [permission, requestPermission] = useCameraPermissions();
-  const [busy, setBusy] = useState(false);
-  const cameraRef = useRef<CameraView>(null);
+  const { hasPermission, requestPermission } = useCameraPermission();
+  const device = useCameraDevice('back');
+  const cameraRef = useRef<Camera>(null);
   const { width, height } = useWindowDimensions();
   const nav = useNavigation<Nav>();
   const ocr = useOcr();
+  const [busy, setBusy] = useState(false);
 
-  const { detections, bestConfidence } = useYolo({ enabled: !busy });
+  const { frameProcessor, detections, bestConfidence, modelLoading, modelError } = useYolo();
   const ready = bestConfidence >= SNAP_CONFIDENCE_THRESHOLD;
 
   useEffect(() => {
-    if (!permission) return;
-    if (!permission.granted && permission.canAskAgain) {
-      requestPermission();
-    }
-  }, [permission, requestPermission]);
+    if (!hasPermission) requestPermission();
+  }, [hasPermission, requestPermission]);
 
-  if (!permission) return <View style={styles.container} />;
-
-  if (!permission.granted) {
-    return (
-      <View style={[styles.container, styles.center]}>
-        <Text style={styles.msg}>Camera access needed to scan trash.</Text>
-        <Pressable onPress={requestPermission} style={styles.permBtn}>
-          <Text style={styles.permBtnText}>Grant Camera Access</Text>
-        </Pressable>
-      </View>
-    );
-  }
-
-  const handleSnap = async () => {
-    if (busy) return;
+  const handleSnap = useCallback(async () => {
+    if (busy || !cameraRef.current) return;
     const top = [...detections].sort((a, b) => b.confidence - a.confidence)[0];
     if (!top) return;
 
     setBusy(true);
     try {
-      const photo = await cameraRef.current?.takePictureAsync({ quality: 0.6, skipProcessing: true });
-      const ocrText = photo?.uri ? await ocr.run(photo.uri) : undefined;
+      const photo = await cameraRef.current.takePhoto({ flash: 'off' });
+      const uri = Platform.OS === 'ios' ? photo.path : `file://${photo.path}`;
+      const ocrText = await ocr.run(uri);
       const info = lookup(top.class);
       const scan: ScanResult = {
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         timestamp: Date.now(),
-        photoUri: photo?.uri,
+        photoUri: uri,
         detection: top,
         ocrText,
         info,
@@ -69,58 +58,87 @@ export default function ScannerScreen() {
     } finally {
       setBusy(false);
     }
-  };
+  }, [busy, detections, ocr, nav]);
+
+  if (!hasPermission) {
+    return (
+      <SafeAreaView className="flex-1 items-center justify-center bg-background px-6">
+        <Text className="mb-4 text-center text-base">
+          Camera access needed to scan trash.
+        </Text>
+        <Button label="Grant Access" onPress={requestPermission} />
+        <Button
+          variant="ghost"
+          label="Open Settings"
+          onPress={() => Linking.openSettings()}
+          className="mt-2"
+        />
+      </SafeAreaView>
+    );
+  }
+
+  if (!device) {
+    return (
+      <SafeAreaView className="flex-1 items-center justify-center bg-background">
+        <Text>No camera device found.</Text>
+      </SafeAreaView>
+    );
+  }
 
   return (
-    <View style={styles.container}>
-      <CameraView ref={cameraRef} style={StyleSheet.absoluteFill} facing="back" />
-      <BoundingBoxOverlay detections={detections} containerWidth={width} containerHeight={height} />
+    <View className="flex-1 bg-black">
+      <Camera
+        ref={cameraRef}
+        style={{ flex: 1 }}
+        device={device}
+        isActive={!busy}
+        photo
+        frameProcessor={frameProcessor}
+        pixelFormat="yuv"
+      />
+      <BoundingBoxOverlay
+        detections={detections}
+        containerWidth={width}
+        containerHeight={height}
+      />
 
-      <View style={styles.topBar}>
-        <Pressable onPress={() => nav.navigate('Diary')} style={styles.chip}>
-          <Text style={styles.chipText}>Diary</Text>
-        </Pressable>
-        <Pressable onPress={() => nav.navigate('Dashboard')} style={styles.chip}>
-          <Text style={styles.chipText}>Dashboard</Text>
-        </Pressable>
-      </View>
+      <SafeAreaView className="absolute inset-x-0 top-0 flex-row justify-end gap-2 p-4" edges={['top']}>
+        <Button
+          variant="outline"
+          size="sm"
+          label="Diary"
+          onPress={() => nav.navigate('Diary')}
+          className="border-white/30 bg-black/50"
+          textClassName="text-white"
+        />
+        <Button
+          variant="outline"
+          size="sm"
+          label="Dashboard"
+          onPress={() => nav.navigate('Dashboard')}
+          className="border-white/30 bg-black/50"
+          textClassName="text-white"
+        />
+      </SafeAreaView>
 
-      <View style={styles.bottomBar}>
-        <SnapButton confidence={bestConfidence} ready={ready} busy={busy} onPress={handleSnap} />
-      </View>
+      {modelLoading && (
+        <View className="absolute inset-x-0 top-28 items-center">
+          <View className="rounded-full bg-black/70 px-4 py-2">
+            <Text className="text-sm text-white">
+              {modelError ? `Model error: ${String(modelError)}` : 'Loading YOLOv8 model…'}
+            </Text>
+          </View>
+        </View>
+      )}
+
+      <SafeAreaView className="absolute inset-x-0 bottom-0 items-center pb-8" edges={['bottom']}>
+        <SnapButton
+          confidence={bestConfidence}
+          ready={ready}
+          busy={busy}
+          onPress={handleSnap}
+        />
+      </SafeAreaView>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000' },
-  center: { alignItems: 'center', justifyContent: 'center', padding: 24 },
-  msg: { color: '#fafafa', fontSize: 16, textAlign: 'center', marginBottom: 16 },
-  permBtn: { backgroundColor: '#22c55e', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 10 },
-  permBtnText: { color: '#0a0a0a', fontWeight: '700' },
-  topBar: {
-    position: 'absolute',
-    top: 60,
-    left: 16,
-    right: 16,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 8,
-  },
-  chip: {
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)',
-  },
-  chipText: { color: '#fff', fontWeight: '600' },
-  bottomBar: {
-    position: 'absolute',
-    bottom: 50,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-  },
-});
