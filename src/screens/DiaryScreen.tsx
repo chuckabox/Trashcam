@@ -1,95 +1,105 @@
-import { useCallback, useState } from 'react';
-import { View, FlatList, Image, RefreshControl, Alert, Pressable } from 'react-native';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation';
-import { clearScans, loadScans } from '../services/storage';
-import type { ScanResult } from '../types';
-import { Card } from '../components/ui/card';
-import { Text } from '../components/ui/text';
-import { Button } from '../components/ui/button';
-
-type Nav = NativeStackNavigationProp<RootStackParamList, 'Diary'>;
+import { useCallback, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { clearScans, loadScans } from '../services/storage'
+import type { ScanResult } from '../types'
+import { Card } from '../components/ui/card'
+import { Button } from '../components/ui/button'
 
 export default function DiaryScreen() {
-  const [scans, setScans] = useState<ScanResult[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
-  const nav = useNavigation<Nav>();
+  const navigate = useNavigate()
+  const [scans, setScans] = useState<ScanResult[]>([])
+  const [refreshing, setRefreshing] = useState(false)
 
   const refresh = useCallback(async () => {
-    setRefreshing(true);
-    const list = await loadScans();
-    setScans(list);
-    setRefreshing(false);
-  }, []);
+    setRefreshing(true)
+    const list = await loadScans()
+    setScans(list)
+    setRefreshing(false)
+  }, [])
 
-  useFocusEffect(
-    useCallback(() => {
-      refresh();
-    }, [refresh]),
-  );
+  useEffect(() => {
+    refresh()
+  }, [refresh])
 
   const handleClear = () => {
-    Alert.alert('Clear diary?', 'This removes all scan history on this device.', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Clear',
-        style: 'destructive',
-        onPress: async () => {
-          await clearScans();
-          setScans([]);
-        },
-      },
-    ]);
-  };
+    if (!window.confirm('Clear all scan history on this device?')) return
+    clearScans().then(() => setScans([]))
+  }
 
-  if (scans.length === 0) {
+  if (scans.length === 0 && !refreshing) {
     return (
-      <View className="flex-1 items-center justify-center gap-2 bg-background">
-        <Text className="text-6xl">📔</Text>
-        <Text className="text-xl font-bold">No scans yet</Text>
-        <Text className="text-sm text-muted-foreground">Your scanned items appear here.</Text>
-      </View>
-    );
+      <div className="flex h-screen flex-col items-center justify-center gap-3 bg-background">
+        <span className="text-6xl">📔</span>
+        <p className="text-xl font-bold text-foreground">No scans yet</p>
+        <p className="text-sm text-muted-foreground">Your scanned items appear here.</p>
+        <Button className="mt-2" onClick={() => navigate('/')}>
+          Start Scanning
+        </Button>
+      </div>
+    )
   }
 
   return (
-    <FlatList
-      className="flex-1 bg-background"
-      data={scans}
-      keyExtractor={(s) => s.id}
-      contentContainerStyle={{ padding: 16, gap: 8 }}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor="#22c55e" />
-      }
-      ListHeaderComponent={
-        <View className="mb-3 flex-row items-center justify-between">
-          <Text className="text-2xl font-bold">Waste Diary ({scans.length})</Text>
-          <Button size="sm" variant="ghost" label="Clear" onPress={handleClear} textClassName="text-destructive" />
-        </View>
-      }
-      renderItem={({ item }) => (
-        <Pressable onPress={() => nav.navigate('Results', { scan: item })}>
-          <Card className="flex-row items-center gap-3 p-3">
-            {item.photoUri ? (
-              <Image source={{ uri: item.photoUri }} className="h-14 w-14 rounded-lg" />
-            ) : (
-              <View className="h-14 w-14 items-center justify-center rounded-lg bg-secondary">
-                <Text className="text-2xl">{item.info.emoji}</Text>
-              </View>
-            )}
-            <View className="flex-1">
-              <Text className="font-semibold">{item.info.displayName}</Text>
-              <Text className="text-xs text-muted-foreground">
-                {new Date(item.timestamp).toLocaleDateString()} · {item.info.material}
-              </Text>
-            </View>
-            <Text className="font-bold text-primary">
-              {Math.round(item.detection.confidence * 100)}%
-            </Text>
-          </Card>
-        </Pressable>
-      )}
-    />
-  );
+    <div className="min-h-screen bg-background">
+      <div className="mx-auto max-w-lg px-4 py-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-foreground">
+            Waste Diary ({scans.length})
+          </h1>
+          <div className="flex gap-2">
+            <Button size="sm" variant="ghost" onClick={() => navigate('/')}>
+              ← Scanner
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-destructive hover:text-destructive"
+              onClick={handleClear}
+            >
+              Clear
+            </Button>
+          </div>
+        </div>
+
+        {refreshing && scans.length === 0 ? (
+          <p className="text-center text-muted-foreground">Loading…</p>
+        ) : (
+          <div className="space-y-2">
+            {scans.map((item) => (
+              <button
+                key={item.id}
+                className="w-full text-left"
+                onClick={() => navigate('/results', { state: { scan: item } })}
+              >
+                <Card className="flex items-center gap-3 p-3 hover:border-border/60 transition-colors">
+                  {item.photoUri ? (
+                    <img
+                      src={item.photoUri}
+                      alt=""
+                      className="h-14 w-14 flex-shrink-0 rounded-lg object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-lg bg-secondary">
+                      <span className="text-2xl">{item.info.emoji}</span>
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-semibold text-foreground">
+                      {item.info.displayName}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(item.timestamp).toLocaleDateString()} · {item.info.material}
+                    </p>
+                  </div>
+                  <span className="font-bold text-primary">
+                    {Math.round(item.detection.confidence * 100)}%
+                  </span>
+                </Card>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
 }

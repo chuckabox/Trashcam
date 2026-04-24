@@ -1,26 +1,25 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { ScanResult, DashboardStats, MaterialCategory } from '../types';
+import type { ScanResult, DashboardStats, MaterialCategory } from '../types'
 
-const KEY = '@trashlife:scans';
+const KEY = 'trashlife:scans'
 
 export async function loadScans(): Promise<ScanResult[]> {
-  const raw = await AsyncStorage.getItem(KEY);
-  if (!raw) return [];
+  const raw = localStorage.getItem(KEY)
+  if (!raw) return []
   try {
-    return JSON.parse(raw) as ScanResult[];
+    return JSON.parse(raw) as ScanResult[]
   } catch {
-    return [];
+    return []
   }
 }
 
 export async function saveScan(scan: ScanResult): Promise<void> {
-  const existing = await loadScans();
-  const next = [scan, ...existing].slice(0, 500);
-  await AsyncStorage.setItem(KEY, JSON.stringify(next));
+  const existing = await loadScans()
+  const next = [scan, ...existing].slice(0, 500)
+  localStorage.setItem(KEY, JSON.stringify(next))
 }
 
 export async function clearScans(): Promise<void> {
-  await AsyncStorage.removeItem(KEY);
+  localStorage.removeItem(KEY)
 }
 
 export function computeStats(scans: ScanResult[]): DashboardStats {
@@ -36,23 +35,23 @@ export function computeStats(scans: ScanResult[]): DashboardStats {
     electronic: 0,
     hazardous: 0,
     composite: 0,
-  };
+  }
 
-  const counts = new Map<string, number>();
-  let co2 = 0;
-  let water = 0;
+  const counts = new Map<string, number>()
+  let co2 = 0
+  let water = 0
 
   for (const s of scans) {
-    breakdown[s.info.material] = (breakdown[s.info.material] ?? 0) + 1;
-    co2 += s.info.co2KgPerItem;
-    water += s.info.waterLitersPerItem;
-    counts.set(s.info.displayName, (counts.get(s.info.displayName) ?? 0) + 1);
+    breakdown[s.info.material] = (breakdown[s.info.material] ?? 0) + 1
+    co2 += s.info.co2KgPerItem
+    water += s.info.waterLitersPerItem
+    counts.set(s.info.displayName, (counts.get(s.info.displayName) ?? 0) + 1)
   }
 
   const topItems = [...counts.entries()]
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5)
-    .map(([name, count]) => ({ name, count }));
+    .map(([name, count]) => ({ name, count }))
 
   return {
     totalScans: scans.length,
@@ -60,5 +59,5 @@ export function computeStats(scans: ScanResult[]): DashboardStats {
     totalWaterLiters: water,
     materialBreakdown: breakdown,
     topItems,
-  };
+  }
 }

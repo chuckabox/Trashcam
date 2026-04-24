@@ -1,72 +1,75 @@
-import { useEffect, useState } from 'react';
-import { useTensorflowModel } from 'react-native-fast-tflite';
-import { useFrameProcessor } from 'react-native-vision-camera';
-import { useResizePlugin } from 'vision-camera-resize-plugin';
-import { Worklets, useSharedValue } from 'react-native-worklets-core';
-import type { Detection } from '../types';
-import {
-  DETECTION_CONFIDENCE_THRESHOLD,
-  MODEL_INPUT_SIZE,
-  parseYoloOutput,
-} from '../services/detection';
+import { useEffect, useRef, useState } from 'react'
+import * as cocoSsd from '@tensorflow-models/coco-ssd'
+import '@tensorflow/tfjs'
+import type { Detection } from '../types'
+import { trashClassForName } from '../services/cocoClasses'
+import { DETECTION_CONFIDENCE_THRESHOLD } from '../services/detection'
 
-const FRAME_SAMPLE_INTERVAL = 5; // run inference every Nth frame
+const FRAME_SKIP = 5
 
-export function useYolo() {
-  const model = useTensorflowModel(require('../../assets/models/yolov8n.tflite'));
-  const { resize } = useResizePlugin();
-  const [detections, setDetections] = useState<Detection[]>([]);
-  const [bestConfidence, setBestConfidence] = useState(0);
-  const frameCounter = useSharedValue(0);
-
-  const setDetectionsJS = Worklets.createRunOnJS((d: Detection[], best: number) => {
-    setDetections(d);
-    setBestConfidence(best);
-  });
-
-  const frameProcessor = useFrameProcessor(
-    (frame) => {
-      'worklet';
-      frameCounter.value = (frameCounter.value + 1) % FRAME_SAMPLE_INTERVAL;
-      if (frameCounter.value !== 0) return;
-      if (model.state !== 'loaded') return;
-
-      const resized = resize(frame, {
-        scale: { width: MODEL_INPUT_SIZE, height: MODEL_INPUT_SIZE },
-        pixelFormat: 'rgb',
-        dataType: 'float32',
-      });
-
-      // ultralytics TFLite expects 0..1 normalized RGB
-      const input = new Float32Array(resized.length);
-      for (let i = 0; i < resized.length; i++) {
-        input[i] = (resized[i] as number) / 255.0;
-      }
-
-      const outputs = model.model!.runSync([input]);
-      const raw = outputs[0] as unknown as Float32Array;
-      const boxes = parseYoloOutput(raw, DETECTION_CONFIDENCE_THRESHOLD);
-
-      let best = 0;
-      for (let i = 0; i < boxes.length; i++) {
-        if (boxes[i].confidence > best) best = boxes[i].confidence;
-      }
-      setDetectionsJS(boxes, best);
-    },
-    [model, resize],
-  );
+export function useYolo(videoRef: React.RefObject<HTMLVideoElement>) {
+  const [detections, setDetections] = useState<Detection[]>([])
+  const [bestConfidence, setBestConfidence] = useState(0)
+  const [modelLoading, setModelLoading] = useState(true)
+  const [modelError, setModelError] = useState<Error | null>(null)
+  const modelRef = useRef<cocoSsd.ObjectDetection | null>(null)
+  const rafRef = useRef<number>(0)
+  const frameCountRef = useRef(0)
 
   useEffect(() => {
-    if (model.state === 'error') {
-      console.error('YOLO model failed to load:', model.error);
+    cocoSsd
+      .load()
+      .then((m) => {
+        modelRef.current = m
+        setModelLoading(false)
+      })
+      .catch((err: Error) => {
+        setModelError(err)
+        setModelLoading(false)
+      })
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
     }
-  }, [model.state]);
+  }, [])
 
-  return {
-    frameProcessor,
-    detections,
-    bestConfidence,
-    modelLoading: model.state !== 'loaded',
-    modelError: model.state === 'error' ? model.error : null,
-  };
+  useEffect(() => {
+    if (modelLoading || !videoRef.current) return
+
+    const video = videoRef.current
+
+    const loop = async () => {
+      frameCountRef.current = (frameCountRef.current + 1) % FRAME_SKIP
+      if (frameCountRef.current === 0 && modelRef.current && video.readyState >= 2) {
+        try {
+          const preds = await modelRef.current.detect(video)
+          const dets: Detection[] = preds
+            .filter((p) => {
+              const tc = trashClassForName(p.class)
+              return tc !== 'unknown' && p.score >= DETECTION_CONFIDENCE_THRESHOLD
+            })
+            .map((p) => ({
+              class: trashClassForName(p.class),
+              confidence: p.score,
+              bbox: {
+                x: p.bbox[0] / (video.videoWidth || 1),
+                y: p.bbox[1] / (video.videoHeight || 1),
+                width: p.bbox[2] / (video.videoWidth || 1),
+                height: p.bbox[3] / (video.videoHeight || 1),
+              },
+            }))
+
+          setDetections(dets)
+          setBestConfidence(dets.reduce((m, d) => Math.max(m, d.confidence), 0))
+        } catch {
+          // ignore transient inference errors
+        }
+      }
+      rafRef.current = requestAnimationFrame(loop)
+    }
+
+    rafRef.current = requestAnimationFrame(loop)
+    return () => cancelAnimationFrame(rafRef.current)
+  }, [modelLoading, videoRef])
+
+  return { detections, bestConfidence, modelLoading, modelError }
 }
