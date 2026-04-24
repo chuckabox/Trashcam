@@ -11,7 +11,8 @@
       "WebFetch(domain:github.com)",
       "Bash(curl -L -o assets/models/yolov8n.tflite \"https://raw.githubusercontent.com/surendramaran/YOLOv8-TfLite-Object-Detector/main/app/src/main/assets/model.tflite\" --max-time 180 -w \"\\\\nHTTP %{http_code} SIZE %{size_download}\\\\n\")",
       "Bash(curl -L \"https://raw.githubusercontent.com/surendramaran/YOLOv8-TfLite-Object-Detector/main/app/src/main/assets/labels.txt\" --max-time 30 -w \"\\\\nHTTP %{http_code}\\\\n\")",
-      "Bash(curl -L -o assets/models/coco-labels.txt \"https://raw.githubusercontent.com/surendramaran/YOLOv8-TfLite-Object-Detector/main/app/src/main/assets/labels.txt\" --max-time 30 -w \"\\\\nHTTP %{http_code} SIZE %{size_download}\\\\n\")"
+      "Bash(curl -L -o assets/models/coco-labels.txt \"https://raw.githubusercontent.com/surendramaran/YOLOv8-TfLite-Object-Detector/main/app/src/main/assets/labels.txt\" --max-time 30 -w \"\\\\nHTTP %{http_code} SIZE %{size_download}\\\\n\")",
+      "Bash(npm run *)"
     ]
   }
 }
