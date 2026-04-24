@@ -2,25 +2,22 @@
 
 **Point your phone at a piece of trash. Real YOLOv8 tells you what it is. The app tells you how long it takes to decompose and how to dispose of it.**
 
-- **Real-time YOLOv8 on-device** (TFLite, ~3 MB, COCO 80-class) via [`react-native-fast-tflite`](https://github.com/mrousavy/react-native-fast-tflite) + [`react-native-vision-camera`](https://github.com/mrousavy/react-native-vision-camera).
-- **shadcn-style UI** using [`react-native-reusables`](https://github.com/mrzachnugent/react-native-reusables)-flavored components + [NativeWind](https://www.nativewind.dev) (Tailwind for React Native).
+- **Real-time Object Detection** via TensorFlow.js (COCO-SSD) in the browser.
+- **Beautiful UI** using Tailwind CSS + Lucide React.
 - **48-item degradation database** (material, decomposition time, CO₂, water, toxicity, disposal tip).
-- **Local-first** waste diary + dashboard (AsyncStorage, no server).
+- **Local-first** waste diary + dashboard (localStorage).
 
 ---
 
 ## Table of Contents
 
 1. [What You'll See](#what-youll-see)
-2. [Architecture](#architecture)
-3. [Project Structure](#project-structure)
-4. [Tech Stack](#tech-stack)
-5. [Getting Started](#getting-started) ← **READ THIS**
-6. [How Real YOLO Is Wired](#how-real-yolo-is-wired)
-7. [COCO → Trash Class Mapping](#coco--trash-class-mapping)
-8. [Training Your Own Trash Model](#training-your-own-trash-model)
-9. [Troubleshooting](#troubleshooting)
-10. [Roadmap](#roadmap)
+2. [Project Structure](#project-structure)
+3. [Tech Stack](#tech-stack)
+4. [Getting Started](#getting-started) ← **READ THIS**
+5. [Troubleshooting](#troubleshooting)
+6. [Roadmap](#roadmap)
+7. [Mobile Version (Native)](#mobile-version-native)
 
 ---
 
@@ -78,123 +75,84 @@
 ## Project Structure
 
 ```
-emmanual/
-├── App.tsx                          # Dark-mode wrapper, NativeWind boot, PortalHost
-├── app.json                         # Expo config + vision-camera plugin
-├── babel.config.js                  # nativewind + worklets-core + reanimated plugins
-├── metro.config.js                  # NativeWind transformer + .tflite assetExt
-├── tailwind.config.js               # shadcn-style theme tokens
-├── global.css                       # CSS variables (dark palette)
-├── assets/models/
-│   ├── yolov8n.tflite               # ← 3.17 MB real YOLOv8 model (COCO-80)
-│   ├── coco-labels.txt              # Reference: 80 class names
-│   └── yolov8n.pt                   # PyTorch original (for re-export/fine-tune)
+```
+trashlife/
 ├── src/
-│   ├── lib/utils.ts                 # cn() — clsx + tailwind-merge
-│   ├── components/
-│   │   ├── ui/                      # shadcn-style primitives
-│   │   │   ├── button.tsx           # CVA variants: default/destructive/outline/secondary/ghost
-│   │   │   ├── card.tsx             # Card + Header/Title/Description/Content/Footer
-│   │   │   ├── badge.tsx            # success/warning/danger variants
-│   │   │   ├── progress.tsx
-│   │   │   └── text.tsx
-│   │   ├── BoundingBoxOverlay.tsx
-│   │   ├── SnapButton.tsx
-│   │   └── ResultsCard.tsx
-│   ├── hooks/
-│   │   ├── useYolo.ts               # Frame processor + fast-tflite inference
-│   │   └── useOcr.ts                # Stub (swap for MLKit or Claude Vision)
-│   ├── services/
-│   │   ├── detection.ts             # parseYoloOutput + NMS (worklet-safe)
-│   │   ├── cocoClasses.ts           # 80 COCO names + COCO_TO_TRASH map
-│   │   ├── degradation.ts
-│   │   ├── ocr.ts
-│   │   └── storage.ts
-│   ├── data/degradation.json
-│   ├── types/index.ts
-│   ├── navigation/index.tsx
-│   └── screens/
-│       ├── ScannerScreen.tsx
-│       ├── ResultsScreen.tsx
-│       ├── DiaryScreen.tsx
-│       └── DashboardScreen.tsx
+│   ├── main.tsx             # Vite entry point
+│   ├── App.tsx              # Web router & layout
+│   ├── index.css            # Tailwind + Global styles
+│   ├── components/          # UI components (Scanner, Results, etc.)
+│   ├── hooks/               # useYolo (TF.js detection), useScan
+│   ├── services/            # ML processing & logic
+│   ├── data/                # Degradation database (JSON)
+│   └── types/               # TypeScript definitions
+├── public/                  # Static assets
+├── package.json             # Web dependencies & scripts
+├── tailwind.config.js       # Tailwind configuration
+└── vite.config.ts           # Vite configuration
 ```
 
 ---
 
 ## Tech Stack
 
-| Layer | Package | Version |
-|---|---|---|
-| Runtime | React Native | 0.74.5 |
-| Framework | Expo | ~51.0.28 (with `expo-dev-client`, prebuild required) |
-| Camera + frame processors | react-native-vision-camera | ^4.5 |
-| Frame resize to 640×640 | vision-camera-resize-plugin | ^3.2 |
-| ML runtime | react-native-fast-tflite | ^1.4 |
-| Worklet bridge | react-native-worklets-core | ^1.3 |
-| Animation / worklets | react-native-reanimated | ~3.10 |
-| UI | NativeWind (Tailwind for RN) | ^4.1 |
-| UI primitives | @rn-primitives/slot, portal | ^1.1 |
-| Variants | class-variance-authority | ^0.7 |
-| Icons | lucide-react-native | ^0.454 |
-| Navigation | @react-navigation/native-stack | ^6.11 |
-| Storage | @react-native-async-storage/async-storage | 1.23 |
-| Charts | react-native-chart-kit | ^6.12 |
+| Layer | Package |
+|---|---|
+| Runtime | React 18 |
+| Build Tool | Vite 5 |
+| ML Runtime | TensorFlow.js + COCO-SSD |
+| Styling | Tailwind CSS |
+| Icons | Lucide React |
+| Navigation | React Router Dom |
+| Charts | Recharts |
 
 ---
-
-## Getting Started
-
-> ⚠️ **This project does NOT run in Expo Go.** It uses native modules (vision-camera, fast-tflite, worklets-core) that are not included in Expo Go. You **must** build a dev client.
 
 ### Prerequisites
 
-- **Node 18+** and **npm** (or yarn/pnpm)
-- **Android Studio** ([download](https://developer.android.com/studio)) with:
-  - Android SDK (latest)
-  - Android SDK Platform-Tools
-  - An Android Virtual Device (emulator) OR a physical Android phone with USB debugging enabled
-- **JDK 17** (Android Studio usually ships one — verify with `java -version`)
-- **Git**
+- **Node 18+**
+- **npm** (or yarn/pnpm)
 
-### First-time setup
+### Running Locally
 
 ```bash
-# 1. Install JS deps
+# 1. Install dependencies
 npm install
 
-# 2. Generate native iOS/Android projects (one-time)
-npx expo prebuild --clean
-
-# 3. Build & install on Android
-npx expo run:android
+# 2. Start development server
+npm run dev
 ```
 
-First build takes **5–10 minutes** (downloads Gradle, compiles native libs). After that, JS changes hot-reload instantly.
+The application will be available at `http://localhost:5173`.
 
-### Running after first build
+### Building for Production
 
 ```bash
-# Terminal 1: Metro bundler
-npm start
-
-# Terminal 2: build + launch on device/emulator
-npm run android
+npm run build
 ```
 
-You only need `expo run:android` again when you add/remove native deps or change `app.json`.
+### Deployment
 
-### iOS
-
-iOS needs a Mac with Xcode installed. After `npx expo prebuild --clean`:
-
-```bash
-npx expo run:ios
-```
+This project is configured for deployment on **Render** (see `render.yaml`).
+- **Build Command**: `npm install && npm run build`
+- **Publish Directory**: `dist`
+- **Fallback**: Rewrites all routes to `index.html` for SPA support.
 
 ---
 
-## How Real YOLO Is Wired
+## Mobile Version (Native)
+
+The root of this repository contains legacy code for a React Native (Expo) version of TrashLife using YOLOv8n on-device.
+
+To run the mobile version, you would need to:
+1. Re-add native dependencies to `package.json` (`react-native`, `expo`, `react-native-vision-camera`, etc.).
+2. Use `npx expo run:android` or `npx expo run:ios`.
+
+For details on the native YOLO implementation, see the sections below (Legacy Documentation).
+
+---
+
+## How Real YOLO Is Wired (Legacy)
 
 The key file is [src/hooks/useYolo.ts](src/hooks/useYolo.ts):
 
