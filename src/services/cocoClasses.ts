@@ -31,3 +31,9 @@ export function trashClassForName(cocoName: string): string {
   if (waste.has(cocoName)) return 'waste';
   return 'unknown';
 }
+
+export function trashClassFor(cocoIndex: number): string {
+  const cocoName = COCO_CLASSES[cocoIndex];
+  if (!cocoName) return 'unknown';
+  return trashClassForName(cocoName);
+}

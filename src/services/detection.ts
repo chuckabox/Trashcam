@@ -47,7 +47,6 @@ export function parseYoloOutput(
     const hh = h * norm
 
     const trashClass = trashClassFor(bestCls)
-    if (trashClass === 'unknown') continue
 
     candidates.push({
       class: trashClass,
