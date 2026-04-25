@@ -28,25 +28,30 @@ const TABS = [
   { id: 'legend', label: 'Legend' },
 ]
 
-const MOCK_GLOBAL: { name: string; items: number; avatar: string }[] = [
-  { name: 'Ava Chen', items: 312, avatar: '🌿' },
-  { name: 'Marcus Reed', items: 287, avatar: '🦊' },
-  { name: 'Priya Patel', items: 251, avatar: '🌸' },
-  { name: 'Jonas Müller', items: 228, avatar: '🐢' },
-  { name: 'Layla Hassan', items: 196, avatar: '🍃' },
-  { name: 'Diego Romero', items: 174, avatar: '🌍' },
-  { name: 'Sienna Brooks', items: 143, avatar: '🐝' },
-  { name: 'Tomoko Sato', items: 118, avatar: '🌱' },
-  { name: 'Rafael Costa', items: 92, avatar: '🦉' },
+// Score = items × 10 + co2Kg × 8 + degradationYrsSaved × 1.5
+function computeScore(items: number, co2Kg: number, yrsSaved: number): number {
+  return Math.round(items * 10 + co2Kg * 8 + yrsSaved * 1.5)
+}
+
+const MOCK_GLOBAL: { name: string; score: number; items: number; avatar: string }[] = [
+  { name: 'Ava Chen', score: 4820, items: 312, avatar: '🌿' },
+  { name: 'Marcus Reed', score: 4510, items: 287, avatar: '🦊' },
+  { name: 'Priya Patel', score: 3970, items: 251, avatar: '🌸' },
+  { name: 'Jonas Müller', score: 3480, items: 228, avatar: '🐢' },
+  { name: 'Layla Hassan', score: 3105, items: 196, avatar: '🍃' },
+  { name: 'Diego Romero', score: 2740, items: 174, avatar: '🌍' },
+  { name: 'Sienna Brooks', score: 2280, items: 143, avatar: '🐝' },
+  { name: 'Tomoko Sato', score: 1860, items: 118, avatar: '🌱' },
+  { name: 'Rafael Costa', score: 1490, items: 92, avatar: '🦉' },
 ]
 
-const MOCK_FRIENDS: { name: string; items: number; avatar: string }[] = [
-  { name: 'Sam K.', items: 41, avatar: '🐼' },
-  { name: 'Jess', items: 35, avatar: '🦄' },
-  { name: 'Rohan', items: 28, avatar: '🐙' },
-  { name: 'Mia', items: 22, avatar: '🌻' },
-  { name: 'Liam', items: 17, avatar: '🐶' },
-  { name: 'Zoe', items: 11, avatar: '🦋' },
+const MOCK_FRIENDS: { name: string; score: number; items: number; avatar: string }[] = [
+  { name: 'Sam K.', score: 645, items: 41, avatar: '🐼' },
+  { name: 'Jess', score: 552, items: 35, avatar: '🦄' },
+  { name: 'Rohan', score: 438, items: 28, avatar: '🐙' },
+  { name: 'Mia', score: 351, items: 22, avatar: '🌻' },
+  { name: 'Liam', score: 274, items: 17, avatar: '🐶' },
+  { name: 'Zoe', score: 168, items: 11, avatar: '🦋' },
 ]
 
 const TOOLTIP_STYLE = {
@@ -274,11 +279,18 @@ function LeaderboardTab({ stats }: { stats: EnhancedStats }) {
   const [scope, setScope] = useState<'global' | 'friends'>('global')
 
   const pool = scope === 'global' ? MOCK_GLOBAL : MOCK_FRIENDS
+  const userScore = computeScore(stats.uniqueItemsScanned, stats.totalCo2Kg, stats.decompositionYearsSaved)
   const rows = [
     ...pool,
-    { name: 'You', items: stats.uniqueItemsScanned, avatar: '🫵', isUser: true as const },
+    {
+      name: 'You',
+      score: userScore,
+      items: stats.uniqueItemsScanned,
+      avatar: '🫵',
+      isUser: true as const,
+    },
   ]
-    .sort((a, b) => b.items - a.items)
+    .sort((a, b) => b.score - a.score)
     .map((r, idx) => ({ ...r, rank: idx + 1 }))
 
   const medal = (rank: number) =>
@@ -307,7 +319,7 @@ function LeaderboardTab({ stats }: { stats: EnhancedStats }) {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>{scope === 'global' ? 'Global' : 'Friends'}</CardTitle>
-            <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">By items scanned</span>
+            <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">By score</span>
           </div>
         </CardHeader>
         <CardContent className="space-y-1">
@@ -327,16 +339,24 @@ function LeaderboardTab({ stats }: { stats: EnhancedStats }) {
                 <span className={`flex-1 text-sm ${isUser ? 'font-bold text-primary' : 'text-foreground'}`}>
                   {r.name}
                 </span>
-                <span className="font-mono text-sm font-bold text-foreground">{r.items}</span>
+                <div className="flex flex-col items-end leading-tight">
+                  <span className="font-mono text-sm font-bold text-foreground">{r.score.toLocaleString()}</span>
+                  <span className="font-mono text-[9px] text-muted-foreground">{r.items} items</span>
+                </div>
               </div>
             )
           })}
         </CardContent>
       </Card>
 
-      <p className="px-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground text-center">
-        Repeat items don't count — each unique item scanned counts once.
-      </p>
+      <div className="px-2 space-y-1 text-center">
+        <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+          Score = items × 10 + CO₂ kg × 8 + years saved × 1.5
+        </p>
+        <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+          Repeat items don't count — each unique item scanned counts once.
+        </p>
+      </div>
     </div>
   )
 }
