@@ -41,12 +41,12 @@ export function Hint({ text, className }: HintProps) {
 
       {show && (
         <div className={cn(
-          "absolute bottom-full z-[60] mb-2 w-[180px] max-w-[calc(100vw-40px)] animate-scale-in",
+          "absolute bottom-full z-[60] mb-2 w-max max-w-[200px] animate-scale-in",
           side === 'left' ? "right-0" : "left-0"
         )}>
           <div className="rounded-md border-2 border-foreground bg-white p-2 shadow-lg">
             <p className={cn(
-              "font-mono text-[9px] leading-tight text-foreground break-words whitespace-normal",
+              "font-mono text-[9px] leading-tight text-foreground break-words",
               side === 'left' ? "text-right" : "text-left"
             )}>
               {text}

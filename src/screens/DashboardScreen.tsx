@@ -249,11 +249,12 @@ function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
 // ── Dictionary tab ────────────────────────────────────────────────────────────
 
 const DICTIONARY = [
-  { term: 'Residual Waste', def: 'Items that can’t go in normal recycling bins, like chip bags or soft plastic wrappers. These usually need special industrial processing.' },
-  { term: 'Carbon Footprint', def: 'The amount of CO2 gas released into the air to make and ship this item.' },
-  { term: 'Recovery Path', def: 'The journey an item takes to be turned back into something useful, like being melted down or composted.' },
-  { term: 'Compostable', def: 'Food or plant-based items that can rot away naturally into soil.' },
-  { term: 'Hazardous Recovery', def: 'Items with toxic parts (like batteries) that need careful handling so they don’t leak into the ground.' },
+  { term: 'Metal Recyclable', def: 'Solid metal items like cans, foil, and scrap. These are melted down to make new metal products.' },
+  { term: 'Electronic Waste', def: 'Anything with a battery or plug (phones, cables, toys). These contain toxic parts and must go to a special drop-off point.' },
+  { term: 'Organic/Food', def: 'Leftover food, garden waste, and natural fibers. These rot away into soil in a compost bin.' },
+  { term: 'Paper & Cardboard', def: 'Clean boxes, newspapers, and envelopes. These are turned back into new paper products if they stay dry.' },
+  { term: 'Residual Waste', def: 'Mixed items that are hard to separate, like chip bags, silver wrappers, and dirty packaging. These usually go to landfill.' },
+  { term: 'Unidentified Item', def: 'Things the scanner isn’t 100% sure about yet. Check for a recycling symbol to help decide where it goes.' },
 ]
 
 function DictionaryTab() {
