@@ -32,7 +32,7 @@ export function BoundingBoxOverlay({ detections }: Props) {
                 strong ? 'bg-primary' : 'bg-yellow-400',
               )}
             >
-              {info.displayName} {Math.round(d.confidence * 100)}%
+              {info.emoji} {info.displayName} {Math.round(d.confidence * 100)}%
             </div>
           </div>
         )

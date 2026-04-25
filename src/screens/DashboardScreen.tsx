@@ -44,12 +44,12 @@ const TOOLTIP_STYLE = {
 function Chip({ label, value, sub, accent, hint }: { label: string; value: string; sub?: string; accent?: string; hint?: string }) {
   return (
     <div className="relative rounded-lg border border-border bg-card p-3 card-hover-effect">
-      <div className="absolute right-1 top-1">
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">{label}</p>
+          <p className="mt-1 font-mono text-xl font-bold" style={{ color: accent ?? '#0F1713' }}>{value}</p>
+        </div>
         {hint && <Hint text={hint} />}
-      </div>
-      <div>
-        <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">{label}</p>
-        <p className="mt-1 font-mono text-xl font-bold" style={{ color: accent ?? '#0F1713' }}>{value}</p>
       </div>
       {sub && <p className="mt-0.5 font-mono text-[9px] text-muted-foreground">{sub}</p>}
     </div>
@@ -159,9 +159,9 @@ function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
     <div className="space-y-4 animate-fade-up">
       {/* Behaviour */}
       <Card>
-        <CardHeader className="relative">
-          <CardTitle>Habits</CardTitle>
-          <div className="absolute right-3 top-3">
+        <CardHeader>
+          <div className="flex items-center">
+            <CardTitle>Habits</CardTitle>
             <Hint text="Insights based on your scan history" />
           </div>
         </CardHeader>
@@ -202,9 +202,9 @@ function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
 
       {/* Impact */}
       <Card>
-        <CardHeader className="relative">
-          <CardTitle>Recovery Impact</CardTitle>
-          <div className="absolute right-3 top-3">
+        <CardHeader>
+          <div className="flex items-center">
+            <CardTitle>Recovery Impact</CardTitle>
             <Hint text="How your sorting helps industrial reuse" />
           </div>
         </CardHeader>
