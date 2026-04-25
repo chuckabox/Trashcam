@@ -28,16 +28,25 @@ const TABS = [
   { id: 'legend', label: 'Legend' },
 ]
 
-const MOCK_LEADERBOARD: { name: string; items: number; avatar: string }[] = [
-  { name: 'Ava Chen', items: 47, avatar: '🌿' },
-  { name: 'Marcus Reed', items: 42, avatar: '🦊' },
-  { name: 'Priya Patel', items: 38, avatar: '🌸' },
-  { name: 'Jonas Müller', items: 33, avatar: '🐢' },
-  { name: 'Layla Hassan', items: 29, avatar: '🍃' },
-  { name: 'Diego Romero', items: 24, avatar: '🌍' },
-  { name: 'Sienna Brooks', items: 19, avatar: '🐝' },
-  { name: 'Tomoko Sato', items: 14, avatar: '🌱' },
-  { name: 'Rafael Costa', items: 9, avatar: '🦉' },
+const MOCK_GLOBAL: { name: string; items: number; avatar: string }[] = [
+  { name: 'Ava Chen', items: 312, avatar: '🌿' },
+  { name: 'Marcus Reed', items: 287, avatar: '🦊' },
+  { name: 'Priya Patel', items: 251, avatar: '🌸' },
+  { name: 'Jonas Müller', items: 228, avatar: '🐢' },
+  { name: 'Layla Hassan', items: 196, avatar: '🍃' },
+  { name: 'Diego Romero', items: 174, avatar: '🌍' },
+  { name: 'Sienna Brooks', items: 143, avatar: '🐝' },
+  { name: 'Tomoko Sato', items: 118, avatar: '🌱' },
+  { name: 'Rafael Costa', items: 92, avatar: '🦉' },
+]
+
+const MOCK_FRIENDS: { name: string; items: number; avatar: string }[] = [
+  { name: 'Sam K.', items: 41, avatar: '🐼' },
+  { name: 'Jess', items: 35, avatar: '🦄' },
+  { name: 'Rohan', items: 28, avatar: '🐙' },
+  { name: 'Mia', items: 22, avatar: '🌻' },
+  { name: 'Liam', items: 17, avatar: '🐶' },
+  { name: 'Zoe', items: 11, avatar: '🦋' },
 ]
 
 const TOOLTIP_STYLE = {
@@ -262,8 +271,11 @@ function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
 // ── Leaderboard tab ───────────────────────────────────────────────────────
 
 function LeaderboardTab({ stats }: { stats: EnhancedStats }) {
+  const [scope, setScope] = useState<'global' | 'friends'>('global')
+
+  const pool = scope === 'global' ? MOCK_GLOBAL : MOCK_FRIENDS
   const rows = [
-    ...MOCK_LEADERBOARD,
+    ...pool,
     { name: 'You', items: stats.uniqueItemsScanned, avatar: '🫵', isUser: true as const },
   ]
     .sort((a, b) => b.items - a.items)
@@ -274,10 +286,27 @@ function LeaderboardTab({ stats }: { stats: EnhancedStats }) {
 
   return (
     <div className="space-y-4 animate-fade-up">
+      {/* Scope toggle */}
+      <div className="flex rounded-lg border border-border bg-card p-1">
+        {(['global', 'friends'] as const).map((s) => (
+          <button
+            key={s}
+            onClick={() => setScope(s)}
+            className={`flex-1 rounded-md py-2 font-mono text-[10px] uppercase tracking-widest transition-colors ${
+              scope === s
+                ? 'bg-primary text-primary-foreground font-bold'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            {s}
+          </button>
+        ))}
+      </div>
+
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Leaderboard</CardTitle>
+            <CardTitle>{scope === 'global' ? 'Global' : 'Friends'}</CardTitle>
             <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">By items scanned</span>
           </div>
         </CardHeader>
