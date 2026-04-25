@@ -14,7 +14,6 @@ export default function ResultsScreen() {
   const navigate = useNavigate()
   const location = useLocation()
   const scan = location.state?.scan as ScanResult | undefined
-
   if (!scan) {
     return (
       <div className="flex h-screen flex-col items-center justify-center gap-4 bg-background">
@@ -23,8 +22,18 @@ export default function ResultsScreen() {
       </div>
     )
   }
+  const { photoUri } = scan
+  const items = scan.items || ((scan as any).info ? [(scan as any).info] : [])
+  const detections = scan.detections || ((scan as any).detection ? [(scan as any).detection] : [])
 
-  const { items, detections, photoUri } = scan
+  if (items.length === 0) {
+    return (
+      <div className="flex h-screen flex-col items-center justify-center gap-4 bg-background">
+        <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Malformed scan data</p>
+        <Button variant="outline" onClick={() => navigate('/scan')}>Go to Scanner</Button>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-background">

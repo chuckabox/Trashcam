@@ -33,8 +33,8 @@ export default function AlbumScreen() {
 
   const filtered = useMemo(() => {
     let result = scans
-    if (filter === 'recyclable') result = result.filter((s) => s.items.some(i => i.recyclable === 'recyclable'))
-    else if (filter === 'landfill') result = result.filter((s) => s.items.some(i => i.recyclable === 'landfill' || i.recyclable === 'hazardous'))
+    if (filter === 'recyclable') result = result.filter((s) => (s.items || []).some(i => i.recyclable === 'recyclable'))
+    else if (filter === 'landfill') result = result.filter((s) => (s.items || []).some(i => i.recyclable === 'landfill' || i.recyclable === 'hazardous'))
     return result
   }, [scans, filter])
 
@@ -87,9 +87,11 @@ export default function AlbumScreen() {
         ) : (
           <div className="space-y-2">
             {filtered.map((scan) => {
-              const primaryItem = scan.items[0]
-              const primaryDetection = scan.detections[0]
-              const othersCount = scan.items.length - 1
+              const items = scan.items || ((scan as any).info ? [(scan as any).info] : [])
+              const detections = scan.detections || ((scan as any).detection ? [(scan as any).detection] : [])
+              const primaryItem = items[0]
+              const primaryDetection = detections[0]
+              const othersCount = items.length - 1
 
               return (
                 <button

@@ -42,7 +42,9 @@ export function computeStats(scans: ScanResult[]): DashboardStats {
   let water = 0
 
   for (const s of scans) {
-    for (const item of s.items) {
+    const items = s.items || ((s as any).info ? [(s as any).info] : [])
+    for (const item of items) {
+      if (!item) continue
       breakdown[item.material] = (breakdown[item.material] ?? 0) + 1
       co2 += item.co2KgPerItem
       water += item.waterLitresPerItem
@@ -74,7 +76,9 @@ export function computeEnhancedStats(scans: ScanResult[]): EnhancedStats {
 
   let recyclableCount = 0, landfillCount = 0, compostableCount = 0, hazardousCount = 0
   for (const s of scans) {
-    for (const item of s.items) {
+    const items = s.items || ((s as any).info ? [(s as any).info] : [])
+    for (const item of items) {
+      if (!item) continue
       if (item.recyclable === 'recyclable') recyclableCount++
       else if (item.recyclable === 'landfill') landfillCount++
       else if (item.recyclable === 'compostable') compostableCount++
@@ -114,14 +118,15 @@ export function computeEnhancedStats(scans: ScanResult[]): EnhancedStats {
 
   const mostScannedItem = base.topItems[0]?.name ?? null
 
-  const uniqueItemsScanned = new Set(scans.flatMap(s => s.items.map(i => i.displayName))).size
+  const uniqueItemsScanned = new Set(scans.flatMap(s => (s.items || ((s as any).info ? [(s as any).info] : [])) as any[]).filter(Boolean).map(i => i.displayName)).size
 
   const seen = new Set<string>()
   let decompositionYearsSaved = 0
   let uniqueCo2KgSaved = 0
   for (const s of scans) {
-    for (const item of s.items) {
-      if (seen.has(item.displayName)) continue
+    const items = s.items || ((s as any).info ? [(s as any).info] : [])
+    for (const item of items) {
+      if (!item || seen.has(item.displayName)) continue
       seen.add(item.displayName)
       decompositionYearsSaved += item.decompositionYears
       uniqueCo2KgSaved += item.co2KgPerItem
