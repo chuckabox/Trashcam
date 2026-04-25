@@ -91,17 +91,17 @@ export default function ResultsScreen() {
 
         {/* Characteristics */}
         <div className="grid grid-cols-2 gap-2">
-          <div className="rounded-lg border border-border bg-card p-3">
-            <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mb-1">Toxicity: {info.toxicity}</p>
-            <p className="text-xs text-foreground leading-relaxed">
+          <div className="rounded-lg border border-border bg-card p-4">
+            <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mb-2">Toxicity</p>
+            <p className="text-sm text-foreground leading-relaxed">
               {info.toxicity === 'high' ? 'Contains hazardous parts. Special handling needed.' : 
                info.toxicity === 'medium' ? 'Moderate toxicity. Dispose carefully.' : 
                'Low toxicity. Safe standard disposal.'}
             </p>
           </div>
-          <div className="rounded-lg border border-border bg-card p-3">
-            <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mb-1">Class: {info.recyclable}</p>
-            <p className="text-xs text-foreground leading-relaxed">
+          <div className="rounded-lg border border-border bg-card p-4">
+            <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mb-2">Class</p>
+            <p className="text-sm text-foreground leading-relaxed">
               {info.recyclable === 'recyclable' ? 'Can be processed into new materials.' :
                info.recyclable === 'compostable' ? 'Breaks down naturally into compost.' :
                info.recyclable === 'hazardous' ? 'Must go to a specialized facility.' :
