@@ -101,7 +101,7 @@ export default function ResultsScreen() {
         {/* Stats grid */}
         <div className="grid grid-cols-3 gap-2">
           {[
-            { label: 'Decomposes', value: decompStr, color: '#b5f23d' },
+            { label: 'Decomposes', value: decompStr, color: '#10BC79' },
             { label: 'CO₂', value: `${info.co2KgPerItem}kg`, color: '#06b6d4' },
             { label: 'Water', value: `${info.waterLitersPerItem}L`, color: '#3b82f6' },
           ].map(({ label, value, color }) => (

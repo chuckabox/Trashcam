@@ -71,8 +71,8 @@ export function BottomNav() {
               className={cn(
                 'flex h-14 w-14 items-center justify-center rounded-full border-2 transition-all',
                 scanActive
-                  ? 'border-primary bg-primary text-primary-foreground shadow-[0_0_20px_rgba(181,242,61,0.35)]'
-                  : 'border-primary/40 bg-secondary text-primary hover:border-primary/70 hover:shadow-[0_0_12px_rgba(181,242,61,0.15)]',
+                  ? 'border-primary bg-primary text-primary-foreground shadow-[0_0_20px_rgba(16,188,121,0.35)]'
+                  : 'border-primary/40 bg-secondary text-primary hover:border-primary/70 hover:shadow-[0_0_12px_rgba(16,188,121,0.15)]',
               )}
             >
               <CameraIcon />

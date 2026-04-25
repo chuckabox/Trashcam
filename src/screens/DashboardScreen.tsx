@@ -28,9 +28,9 @@ const TABS = [
 ]
 
 const TOOLTIP_STYLE = {
-  background: '#0c1510',
-  border: '1px solid #1c2d20',
-  color: '#ddefd8',
+  background: '#F5F6F3',
+  border: '1px solid #E1E4DF',
+  color: '#0F1713',
   borderRadius: '6px',
   fontSize: 11,
   fontFamily: '"DM Mono", monospace',
@@ -47,13 +47,13 @@ function HealthArc({ score }: { score: number }) {
   const arcLen = circ * 0.75
   const filled = arcLen * (score / 100)
   const color =
-    score >= 75 ? '#b5f23d' : score >= 50 ? '#f0c040' : score >= 25 ? '#f97316' : '#ff4d4d'
+    score >= 75 ? '#10BC79' : score >= 50 ? '#f0c040' : score >= 25 ? '#f97316' : '#ff4d4d'
 
   return (
     <div className="relative flex items-center justify-center">
       <svg viewBox="0 0 128 128" className="w-44 h-44">
         {/* Track */}
-        <circle cx={cx} cy={cy} r={r} fill="none" stroke="#1c2d20" strokeWidth="7"
+        <circle cx={cx} cy={cy} r={r} fill="none" stroke="#E1E4DF" strokeWidth="7"
           strokeDasharray={`${arcLen} ${circ - arcLen}`} strokeLinecap="round"
           transform={`rotate(135 ${cx} ${cy})`} />
         {/* Fill */}
@@ -75,7 +75,7 @@ function Chip({ label, value, sub, accent }: { label: string; value: string; sub
   return (
     <div className="rounded-lg border border-border bg-card p-3">
       <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">{label}</p>
-      <p className="mt-1 font-mono text-xl font-bold" style={{ color: accent ?? '#ddefd8' }}>{value}</p>
+      <p className="mt-1 font-mono text-xl font-bold" style={{ color: accent ?? '#0F1713' }}>{value}</p>
       {sub && <p className="mt-0.5 font-mono text-[9px] text-muted-foreground">{sub}</p>}
     </div>
   )
@@ -102,7 +102,7 @@ function OverviewTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
   const todayLabel = new Date().toLocaleDateString('en', { weekday: 'short' })
   const barData = stats.weeklyData.map((b) => ({
     ...b,
-    fill: b.day === todayLabel ? '#b5f23d' : '#1c2d20',
+    fill: b.day === todayLabel ? '#10BC79' : '#E1E4DF',
   }))
 
   const alertsShown = showAllAlerts ? stats.urgentScans : stats.urgentScans.slice(0, 3)
@@ -123,9 +123,9 @@ function OverviewTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
       {/* KPI chips */}
       <div className="grid grid-cols-2 gap-2">
         <Chip label="Today" value={String(stats.scannedToday)} sub="items scanned" />
-        <Chip label="Recyclable" value={`${stats.recyclablePercent}%`} sub="vs landfill" accent="#b5f23d" />
+        <Chip label="Recyclable" value={`${stats.recyclablePercent}%`} sub="vs landfill" accent="#10BC79" />
         <Chip label="Avg Degradation" value={String(stats.avgDegradationScore)} sub="score 0–100" accent="#f0c040" />
-        <Chip label="Urgent" value={String(stats.urgentCount)} sub="need action" accent={stats.urgentCount > 0 ? '#ff4d4d' : '#ddefd8'} />
+        <Chip label="Urgent" value={String(stats.urgentCount)} sub="need action" accent={stats.urgentCount > 0 ? '#ff4d4d' : '#0F1713'} />
       </div>
 
       {/* Alerts */}
@@ -218,7 +218,7 @@ function OverviewTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
               <XAxis dataKey="day" tick={{ fill: '#4d6450', fontSize: 10, fontFamily: '"DM Mono"' }}
                 axisLine={false} tickLine={false} />
               <YAxis hide allowDecimals={false} />
-              <Tooltip cursor={{ fill: 'rgba(181,242,61,0.04)' }} contentStyle={TOOLTIP_STYLE} />
+              <Tooltip cursor={{ fill: 'rgba(16,188,121,0.04)' }} contentStyle={TOOLTIP_STYLE} />
               <Bar dataKey="count" radius={[3, 3, 0, 0]}>
                 {barData.map((d, i) => <Cell key={i} fill={d.fill} />)}
               </Bar>
@@ -341,7 +341,7 @@ function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
           {[
             { label: 'CO₂ Generated', value: `${stats.totalCo2Kg.toFixed(2)} kg`, icon: '🌍' },
             { label: 'Water Used', value: `${stats.totalWaterLiters.toFixed(0)} L`, icon: '💧' },
-            { label: 'Recyclable Items', value: String(stats.recyclableCount), icon: '♻️', accent: '#b5f23d' },
+            { label: 'Recyclable Items', value: String(stats.recyclableCount), icon: '♻️', accent: '#10BC79' },
             { label: 'Landfill Items', value: String(stats.landfillCount), icon: '🗑️', accent: '#ff4d4d' },
           ].map(({ label, value, icon, accent }) => (
             <div key={label} className="flex items-center justify-between py-1.5 border-b border-border last:border-0">
@@ -349,7 +349,7 @@ function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
                 <span className="text-base">{icon}</span>
                 <span className="font-mono text-xs text-muted-foreground">{label}</span>
               </div>
-              <span className="font-mono text-sm font-bold" style={{ color: accent ?? '#ddefd8' }}>{value}</span>
+              <span className="font-mono text-sm font-bold" style={{ color: accent ?? '#0F1713' }}>{value}</span>
             </div>
           ))}
         </CardContent>

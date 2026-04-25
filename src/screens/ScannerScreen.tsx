@@ -72,12 +72,12 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
   const pct = Math.round(bestConfidence * 100)
 
   return (
-    <div className="relative h-screen w-full overflow-hidden bg-black">
+    <div className="relative h-screen w-full overflow-hidden bg-background">
       {/* Camera feed */}
       <video ref={videoRef} className="h-full w-full object-cover opacity-90" autoPlay playsInline muted />
 
-      {/* Dark vignette */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.7)_100%)]" />
+      {/* Subtle vignette */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.1)_100%)]" />
 
       {/* Bounding boxes */}
       <BoundingBoxOverlay detections={detections} />
@@ -88,7 +88,7 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
           <span className="h-1.5 w-1.5 rounded-full bg-primary animate-blink" />
           <span className="font-mono text-[10px] uppercase tracking-widest text-primary">Live</span>
         </div>
-        <span className="font-mono text-[10px] uppercase tracking-widest text-white/30">BioScan</span>
+        <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/40">BioScan</span>
       </div>
 
       {/* Model loading banner */}
@@ -116,7 +116,7 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
                 pos === 'tr' ? 'top-0 right-0 border-t-2 border-r-2' : '',
                 pos === 'bl' ? 'bottom-0 left-0 border-b-2 border-l-2' : '',
                 pos === 'br' ? 'bottom-0 right-0 border-b-2 border-r-2' : '',
-                ready ? 'border-primary shadow-[0_0_8px_rgba(181,242,61,0.6)]' : 'border-white/30',
+                ready ? 'border-primary shadow-[0_0_8px_rgba(16,188,121,0.6)]' : 'border-muted-foreground/30',
               ].join(' ')}
             />
           ))}
@@ -127,8 +127,8 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
               className="absolute inset-x-4 h-px animate-scan"
               style={{
                 background: ready
-                  ? 'linear-gradient(90deg, transparent, rgba(181,242,61,0.7), transparent)'
-                  : 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                  ? 'linear-gradient(90deg, transparent, rgba(16,188,121,0.7), transparent)'
+                  : 'linear-gradient(90deg, transparent, rgba(15,23,19,0.2), transparent)',
               }}
             />
           )}
@@ -136,8 +136,8 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
           {/* Center crosshair */}
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="relative h-5 w-5">
-              <span className={`absolute left-0 right-0 top-1/2 h-px -translate-y-1/2 ${ready ? 'bg-primary/60' : 'bg-white/20'}`} />
-              <span className={`absolute top-0 bottom-0 left-1/2 w-px -translate-x-1/2 ${ready ? 'bg-primary/60' : 'bg-white/20'}`} />
+              <span className={`absolute left-0 right-0 top-1/2 h-px -translate-y-1/2 ${ready ? 'bg-primary/60' : 'bg-muted-foreground/20'}`} />
+              <span className={`absolute top-0 bottom-0 left-1/2 w-px -translate-x-1/2 ${ready ? 'bg-primary/60' : 'bg-muted-foreground/20'}`} />
             </div>
           </div>
         </div>
@@ -173,14 +173,14 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
             <span className="absolute inset-0 rounded-full border-2 border-primary/30 animate-pulse-ring" />
           )}
           {/* Outer ring */}
-          <span className={`absolute inset-1 rounded-full border-2 transition-colors ${ready ? 'border-primary' : 'border-white/20'}`} />
+          <span className={`absolute inset-1 rounded-full border-2 transition-colors ${ready ? 'border-primary' : 'border-muted-foreground/20'}`} />
           {/* Inner */}
-          <span className={`flex h-12 w-12 items-center justify-center rounded-full transition-all ${ready ? 'bg-primary' : 'bg-white/8'}`}>
+          <span className={`flex h-12 w-12 items-center justify-center rounded-full transition-all ${ready ? 'bg-primary' : 'bg-muted-foreground/10'}`}>
             {busy ? (
               <span className="h-4 w-4 rounded-full border-2 border-primary-foreground border-t-transparent animate-spin" />
             ) : (
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                stroke={ready ? '#060a08' : 'rgba(255,255,255,0.3)'}
+                stroke={ready ? '#FFFFFF' : 'rgba(15,23,19,0.3)'}
                 strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
                 <circle cx="12" cy="13" r="3" />
@@ -189,7 +189,7 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
           </span>
         </button>
 
-        <p className="font-mono text-[10px] uppercase tracking-widest text-white/30">
+        <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/40">
           {modelLoading ? 'Loading model' : ready ? 'Tap to capture' : 'Aim at waste item'}
         </p>
       </div>
@@ -217,8 +217,8 @@ export default function ScannerScreen() {
   if (permState === 'denied') return <PermDenied navigate={navigate} />
   if (permState === 'pending') {
     return (
-      <div className="flex h-screen items-center justify-center bg-black">
-        <span className="font-mono text-[10px] uppercase tracking-widest text-white/30 animate-blink">Starting camera</span>
+      <div className="flex h-screen items-center justify-center bg-background">
+        <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/40 animate-blink">Starting camera</span>
       </div>
     )
   }
