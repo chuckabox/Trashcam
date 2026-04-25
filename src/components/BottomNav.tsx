@@ -22,10 +22,10 @@ function DiaryIcon({ active }: { active: boolean }) {
   )
 }
 
-function CameraIcon() {
+function CameraIcon({ active }: { active: boolean }) {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      strokeWidth={active ? 2 : 1.5} strokeLinecap="round" strokeLinejoin="round">
       <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
       <circle cx="12" cy="13" r="3" />
     </svg>
@@ -62,29 +62,17 @@ export function BottomNav() {
             {dashActive && <span className="h-px w-4 bg-primary rounded-full" />}
           </button>
 
-          {/* Scanner — raised */}
+          {/* Scanner */}
           <button
             onClick={() => navigate('/')}
-            className="relative -mt-5 flex flex-col items-center gap-1"
+            className={cn(
+              'flex flex-col items-center gap-1.5 transition-all',
+              scanActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground',
+            )}
           >
-            <span
-              className={cn(
-                'flex h-14 w-14 items-center justify-center rounded-full border-2 transition-all',
-                scanActive
-                  ? 'border-primary bg-primary text-primary-foreground shadow-[0_0_20px_rgba(16,188,121,0.35)]'
-                  : 'border-primary/40 bg-secondary text-primary hover:border-primary/70 hover:shadow-[0_0_12px_rgba(16,188,121,0.15)]',
-              )}
-            >
-              <CameraIcon />
-            </span>
-            <span
-              className={cn(
-                'font-mono text-[9px] uppercase tracking-widest transition-colors',
-                scanActive ? 'text-primary' : 'text-muted-foreground',
-              )}
-            >
-              Scan
-            </span>
+            <CameraIcon active={scanActive} />
+            <span className="font-mono text-[9px] uppercase tracking-widest">Scan</span>
+            {scanActive && <span className="h-px w-4 bg-primary rounded-full" />}
           </button>
 
           {/* Diary */}
