@@ -52,7 +52,7 @@ export default function ResultsScreen() {
         </button>
 
         {/* Hero */}
-        <div className="rounded-lg border border-border bg-card overflow-hidden">
+        <div className="rounded-xl border border-border bg-card overflow-hidden">
           {photoUri ? (
             <div className="relative h-52 w-full overflow-hidden">
               <img src={photoUri} alt={info.displayName} className="h-full w-full object-cover opacity-80" />
@@ -66,7 +66,7 @@ export default function ResultsScreen() {
             </div>
           ) : (
             <div className="flex items-center gap-4 p-4">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-secondary text-4xl">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-secondary text-4xl">
                 {info.emoji}
               </div>
               <div>
@@ -87,7 +87,7 @@ export default function ResultsScreen() {
             { label: 'CO₂', value: `${info.co2KgPerItem}kg`, color: 'text-cyan-600' },
             { label: 'Water', value: `${info.waterLitresPerItem}L`, color: 'text-blue-600' },
           ].map(({ label, value, color }) => (
-            <div key={label} className="rounded-lg border border-border bg-card p-3 text-center card-hover-effect">
+            <div key={label} className="rounded-xl border border-border bg-card p-3 text-center card-hover-effect">
               <p className="font-mono text-[8px] font-bold uppercase tracking-widest text-primary">{label}</p>
               <p className={cn("mt-1 font-mono text-sm font-bold", color)}>{value}</p>
             </div>
@@ -96,18 +96,18 @@ export default function ResultsScreen() {
 
         {/* Safety & Category */}
         <div className="grid grid-cols-1 gap-2">
-          <div className="rounded-lg border border-border bg-card p-4">
+          <div className="rounded-xl border border-border bg-card p-4">
             <p className="font-mono text-[9px] font-bold uppercase tracking-widest text-primary mb-2">Safety & Toxicity</p>
             <p className="text-sm text-foreground leading-relaxed">{TOX_TEXT[info.toxicity]}</p>
           </div>
-          <div className="rounded-lg border border-border bg-card p-4">
+          <div className="rounded-xl border border-border bg-card p-4">
             <p className="font-mono text-[9px] font-bold uppercase tracking-widest text-primary mb-2">Recycling Info</p>
             <p className="text-sm text-foreground leading-relaxed">{REC_TEXT[info.recyclable]}</p>
           </div>
         </div>
 
         {/* Disposal tip */}
-        <div className="rounded-lg border border-border bg-card p-4">
+        <div className="rounded-xl border border-border bg-card p-4">
           <p className="font-mono text-[9px] font-bold uppercase tracking-widest text-primary mb-2">How to dispose</p>
           <p className="text-sm text-foreground leading-relaxed">{info.disposalTip}</p>
         </div>

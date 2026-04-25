@@ -93,7 +93,7 @@ export default function DiaryScreen() {
                   className="w-full text-left group"
                   onClick={() => navigate('/results', { state: { scan: item } })}
                 >
-                  <div className="flex items-center gap-3 rounded-lg border border-border bg-card p-3 card-hover-effect">
+                  <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-3 card-hover-effect">
                     {/* Thumbnail */}
                     {item.photoUri ? (
                       <img src={item.photoUri} alt="" className="h-12 w-12 shrink-0 rounded-md object-cover" />
