@@ -57,16 +57,6 @@ export interface DashboardStats {
   topItems: { name: string; count: number }[];
 }
 
-export type DegradationCondition = 'fresh' | 'mid-life' | 'degrading' | 'critical';
-
-export interface ScanWithDegradation {
-  scan: ScanResult;
-  score: number;
-  condition: DegradationCondition;
-  remainingDays: number;
-  confidence: number;
-}
-
 export interface WeeklyBucket {
   day: string;
   count: number;
@@ -79,13 +69,9 @@ export interface EnhancedStats extends DashboardStats {
   compostableCount: number;
   hazardousCount: number;
   recyclablePercent: number;
-  avgDegradationScore: number;
-  wasteHealthScore: number;
-  urgentCount: number;
   weeklyData: WeeklyBucket[];
   mostWastedCategory: MaterialCategory | null;
   mostScannedItem: string | null;
   reductionPercent: number | null;
-  urgentScans: ScanWithDegradation[];
-  allScored: ScanWithDegradation[];
+  allScans: ScanResult[];
 }

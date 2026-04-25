@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import type { ScanResult } from '../types'
-import { scoreScan, CONDITION_LABEL, CONDITION_COLOR, CONDITION_BADGE_VARIANT } from '../services/degradationScore'
+
 import { Badge } from '../components/ui/badge'
 import { Button } from '../components/ui/button'
 
@@ -24,7 +24,6 @@ export default function ResultsScreen() {
   }
 
   const { info, detection, photoUri } = scan
-  const { score, condition, remainingDays, confidence } = scoreScan(scan)
   const decompStr = info.decompositionYears >= 1000 ? '1000+ yrs'
     : info.decompositionYears < 1 ? `${Math.round(info.decompositionYears * 365)}d`
     : `${info.decompositionYears} yrs`
@@ -70,33 +69,7 @@ export default function ResultsScreen() {
           )}
         </div>
 
-        {/* Degradation card */}
-        <div className="rounded-lg border bg-card p-4 space-y-3" style={{ borderColor: `${CONDITION_COLOR[condition]}33` }}>
-          <div className="flex items-center justify-between">
-            <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Degradation Score</p>
-            <Badge label={CONDITION_LABEL[condition]} variant={CONDITION_BADGE_VARIANT[condition]} />
-          </div>
-          <div className="flex items-end gap-3">
-            <p className="font-mono text-5xl font-bold leading-none" style={{ color: CONDITION_COLOR[condition] }}>
-              {score}
-            </p>
-            <div className="pb-1">
-              <p className="font-mono text-xs text-muted-foreground">/100</p>
-              <p className="font-mono text-xs" style={{ color: CONDITION_COLOR[condition] }}>
-                {remainingDays === 0 ? 'Overdue' : `${remainingDays}d remaining`}
-              </p>
-            </div>
-          </div>
-          {/* Score bar */}
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
-            <div className="h-full rounded-full transition-all duration-700"
-              style={{ width: `${score}%`, backgroundColor: CONDITION_COLOR[condition],
-                boxShadow: `0 0 8px ${CONDITION_COLOR[condition]}66` }} />
-          </div>
-          <p className="font-mono text-[9px] text-muted-foreground">
-            Detection confidence: {Math.round(confidence * 100)}%
-          </p>
-        </div>
+
 
         {/* Stats grid */}
         <div className="grid grid-cols-3 gap-2">

@@ -1,5 +1,4 @@
 import type { ScanResult, DashboardStats, MaterialCategory, EnhancedStats, WeeklyBucket } from '../types'
-import { scoreScan } from './degradationScore'
 
 const KEY = 'trashlife:scans'
 
@@ -83,17 +82,6 @@ export function computeEnhancedStats(scans: ScanResult[]): EnhancedStats {
     ? Math.round((recyclableCount / scans.length) * 100)
     : 0
 
-  const allScored = scans.map(scoreScan)
-  const avgDegradationScore = allScored.length > 0
-    ? Math.round(allScored.reduce((sum, s) => sum + s.score, 0) / allScored.length)
-    : 0
-  const wasteHealthScore = 100 - avgDegradationScore
-
-  const urgentScans = allScored
-    .filter((s) => s.score >= 61)
-    .sort((a, b) => b.score - a.score)
-  const urgentCount = urgentScans.length
-
   const weeklyData: WeeklyBucket[] = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(now)
     d.setDate(d.getDate() - (6 - i))
@@ -130,14 +118,10 @@ export function computeEnhancedStats(scans: ScanResult[]): EnhancedStats {
     compostableCount,
     hazardousCount,
     recyclablePercent,
-    avgDegradationScore,
-    wasteHealthScore,
-    urgentCount,
     weeklyData,
     mostWastedCategory,
     mostScannedItem,
     reductionPercent,
-    urgentScans,
-    allScored,
+    allScans: scans,
   }
 }

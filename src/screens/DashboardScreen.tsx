@@ -5,8 +5,7 @@ import {
   BarChart, Bar, XAxis, YAxis,
 } from 'recharts'
 import { computeEnhancedStats, loadScans } from '../services/storage'
-import { CONDITION_LABEL, CONDITION_COLOR, CONDITION_BADGE_VARIANT } from '../services/degradationScore'
-import type { EnhancedStats, ScanWithDegradation, MaterialCategory, DegradationCondition } from '../types'
+import type { EnhancedStats, MaterialCategory } from '../types'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
 import { Tabs } from '../components/ui/tabs'
@@ -23,7 +22,6 @@ const MAT_COLOR: Record<MaterialCategory, string> = {
 
 const TABS = [
   { id: 'overview', label: 'Overview' },
-  { id: 'track', label: 'Track' },
   { id: 'insights', label: 'Insights' },
 ]
 
@@ -38,37 +36,7 @@ const TOOLTIP_STYLE = {
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-/** SVG arc health gauge */
-function HealthArc({ score }: { score: number }) {
-  const r = 52
-  const cx = 64
-  const cy = 64
-  const circ = 2 * Math.PI * r
-  const arcLen = circ * 0.75
-  const filled = arcLen * (score / 100)
-  const color =
-    score >= 75 ? '#10BC79' : score >= 50 ? '#f0c040' : score >= 25 ? '#f97316' : '#ff4d4d'
 
-  return (
-    <div className="relative flex items-center justify-center">
-      <svg viewBox="0 0 128 128" className="w-44 h-44">
-        {/* Track */}
-        <circle cx={cx} cy={cy} r={r} fill="none" stroke="#E1E4DF" strokeWidth="7"
-          strokeDasharray={`${arcLen} ${circ - arcLen}`} strokeLinecap="round"
-          transform={`rotate(135 ${cx} ${cy})`} />
-        {/* Fill */}
-        <circle cx={cx} cy={cy} r={r} fill="none" stroke={color} strokeWidth="7"
-          strokeDasharray={`${filled} ${circ - filled}`} strokeLinecap="round"
-          transform={`rotate(135 ${cx} ${cy})`}
-          style={{ filter: `drop-shadow(0 0 6px ${color}55)`, transition: 'stroke-dasharray 0.8s ease-out' }} />
-      </svg>
-      <div className="absolute text-center pointer-events-none">
-        <p className="font-mono text-5xl font-bold leading-none" style={{ color }}>{score}</p>
-        <p className="mt-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">health</p>
-      </div>
-    </div>
-  )
-}
 
 /** Compact stat chip */
 function Chip({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent?: string }) {
@@ -81,15 +49,7 @@ function Chip({ label, value, sub, accent }: { label: string; value: string; sub
   )
 }
 
-/** Score bar for degradation */
-function ScoreBar({ score, condition }: { score: number; condition: DegradationCondition }) {
-  return (
-    <div className="h-1 w-full overflow-hidden rounded-full bg-secondary">
-      <div className="h-full rounded-full transition-all duration-500"
-        style={{ width: `${score}%`, backgroundColor: CONDITION_COLOR[condition] }} />
-    </div>
-  )
-}
+
 
 // ── Overview tab ──────────────────────────────────────────────────────────────
 
@@ -105,65 +65,14 @@ function OverviewTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
     fill: b.day === todayLabel ? '#10BC79' : '#E1E4DF',
   }))
 
-  const alertsShown = showAllAlerts ? stats.urgentScans : stats.urgentScans.slice(0, 3)
-
-  return (
     <div className="space-y-4 animate-fade-up">
-      {/* Health gauge */}
-      <Card className="flex flex-col items-center py-6">
-        <p className="mb-3 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-          Waste Health Score
-        </p>
-        <HealthArc score={stats.wasteHealthScore} />
-        <p className="mt-3 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-          {stats.wasteHealthScore >= 75 ? 'Excellent' : stats.wasteHealthScore >= 50 ? 'Fair' : 'Needs attention'}
-        </p>
-      </Card>
-
       {/* KPI chips */}
       <div className="grid grid-cols-2 gap-2">
         <Chip label="Today" value={String(stats.scannedToday)} sub="items scanned" />
         <Chip label="Recyclable" value={`${stats.recyclablePercent}%`} sub="vs landfill" accent="#10BC79" />
-        <Chip label="Avg Degradation" value={String(stats.avgDegradationScore)} sub="score 0–100" accent="#f0c040" />
-        <Chip label="Urgent" value={String(stats.urgentCount)} sub="need action" accent={stats.urgentCount > 0 ? '#ff4d4d' : '#0F1713'} />
+        <Chip label="Compostable" value={String(stats.compostableCount)} sub="organic items" accent="#f0c040" />
+        <Chip label="Total Co2" value={`${stats.totalCo2Kg.toFixed(1)}kg`} sub="embedded impact" accent="#0F1713" />
       </div>
-
-      {/* Alerts */}
-      {stats.urgentScans.length > 0 && (
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-red-400 animate-blink" />
-            <p className="font-mono text-[9px] uppercase tracking-widest text-red-400">
-              Alerts · {stats.urgentScans.length}
-            </p>
-          </div>
-          {alertsShown.map(({ scan, score, condition, remainingDays }) => (
-            <button key={scan.id} className="w-full text-left" onClick={() => navigate('/results', { state: { scan } })}>
-              <Card className="border-red-500/20 bg-red-500/5 p-3 hover:border-red-500/40 transition-colors">
-                <div className="flex items-start gap-3">
-                  <span className="text-xl">{scan.info.emoji}</span>
-                  <div className="min-w-0 flex-1 space-y-1.5">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="truncate text-sm font-semibold text-foreground">{scan.info.displayName}</p>
-                      <Badge label={CONDITION_LABEL[condition]} variant={CONDITION_BADGE_VARIANT[condition]} />
-                    </div>
-                    <ScoreBar score={score} condition={condition} />
-                    <p className="font-mono text-[9px] text-muted-foreground">
-                      {remainingDays === 0 ? 'Dispose immediately' : `${remainingDays}d remaining · ${scan.info.disposalTip.slice(0, 48)}…`}
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            </button>
-          ))}
-          {stats.urgentScans.length > 3 && (
-            <button className="w-full text-center font-mono text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground py-1"
-              onClick={() => setShowAllAlerts(!showAllAlerts)}>
-              {showAllAlerts ? 'Show less' : `+${stats.urgentScans.length - 3} more`}
-            </button>
-          )}
-        </div>
-      )}
 
       {/* Material breakdown */}
       <Card>
@@ -230,70 +139,11 @@ function OverviewTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
   )
 }
 
-// ── Track tab ─────────────────────────────────────────────────────────────────
 
-function TrackTab({ items }: { items: ScanWithDegradation[] }) {
-  const [showAll, setShowAll] = useState(false)
-  const sorted = [...items].sort((a, b) => b.score - a.score)
-  const shown = showAll ? sorted : sorted.slice(0, 10)
-
-  if (items.length === 0) {
-    return (
-      <div className="flex flex-col items-center gap-3 py-24 text-center animate-fade-up">
-        <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">No items tracked yet</p>
-      </div>
-    )
-  }
-
-  return (
-    <div className="space-y-3 animate-fade-up">
-      <div className="flex items-center justify-between">
-        <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-          Sorted by urgency · {items.length} items
-        </p>
-      </div>
-      <p className="font-mono text-[9px] text-muted-foreground">
-        0–25 Fresh · 26–60 Mid-life · 61–85 Degrading · 86–100 Critical
-      </p>
-
-      {shown.map(({ scan, score, condition, remainingDays, confidence }) => (
-        <Card key={scan.id} className="p-3">
-          <div className="flex items-center gap-3">
-            <span className="text-xl shrink-0">{scan.info.emoji}</span>
-            <div className="min-w-0 flex-1 space-y-1.5">
-              <div className="flex items-center justify-between gap-2">
-                <p className="truncate text-sm font-semibold text-foreground">{scan.info.displayName}</p>
-                <span className="font-mono text-sm font-bold shrink-0" style={{ color: CONDITION_COLOR[condition] }}>
-                  {score}
-                </span>
-              </div>
-              <ScoreBar score={score} condition={condition} />
-              <div className="flex items-center justify-between">
-                <Badge label={CONDITION_LABEL[condition]} variant={CONDITION_BADGE_VARIANT[condition]} />
-                <span className="font-mono text-[9px] text-muted-foreground">
-                  {remainingDays === 0 ? 'Overdue' : `${remainingDays}d · ${Math.round(confidence * 100)}% conf`}
-                </span>
-              </div>
-            </div>
-          </div>
-        </Card>
-      ))}
-
-      {sorted.length > 10 && (
-        <button className="w-full py-2 text-center font-mono text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground"
-          onClick={() => setShowAll(!showAll)}>
-          {showAll ? 'Show less' : `Show ${sorted.length - 10} more`}
-        </button>
-      )}
-    </div>
-  )
-}
 
 // ── Insights tab ──────────────────────────────────────────────────────────────
 
 function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: ReturnType<typeof useNavigate> }) {
-  const midLife = stats.allScored.filter((s) => s.condition === 'mid-life').slice(0, 3)
-
   return (
     <div className="space-y-4 animate-fade-up">
       {/* Behaviour */}
@@ -355,27 +205,7 @@ function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
         </CardContent>
       </Card>
 
-      {/* Deal with soon */}
-      {midLife.length > 0 && (
-        <Card>
-          <CardHeader><CardTitle>Deal With Soon</CardTitle></CardHeader>
-          <CardContent className="space-y-1">
-            {midLife.map(({ scan, remainingDays }) => (
-              <button key={scan.id} className="w-full text-left"
-                onClick={() => navigate('/results', { state: { scan } })}>
-                <div className="flex items-center gap-3 py-2 border-b border-border last:border-0">
-                  <span className="text-lg">{scan.info.emoji}</span>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm text-foreground">{scan.info.displayName}</p>
-                    <p className="font-mono text-[9px] text-muted-foreground">{scan.info.disposalTip.slice(0, 55)}…</p>
-                  </div>
-                  <span className="shrink-0 font-mono text-xs text-yellow-400">{remainingDays}d</span>
-                </div>
-              </button>
-            ))}
-          </CardContent>
-        </Card>
-      )}
+
 
       {/* Frequently scanned */}
       {stats.topItems.length > 0 && (
@@ -429,7 +259,6 @@ export default function DashboardScreen() {
         ) : (
           <>
             {tab === 'overview' && <OverviewTab stats={stats} navigate={navigate} />}
-            {tab === 'track' && <TrackTab items={stats.allScored} />}
             {tab === 'insights' && <InsightsTab stats={stats} navigate={navigate} />}
           </>
         )}
