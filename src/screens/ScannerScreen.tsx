@@ -157,19 +157,19 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
 
       {/* Top bar */}
       <div className="absolute inset-x-0 top-0 flex items-center justify-between px-5 pt-5">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 rounded-md border border-border bg-white px-3 py-1.5 shadow-sm">
           <span className="h-1.5 w-1.5 rounded-full bg-primary animate-blink" />
-          <span className="font-mono text-[10px] uppercase tracking-widest text-primary">Live</span>
+          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-foreground">Live</span>
         </div>
       </div>
 
       {/* Model loading or processing banner */}
       {(modelLoading || processingUpload) && (
         <div className="absolute inset-x-0 top-14 flex justify-center z-50">
-          <div className="flex items-center gap-2 rounded border border-border bg-background/80 px-4 py-2 backdrop-blur-sm">
-            <span className="h-3 w-3 rounded-full border border-primary border-t-transparent animate-spin" />
-            <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-              {processingUpload ? 'Analysing' : 'Loading model'}
+          <div className="flex items-center gap-2 rounded-md border border-border bg-white px-4 py-2 shadow-sm">
+            <span className="h-3 w-3 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+            <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-foreground">
+              {processingUpload ? 'Analysing' : 'Syncing Model'}
             </span>
           </div>
         </div>
@@ -178,18 +178,22 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
       {/* Bottom controls */}
       <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-24 pt-6 gap-5">
         {/* Confidence pill */}
-        <div className={`flex items-center gap-2 rounded-full border px-4 py-1.5 backdrop-blur-sm transition-all ${
+        <div className={cn(
+          'flex items-center gap-2 rounded-md border px-4 py-2 transition-all shadow-sm',
           ready
-            ? 'border-primary/40 bg-primary/10'
+            ? 'border-primary bg-primary/5'
             : bestConfidence > 0
-            ? 'border-yellow-400/30 bg-yellow-400/5'
-            : 'border-border bg-background/60'
-        }`}>
+            ? 'border-yellow-400 bg-yellow-400/5'
+            : 'border-border bg-white'
+        )}>
           {bestConfidence > 0 && (
-            <span className={`h-1.5 w-1.5 rounded-full ${ready ? 'bg-primary animate-pulse' : 'bg-yellow-400'}`} />
+            <span className={`h-2 w-2 rounded-full ${ready ? 'bg-primary animate-pulse' : 'bg-yellow-400'}`} />
           )}
-          <span className={`font-mono text-xs ${ready ? 'text-primary' : bestConfidence > 0 ? 'text-yellow-400' : 'text-muted-foreground'}`}>
-            {bestConfidence > 0 ? `${pct}% confidence` : 'No detection'}
+          <span className={cn(
+            'font-mono text-[10px] font-bold uppercase tracking-widest',
+            ready ? 'text-primary' : bestConfidence > 0 ? 'text-yellow-600' : 'text-muted-foreground'
+          )}>
+            {bestConfidence > 0 ? `${pct}% Confidence` : 'Scan Material'}
           </span>
         </div>
 
@@ -204,7 +208,7 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
           />
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-background/20 backdrop-blur-md hover:bg-background/40 transition-all active:scale-90"
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-white shadow-sm transition-all hover:bg-secondary active:scale-90"
             aria-label="Upload photo"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -217,21 +221,23 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
             onClick={handleSnap}
             disabled={busy || modelLoading || !ready}
             aria-label="Snap photo"
-            className="relative flex h-20 w-20 items-center justify-center disabled:opacity-40 transition-transform active:scale-95"
+            className="group relative flex h-20 w-20 items-center justify-center disabled:opacity-40 transition-transform active:scale-95"
           >
-            {/* Pulse ring */}
-            {ready && (
-              <span className="absolute inset-0 rounded-full border-2 border-primary/30 animate-pulse-ring" />
-            )}
             {/* Outer ring */}
-            <span className={`absolute inset-1 rounded-full border-2 transition-colors ${ready ? 'border-primary' : 'border-muted-foreground/20'}`} />
+            <span className={cn(
+              'absolute inset-0 rounded-full border-2 transition-all duration-300',
+              ready ? 'border-primary scale-110' : 'border-muted-foreground/10'
+            )} />
             {/* Inner */}
-            <span className={`flex h-12 w-12 items-center justify-center rounded-full transition-all ${ready ? 'bg-primary' : 'bg-muted-foreground/10'}`}>
+            <span className={cn(
+              'flex h-14 w-14 items-center justify-center rounded-full border border-border shadow-md transition-all duration-300',
+              ready ? 'bg-primary scale-100' : 'bg-white'
+            )}>
               {busy ? (
                 <span className="h-4 w-4 rounded-full border-2 border-primary-foreground border-t-transparent animate-spin" />
               ) : (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                  stroke={ready ? '#FFFFFF' : 'rgba(15,23,19,0.3)'}
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  stroke={ready ? '#FFFFFF' : '#0F1713'}
                   strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
                   <circle cx="12" cy="13" r="3" />
@@ -240,11 +246,11 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
             </span>
           </button>
           
-          <div className="w-12" /> {/* Spacer to keep Snap centered */}
+          <div className="w-12" /> {/* Spacer */}
         </div>
 
-        <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/40">
-          {modelLoading ? 'Loading model' : ready ? 'Tap to capture' : 'Aim at waste item'}
+        <p className="font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground/60">
+          {modelLoading ? 'Calibrating' : ready ? 'Ready' : 'Aim at Material'}
         </p>
       </div>
     </div>
