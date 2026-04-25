@@ -95,9 +95,24 @@ export default function ResultsScreen() {
                 </div>
               </div>
               
-              <div className="flex flex-wrap gap-2">
-                <Badge variant={TOX_VARIANT[item.info.toxicity]} label={`Toxicity: ${item.info.toxicity}`} />
-                <Badge variant={REC_VARIANT[item.info.recyclable]} label={item.info.recyclable} />
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-lg bg-secondary/20 p-3">
+                  <p className="font-mono text-[8px] uppercase tracking-widest text-muted-foreground mb-1">Toxicity</p>
+                  <p className="text-[11px] font-medium text-foreground">
+                    {item.info.toxicity === 'low' ? 'Safe for standard handling and recovery.' 
+                      : item.info.toxicity === 'medium' ? 'Contains some chemicals; handle with care.'
+                      : 'Toxic materials; requires specialist handling.'}
+                  </p>
+                </div>
+                <div className="rounded-lg bg-secondary/20 p-3">
+                  <p className="font-mono text-[8px] uppercase tracking-widest text-muted-foreground mb-1">Status</p>
+                  <p className="text-[11px] font-medium text-foreground capitalize">
+                    {item.info.recyclable === 'recyclable' ? 'Recoverable for industrial reuse.'
+                      : item.info.recyclable === 'landfill' ? 'Not recoverable; sent to landfill.'
+                      : item.info.recyclable === 'compostable' ? 'Naturally decomposes into soil.'
+                      : 'Dangerous waste; keep out of bins.'}
+                  </p>
+                </div>
               </div>
 
               <div className="rounded-lg bg-secondary/30 p-3">
