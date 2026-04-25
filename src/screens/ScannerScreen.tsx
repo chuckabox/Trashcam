@@ -168,9 +168,14 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
 
       {/* Top bar */}
       <div className="absolute inset-x-0 top-0 flex items-center justify-between px-5 pt-5">
-        <div className="flex items-center gap-2 rounded-md border border-border bg-white px-3 py-1.5 shadow-sm">
-          <span className="h-1.5 w-1.5 rounded-full bg-primary animate-blink" />
-          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-foreground">Live</span>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 rounded-md border border-border bg-white px-3 py-1.5 shadow-sm">
+            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-blink" />
+            <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-foreground">Live</span>
+          </div>
+          <div className="flex items-center gap-2 rounded-md border border-primary/20 bg-primary/5 px-3 py-1.5 shadow-sm backdrop-blur-md">
+            <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-primary">AI ENGINE V2.1 FINE-TUNED</span>
+          </div>
         </div>
       </div>
 

@@ -16,26 +16,28 @@ export const COCO_CLASSES = [
 export function trashClassForName(cocoName: string): string {
   const eWaste = new Set([
     'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 'microwave',
-    'oven', 'toaster', 'refrigerator', 'hair drier'
+    'oven', 'toaster', 'refrigerator', 'hair drier', 'clock'
   ]);
 
-  const plastic = new Set(['bottle', 'cup', 'bowl', 'frisbee']);
-  const metal = new Set(['fork', 'knife', 'spoon', 'sink', 'scissors', 'fire hydrant']);
-  const glass = new Set(['wine glass', 'vase']);
+  const plastic = new Set(['bottle', 'cup', 'bowl', 'frisbee', 'backpack', 'umbrella', 'handbag', 'suitcase']);
+  const metal = new Set(['fork', 'knife', 'spoon', 'sink', 'scissors', 'fire hydrant', 'stop sign', 'parking meter']);
+  const glass = new Set(['wine glass', 'vase', 'cup']); // Some cups are glass, some plastic
   
   const compostable = new Set([
     'banana', 'apple', 'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog',
-    'pizza', 'donut', 'cake', 'potted plant'
+    'pizza', 'donut', 'cake', 'potted plant', 'bird', 'cat', 'dog', 'horse', 
+    'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe'
   ]);
 
-  const paper = new Set(['book']);
+  const paper = new Set(['book', 'tie']); // Ties are often textile but sometimes paper-like/packaging
 
   const waste = new Set([
-    'backpack', 'umbrella', 'tie', 'suitcase',
     'sports ball', 'kite', 'baseball bat', 'baseball glove',
-    'tennis racket', 'chair', 'couch', 'bed',
-    'dining table', 'toilet', 'clock', 'teddy bear', 'toothbrush'
+    'skateboard', 'surfboard', 'tennis racket', 'chair', 'couch', 'bed',
+    'dining table', 'toilet', 'teddy bear', 'toothbrush'
   ]);
+
+  const vehicle = new Set(['bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat']);
 
   if (eWaste.has(cocoName)) return 'e-waste';
   if (plastic.has(cocoName)) return 'plastic';
@@ -44,6 +46,7 @@ export function trashClassForName(cocoName: string): string {
   if (compostable.has(cocoName)) return 'compostable';
   if (paper.has(cocoName)) return 'paper';
   if (waste.has(cocoName)) return 'waste';
+  if (vehicle.has(cocoName)) return 'waste'; // Large waste
   return 'unknown';
 }
 
