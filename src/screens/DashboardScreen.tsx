@@ -11,6 +11,7 @@ import { Badge } from '../components/ui/badge'
 import { Tabs } from '../components/ui/tabs'
 import { Button } from '../components/ui/button'
 import { Hint } from '../components/Hint'
+import { cn } from '../lib/utils'
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 
@@ -41,17 +42,23 @@ const TOOLTIP_STYLE = {
 
 
 /** Compact stat chip */
-function Chip({ label, value, sub, accent, hint }: { label: string; value: string; sub?: string; accent?: string; hint?: string }) {
+function Chip({ label, value, sub, theme, hint }: { label: string; value: string; sub?: string; theme: 'blue'|'emerald'|'amber'|'purple'; hint?: string }) {
+  const themes = {
+    blue: 'bg-tint-blue border-border-blue text-text-blue',
+    emerald: 'bg-tint-emerald border-border-emerald text-text-emerald',
+    amber: 'bg-tint-amber border-border-amber text-text-amber',
+    purple: 'bg-tint-purple border-border-purple text-text-purple',
+  }
   return (
-    <div className="relative rounded-lg border border-border bg-card p-3 card-hover-effect">
+    <div className={cn("relative rounded-lg border p-3 card-hover-effect", themes[theme])}>
       <div className="flex items-start justify-between">
         <div>
-          <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">{label}</p>
-          <p className="mt-1 font-mono text-xl font-bold" style={{ color: accent ?? '#0F1713' }}>{value}</p>
+          <p className={cn("font-mono text-[9px] uppercase tracking-widest", themes[theme])}>{label}</p>
+          <p className={cn("mt-1 font-mono text-xl font-bold", themes[theme])}>{value}</p>
         </div>
         {hint && <Hint text={hint} />}
       </div>
-      {sub && <p className="mt-0.5 font-mono text-[9px] text-muted-foreground">{sub}</p>}
+      {sub && <p className={cn("mt-0.5 font-mono text-[9px] opacity-80", themes[theme])}>{sub}</p>}
     </div>
   )
 }
@@ -75,10 +82,10 @@ function OverviewTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
     <div className="space-y-4 animate-fade-up">
       {/* KPI chips */}
       <div className="grid grid-cols-2 gap-2">
-        <Chip label="Today" value={String(stats.scannedToday)} sub="items scanned" />
-        <Chip label="Recyclable" value={`${stats.recyclablePercent}%`} sub="vs landfill" accent="#10BC79" />
-        <Chip label="Compostable" value={String(stats.compostableCount)} sub="organic items" accent="#f0c040" />
-        <Chip label="Total Co2" value={`${stats.totalCo2Kg.toFixed(1)}kg`} sub="carbon footprint" accent="#0F1713" 
+        <Chip label="Today" value={String(stats.scannedToday)} sub="items scanned" theme="blue" />
+        <Chip label="Recyclable" value={`${stats.recyclablePercent}%`} sub="vs landfill" theme="emerald" />
+        <Chip label="Compostable" value={String(stats.compostableCount)} sub="organic items" theme="amber" />
+        <Chip label="Total Co2" value={`${stats.totalCo2Kg.toFixed(1)}kg`} sub="carbon footprint" theme="purple" 
           hint="Greenhouse gases released during production" />
       </div>
 

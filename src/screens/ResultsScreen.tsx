@@ -75,13 +75,13 @@ export default function ResultsScreen() {
 
         <div className="grid grid-cols-3 gap-2">
           {[
-            { label: 'Breakdown', value: decompStr, color: 'text-primary', hint: 'Time to vanish' },
-            { label: 'CO₂', value: `${info.co2KgPerItem}kg`, color: 'text-cyan-600', hint: 'Carbon footprint' },
-            { label: 'Water', value: `${info.waterLitresPerItem}L`, color: 'text-blue-600', hint: 'Manufacturing usage' },
-          ].map(({ label, value, color, hint }) => (
-            <div key={label} className="rounded-lg border border-border bg-card p-3 text-center card-hover-effect">
+            { label: 'Breakdown', value: decompStr, color: 'text-text-emerald', bg: 'bg-tint-emerald border-border-emerald', hint: 'Time to vanish' },
+            { label: 'CO₂', value: `${info.co2KgPerItem}kg`, color: 'text-text-amber', bg: 'bg-tint-amber border-border-amber', hint: 'Carbon footprint' },
+            { label: 'Water', value: `${info.waterLitresPerItem}L`, color: 'text-text-blue', bg: 'bg-tint-blue border-border-blue', hint: 'Manufacturing usage' },
+          ].map(({ label, value, color, bg, hint }) => (
+            <div key={label} className={cn("rounded-lg border p-3 text-center card-hover-effect", bg)}>
               <div className="flex items-center justify-center gap-1">
-                <p className="font-mono text-[8px] font-bold uppercase tracking-widest text-primary">{label}</p>
+                <p className={cn("font-mono text-[8px] font-bold uppercase tracking-widest", color)}>{label}</p>
                 <Hint text={hint} />
               </div>
               <p className={cn("mt-1 font-mono text-sm font-bold", color)}>{value}</p>
@@ -91,16 +91,34 @@ export default function ResultsScreen() {
 
         {/* Characteristics */}
         <div className="grid grid-cols-2 gap-2">
-          <div className="rounded-lg border border-border bg-card p-4">
-            <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mb-2">Toxicity</p>
+          <div className={cn("rounded-lg border p-4", 
+            info.toxicity === 'high' ? 'bg-tint-rose border-border-rose' : 
+            info.toxicity === 'medium' ? 'bg-tint-amber border-border-amber' : 
+            'bg-tint-emerald border-border-emerald'
+          )}>
+            <p className={cn("font-mono text-[9px] uppercase tracking-widest mb-2",
+              info.toxicity === 'high' ? 'text-text-rose' : 
+              info.toxicity === 'medium' ? 'text-text-amber' : 
+              'text-text-emerald'
+            )}>Toxicity</p>
             <p className="text-sm text-foreground leading-relaxed">
               {info.toxicity === 'high' ? 'Contains hazardous parts. Special handling needed.' : 
                info.toxicity === 'medium' ? 'Moderate toxicity. Dispose carefully.' : 
                'Low toxicity. Safe standard disposal.'}
             </p>
           </div>
-          <div className="rounded-lg border border-border bg-card p-4">
-            <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mb-2">Class</p>
+          <div className={cn("rounded-lg border p-4",
+            info.recyclable === 'recyclable' ? 'bg-tint-blue border-border-blue' :
+            info.recyclable === 'compostable' ? 'bg-tint-emerald border-border-emerald' :
+            info.recyclable === 'hazardous' ? 'bg-tint-rose border-border-rose' :
+            'bg-tint-purple border-border-purple'
+          )}>
+            <p className={cn("font-mono text-[9px] uppercase tracking-widest mb-2",
+              info.recyclable === 'recyclable' ? 'text-text-blue' :
+              info.recyclable === 'compostable' ? 'text-text-emerald' :
+              info.recyclable === 'hazardous' ? 'text-text-rose' :
+              'text-text-purple'
+            )}>Class</p>
             <p className="text-sm text-foreground leading-relaxed">
               {info.recyclable === 'recyclable' ? 'Can be processed into new materials.' :
                info.recyclable === 'compostable' ? 'Breaks down naturally into compost.' :

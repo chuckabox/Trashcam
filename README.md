@@ -101,7 +101,7 @@ trashlife/
 | Runtime | React 18 |
 | Build Tool | Vite 5 |
 | ML Runtime | TensorFlow.js + COCO-SSD |
-| Styling | Tailwind CSS |
+| Styling | Tailwind CSS (Semantic Tinted Palette: Blue, Emerald, Amber, Rose, Purple) |
 | Icons | Lucide React |A
 | Navigation | React Router Dom |
 | Charts | Recharts |

@@ -11,17 +11,37 @@ export default {
       colors: {
         background: '#FDFDFB',
         foreground: '#0F1713',
-        card: '#F5F6F3',
+        card: '#FFFFFF',
         'card-foreground': '#0F1713',
         border: '#E1E4DF',
         primary: '#10BC79',
         'primary-foreground': '#FFFFFF',
-        secondary: '#E8EBE6',
+        secondary: '#F0F2EF',
         'secondary-foreground': '#405045',
-        muted: '#F0F2EF',
+        muted: '#F5F6F3',
         'muted-foreground': '#607065',
-        destructive: '#E53E3E',
+        destructive: '#E11D48',
         'destructive-foreground': '#FFFFFF',
+        
+        'tint-blue': '#EBF4FF',
+        'text-blue': '#1E40AF',
+        'border-blue': '#BFDBFE',
+        
+        'tint-emerald': '#ECFDF5',
+        'text-emerald': '#065F46',
+        'border-emerald': '#A7F3D0',
+
+        'tint-amber': '#FEF3C7',
+        'text-amber': '#92400E',
+        'border-amber': '#FDE68A',
+
+        'tint-rose': '#FFE4E6',
+        'text-rose': '#BE123C',
+        'border-rose': '#FECDD3',
+        
+        'tint-purple': '#F3E8FF',
+        'text-purple': '#6B21A8',
+        'border-purple': '#E9D5FF',
       },
       keyframes: {
         'pulse-ring': {
