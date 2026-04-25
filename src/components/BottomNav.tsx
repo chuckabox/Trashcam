@@ -12,7 +12,7 @@ function StatsIcon({ active }: { active: boolean }) {
   )
 }
 
-function AlbumIcon({ active }: { active: boolean }) {
+function DiaryIcon({ active }: { active: boolean }) {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       strokeWidth={active ? 2 : 1.5} strokeLinecap="round" strokeLinejoin="round">
@@ -73,7 +73,7 @@ export function BottomNav() {
             <span className="font-mono text-[9px] uppercase tracking-widest">Scan</span>
           </button>
 
-          {/* Album */}
+          {/* Diary */}
           <button
             onClick={() => navigate('/diary')}
             className={cn(
@@ -81,8 +81,8 @@ export function BottomNav() {
               diaryActive ? 'text-primary scale-110' : 'text-muted-foreground hover:text-foreground',
             )}
           >
-            <AlbumIcon active={diaryActive} />
-            <span className="font-mono text-[9px] uppercase tracking-widest">Album</span>
+            <DiaryIcon active={diaryActive} />
+            <span className="font-mono text-[9px] uppercase tracking-widest">Diary</span>
           </button>
 
         </div>

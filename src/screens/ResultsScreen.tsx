@@ -6,17 +6,9 @@ import { Button } from '../components/ui/button'
 import { Hint } from '../components/Hint'
 import { cn } from '../lib/utils'
 
-const TOX_TEXT = {
-  low: 'Safe to handle. No significant toxic risk to nature if sorted properly.',
-  medium: 'Contains chemicals or dyes. Handle carefully and keep away from waterways.',
-  high: 'Contains hazardous parts. Can be harmful to humans and the environment if leaked.',
-} as const
-
-const REC_TEXT = {
-  recyclable: 'Fully recyclable. This can be processed into new raw materials for manufacturing.',
-  compostable: '100% organic. This will naturally break down into nutrient-rich soil.',
-  landfill: 'Destined for landfill. This is made of mixed materials that are hard to recover.',
-  hazardous: 'Special disposal required. Contains dangerous parts that cannot go in normal bins.',
+const TOX_VARIANT = { low: 'success', medium: 'warning', high: 'danger' } as const
+const REC_VARIANT = {
+  recyclable: 'success', compostable: 'success', landfill: 'secondary', hazardous: 'danger',
 } as const
 
 export default function ResultsScreen() {
@@ -83,39 +75,36 @@ export default function ResultsScreen() {
 
         <div className="grid grid-cols-3 gap-2">
           {[
-            { label: 'Decomposes', value: decompStr, color: 'text-primary' },
-            { label: 'CO₂', value: `${info.co2KgPerItem}kg`, color: 'text-cyan-600' },
-            { label: 'Water', value: `${info.waterLitresPerItem}L`, color: 'text-blue-600' },
-          ].map(({ label, value, color }) => (
+            { label: 'Breakdown', value: decompStr, color: 'text-primary', hint: 'Time to vanish' },
+            { label: 'CO₂', value: `${info.co2KgPerItem}kg`, color: 'text-cyan-600', hint: 'Carbon footprint' },
+            { label: 'Water', value: `${info.waterLitresPerItem}L`, color: 'text-blue-600', hint: 'Manufacturing usage' },
+          ].map(({ label, value, color, hint }) => (
             <div key={label} className="rounded-lg border border-border bg-card p-3 text-center card-hover-effect">
-              <p className="font-mono text-[8px] font-bold uppercase tracking-widest text-primary">{label}</p>
+              <div className="flex items-center justify-center gap-1">
+                <p className="font-mono text-[8px] font-bold uppercase tracking-widest text-primary">{label}</p>
+                <Hint text={hint} />
+              </div>
               <p className={cn("mt-1 font-mono text-sm font-bold", color)}>{value}</p>
             </div>
           ))}
         </div>
 
-        {/* Safety & Category */}
-        <div className="grid grid-cols-1 gap-2">
-          <div className="rounded-lg border border-border bg-card p-4">
-            <p className="font-mono text-[9px] font-bold uppercase tracking-widest text-primary mb-2">Safety & Toxicity</p>
-            <p className="text-sm text-foreground leading-relaxed">{TOX_TEXT[info.toxicity]}</p>
-          </div>
-          <div className="rounded-lg border border-border bg-card p-4">
-            <p className="font-mono text-[9px] font-bold uppercase tracking-widest text-primary mb-2">Recycling Info</p>
-            <p className="text-sm text-foreground leading-relaxed">{REC_TEXT[info.recyclable]}</p>
-          </div>
+        {/* Badges */}
+        <div className="flex flex-wrap gap-2">
+          <Badge variant={TOX_VARIANT[info.toxicity]} label={`Toxicity: ${info.toxicity}`} />
+          <Badge variant={REC_VARIANT[info.recyclable]} label={info.recyclable} />
         </div>
 
         {/* Disposal tip */}
         <div className="rounded-lg border border-border bg-card p-4">
-          <p className="font-mono text-[9px] font-bold uppercase tracking-widest text-primary mb-2">How to dispose</p>
+          <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mb-2">How to dispose</p>
           <p className="text-sm text-foreground leading-relaxed">{info.disposalTip}</p>
         </div>
 
         {/* Actions */}
         <div className="flex gap-2 pt-1">
           <Button className="flex-1" onClick={() => navigate('/')}>Scan Another</Button>
-          <Button variant="outline" className="flex-1" onClick={() => navigate('/diary')}>View Album</Button>
+          <Button variant="outline" className="flex-1" onClick={() => navigate('/diary')}>View Diary</Button>
         </div>
       </div>
     </div>

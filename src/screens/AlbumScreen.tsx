@@ -47,7 +47,7 @@ export default function DiaryScreen() {
           <div>
             <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Trashcams</p>
             <h1 className="text-2xl font-800 text-foreground">
-              Album
+              Diary
               <span className="ml-2 font-mono text-base font-normal text-muted-foreground">({scans.length})</span>
             </h1>
           </div>
