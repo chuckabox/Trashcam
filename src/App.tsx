@@ -4,6 +4,7 @@ import ResultsScreen from './screens/ResultsScreen'
 import DiaryScreen from './screens/DiaryScreen'
 import DashboardScreen from './screens/DashboardScreen'
 import { BottomNav } from './components/BottomNav'
+import { cn } from './lib/utils'
 
 const NAV_ROUTES = new Set(['/', '/diary', '/dashboard'])
 const FULLSCREEN_ROUTES = new Set(['/'])
