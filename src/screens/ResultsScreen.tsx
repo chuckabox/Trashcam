@@ -75,15 +75,12 @@ export default function ResultsScreen() {
 
         <div className="grid grid-cols-3 gap-2">
           {[
-            { label: 'Breakdown', value: decompStr, color: 'text-primary', hint: 'Time to vanish' },
-            { label: 'CO₂', value: `${info.co2KgPerItem}kg`, color: 'text-cyan-600', hint: 'Carbon footprint' },
-            { label: 'Water', value: `${info.waterLitresPerItem}L`, color: 'text-blue-600', hint: 'Manufacturing usage' },
-          ].map(({ label, value, color, hint }) => (
+            { label: 'Decomposes', value: decompStr, color: 'text-primary' },
+            { label: 'CO₂', value: `${info.co2KgPerItem}kg`, color: 'text-cyan-600' },
+            { label: 'Water', value: `${info.waterLitresPerItem}L`, color: 'text-blue-600' },
+          ].map(({ label, value, color }) => (
             <div key={label} className="rounded-lg border border-border bg-card p-3 text-center card-hover-effect">
-              <div className="flex items-center justify-center gap-1">
-                <p className="font-mono text-[8px] font-bold uppercase tracking-widest text-primary">{label}</p>
-                <Hint text={hint} />
-              </div>
+              <p className="font-mono text-[8px] font-bold uppercase tracking-widest text-primary">{label}</p>
               <p className={cn("mt-1 font-mono text-sm font-bold", color)}>{value}</p>
             </div>
           ))}
