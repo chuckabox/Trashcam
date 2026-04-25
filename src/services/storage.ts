@@ -6,7 +6,14 @@ export async function loadScans(): Promise<ScanResult[]> {
   const raw = localStorage.getItem(KEY)
   if (!raw) return []
   try {
-    return JSON.parse(raw) as ScanResult[]
+    const scans = JSON.parse(raw) as any[]
+    // Migration: Ensure old scans have 'detections' array
+    return scans.map(s => {
+      if (s.detection && !s.detections) {
+        return { ...s, detections: [s.detection] }
+      }
+      return s as ScanResult
+    })
   } catch {
     return []
   }
