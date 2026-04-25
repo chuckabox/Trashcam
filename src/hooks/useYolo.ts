@@ -44,8 +44,7 @@ export function useYolo(videoRef: React.RefObject<HTMLVideoElement>) {
           const preds = await modelRef.current.detect(video)
           const dets: Detection[] = preds
             .filter((p) => {
-              const tc = trashClassForName(p.class)
-              return tc !== 'unknown' && p.score >= DETECTION_CONFIDENCE_THRESHOLD
+              return p.score >= DETECTION_CONFIDENCE_THRESHOLD
             })
             .map((p) => ({
               class: trashClassForName(p.class),
