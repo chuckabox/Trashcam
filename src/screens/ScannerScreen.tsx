@@ -181,7 +181,7 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
       )}
 
       {/* Bottom controls */}
-      <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-10 pt-6 gap-6">
+      <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-24 pt-6 gap-6">
         {/* Action Buttons */}
         <div className="flex items-center gap-8">
           <input
