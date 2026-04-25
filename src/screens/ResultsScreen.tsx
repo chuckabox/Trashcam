@@ -6,9 +6,17 @@ import { Button } from '../components/ui/button'
 import { Hint } from '../components/Hint'
 import { cn } from '../lib/utils'
 
-const TOX_VARIANT = { low: 'success', medium: 'warning', high: 'danger' } as const
-const REC_VARIANT = {
-  recyclable: 'success', compostable: 'success', landfill: 'secondary', hazardous: 'danger',
+const TOX_TEXT = {
+  low: 'Safe to handle. No significant toxic risk to nature if sorted properly.',
+  medium: 'Contains chemicals or dyes. Handle carefully and keep away from waterways.',
+  high: 'Contains hazardous parts. Can be harmful to humans and the environment if leaked.',
+} as const
+
+const REC_TEXT = {
+  recyclable: 'Fully recyclable. This can be processed into new raw materials for manufacturing.',
+  compostable: '100% organic. This will naturally break down into nutrient-rich soil.',
+  landfill: 'Destined for landfill. This is made of mixed materials that are hard to recover.',
+  hazardous: 'Special disposal required. Contains dangerous parts that cannot go in normal bins.',
 } as const
 
 export default function ResultsScreen() {
@@ -25,20 +33,14 @@ export default function ResultsScreen() {
     )
   }
 
-  const { items, photoUri } = scan
-  
-  // Aggregate stats across all items
-  const totalCo2 = items.reduce((acc, item) => acc + item.info.co2KgPerItem, 0)
-  const totalWater = items.reduce((acc, item) => acc + item.info.waterLitresPerItem, 0)
-  const maxDecomp = Math.max(...items.map(item => item.info.decompositionYears))
-  
-  const decompStr = maxDecomp >= 1000 ? '1000+ yrs'
-    : maxDecomp < 1 ? `${Math.round(maxDecomp * 365)}d`
-    : `${maxDecomp} yrs`
+  const { info, detection, photoUri } = scan
+  const decompStr = info.decompositionYears >= 1000 ? '1000+ yrs'
+    : info.decompositionYears < 1 ? `${Math.round(info.decompositionYears * 365)}d`
+    : `${info.decompositionYears} yrs`
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-lg px-4 pb-8 pt-6 space-y-6">
+      <div className="mx-auto max-w-lg px-4 pb-8 pt-6 space-y-4">
 
         {/* Back */}
         <button onClick={() => navigate(-1)}
@@ -49,82 +51,69 @@ export default function ResultsScreen() {
           Back
         </button>
 
-        {/* Hero Image */}
-        <div className="rounded-xl border border-border bg-card overflow-hidden shadow-sm">
-          {photoUri && (
-            <div className="relative h-48 w-full overflow-hidden">
-              <img src={photoUri} alt="Scan capture" className="h-full w-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-              <div className="absolute bottom-3 left-4">
-                <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-white">
-                  {items.length} {items.length === 1 ? 'Item' : 'Items'} Detected
+        {/* Hero */}
+        <div className="rounded-lg border border-border bg-card overflow-hidden">
+          {photoUri ? (
+            <div className="relative h-52 w-full overflow-hidden">
+              <img src={photoUri} alt={info.displayName} className="h-full w-full object-cover opacity-80" />
+              <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <p className="text-xl font-bold text-foreground">{info.displayName}</p>
+                <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mt-0.5">
+                  {Math.round(detection.confidence * 100)}% confidence · {info.material}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-4 p-4">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-secondary text-4xl">
+                {info.emoji}
+              </div>
+              <div>
+                <p className="text-xl font-bold text-foreground">{info.displayName}</p>
+                <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mt-0.5">
+                  {Math.round(detection.confidence * 100)}% confidence · {info.material}
                 </p>
               </div>
             </div>
           )}
         </div>
 
-        {/* Total Impact Summary */}
+
+
         <div className="grid grid-cols-3 gap-2">
           {[
             { label: 'Decomposes', value: decompStr, color: 'text-primary' },
-            { label: 'Total CO₂', value: `${totalCo2.toFixed(2)}kg`, color: 'text-cyan-600' },
-            { label: 'Total Water', value: `${totalWater.toFixed(0)}L`, color: 'text-blue-600' },
+            { label: 'CO₂', value: `${info.co2KgPerItem}kg`, color: 'text-cyan-600' },
+            { label: 'Water', value: `${info.waterLitresPerItem}L`, color: 'text-blue-600' },
           ].map(({ label, value, color }) => (
-            <div key={label} className="rounded-lg border border-border bg-white p-3 text-center shadow-sm">
+            <div key={label} className="rounded-lg border border-border bg-card p-3 text-center card-hover-effect">
               <p className="font-mono text-[8px] font-bold uppercase tracking-widest text-primary">{label}</p>
               <p className={cn("mt-1 font-mono text-sm font-bold", color)}>{value}</p>
             </div>
           ))}
         </div>
 
-        {/* Individual Items List */}
-        <div className="space-y-3">
-          <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Scan Details</p>
-          {items.map((item, idx) => (
-            <div key={`${item.info.yoloClass}-${idx}`} className="rounded-xl border border-border bg-white p-4 shadow-sm space-y-3">
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-secondary text-2xl">
-                  {item.info.emoji}
-                </div>
-                <div>
-                  <p className="text-lg font-bold text-foreground">{item.info.displayName}</p>
-                  <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mt-0.5">
-                    {Math.round(item.detection.confidence * 100)}% Confidence · {item.info.material}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-lg bg-secondary/20 p-3">
-                  <p className="font-mono text-[8px] uppercase tracking-widest text-muted-foreground mb-1">Toxicity</p>
-                  <p className="text-[11px] font-medium text-foreground">
-                    {item.info.toxicity === 'low' ? 'Safe for standard handling and recovery.' 
-                      : item.info.toxicity === 'medium' ? 'Contains some chemicals; handle with care.'
-                      : 'Toxic materials; requires specialist handling.'}
-                  </p>
-                </div>
-                <div className="rounded-lg bg-secondary/20 p-3">
-                  <p className="font-mono text-[8px] uppercase tracking-widest text-muted-foreground mb-1">Status</p>
-                  <p className="text-[11px] font-medium text-foreground capitalize">
-                    {item.info.recyclable === 'recyclable' ? 'Recoverable for industrial reuse.'
-                      : item.info.recyclable === 'landfill' ? 'Not recoverable; sent to landfill.'
-                      : item.info.recyclable === 'compostable' ? 'Naturally decomposes into soil.'
-                      : 'Dangerous waste; keep out of bins.'}
-                  </p>
-                </div>
-              </div>
+        {/* Safety & Category */}
+        <div className="grid grid-cols-1 gap-2">
+          <div className="rounded-lg border border-border bg-card p-4">
+            <p className="font-mono text-[9px] font-bold uppercase tracking-widest text-primary mb-2">Safety & Toxicity</p>
+            <p className="text-sm text-foreground leading-relaxed">{TOX_TEXT[info.toxicity]}</p>
+          </div>
+          <div className="rounded-lg border border-border bg-card p-4">
+            <p className="font-mono text-[9px] font-bold uppercase tracking-widest text-primary mb-2">Recycling Info</p>
+            <p className="text-sm text-foreground leading-relaxed">{REC_TEXT[info.recyclable]}</p>
+          </div>
+        </div>
 
-              <div className="rounded-lg bg-secondary/30 p-3">
-                <p className="font-mono text-[8px] uppercase tracking-widest text-muted-foreground mb-1">Disposal Tip</p>
-                <p className="text-xs text-foreground leading-relaxed">{item.info.disposalTip}</p>
-              </div>
-            </div>
-          ))}
+        {/* Disposal tip */}
+        <div className="rounded-lg border border-border bg-card p-4">
+          <p className="font-mono text-[9px] font-bold uppercase tracking-widest text-primary mb-2">How to dispose</p>
+          <p className="text-sm text-foreground leading-relaxed">{info.disposalTip}</p>
         </div>
 
         {/* Actions */}
-        <div className="flex gap-2 pt-2">
+        <div className="flex gap-2 pt-1">
           <Button className="flex-1" onClick={() => navigate('/')}>Scan Another</Button>
           <Button variant="outline" className="flex-1" onClick={() => navigate('/diary')}>View Album</Button>
         </div>

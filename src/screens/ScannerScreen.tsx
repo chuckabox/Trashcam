@@ -45,10 +45,8 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
 
   const handleSnap = useCallback(async () => {
     if (busy || !videoRef.current || !detections.length) return
-    
-    // Capture all detections above threshold
-    const validDetections = detections.filter(d => d.confidence >= SNAP_CONFIDENCE_THRESHOLD)
-    if (!validDetections.length) return
+    const top = [...detections].sort((a, b) => b.confidence - a.confidence)[0]
+    if (!top) return
 
     setBusy(true)
     try {
@@ -59,16 +57,13 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
       canvas.getContext('2d')!.drawImage(video, 0, 0)
       const photoUri = canvas.toDataURL('image/jpeg', 0.8)
 
-      const items = validDetections.map(d => ({
-        detection: d,
-        info: lookup(d.class)
-      }))
-
+      const info = lookup(top.class)
       const scan: ScanResult = {
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         timestamp: Date.now(),
         photoUri,
-        items,
+        detection: top,
+        info,
       }
       await saveScan(scan)
       navigate('/results', { state: { scan } })
@@ -89,20 +84,14 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
         const img = new Image()
         img.onload = async () => {
           const results = await runInference(img)
+          const top = [...results].sort((a, b) => b.confidence - a.confidence)[0]
           
-          // Use all detections found in upload
-          const items = results.length > 0 
-            ? results.map(r => ({ detection: r, info: lookup(r.class) }))
-            : [{ 
-                detection: { class: 'unknown', confidence: 0, bbox: { x: 0, y: 0, width: 1, height: 1 } },
-                info: lookup('unknown')
-              }]
-
           const scan: ScanResult = {
             id: `upload-${Date.now()}`,
             timestamp: Date.now(),
             photoUri: dataUrl,
-            items,
+            detection: top || { class: 'unknown', confidence: 0, bbox: { x: 0, y: 0, width: 1, height: 1 } },
+            info: lookup(top?.class || 'unknown'),
           }
           await saveScan(scan)
           navigate('/results', { state: { scan } })

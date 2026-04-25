@@ -12,7 +12,7 @@ const FILTER_TABS = [
   { id: 'landfill', label: 'Landfill' },
 ]
 
-export default function AlbumScreen() {
+export default function DiaryScreen() {
   const navigate = useNavigate()
   const [scans, setScans] = useState<ScanResult[]>([])
   const [refreshing, setRefreshing] = useState(false)
@@ -33,8 +33,8 @@ export default function AlbumScreen() {
 
   const filtered = useMemo(() => {
     let result = scans
-    if (filter === 'recyclable') result = result.filter((s) => s.items.some(i => i.info.recyclable === 'recyclable'))
-    else if (filter === 'landfill') result = result.filter((s) => s.items.some(i => i.info.recyclable === 'landfill' || i.info.recyclable === 'hazardous'))
+    if (filter === 'recyclable') result = result.filter((s) => s.info.recyclable === 'recyclable')
+    else if (filter === 'landfill') result = result.filter((s) => s.info.recyclable === 'landfill' || s.info.recyclable === 'hazardous')
     return result
   }, [scans, filter])
 
@@ -99,32 +99,24 @@ export default function AlbumScreen() {
                       <img src={item.photoUri} alt="" className="h-12 w-12 shrink-0 rounded-md object-cover" />
                     ) : (
                       <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-secondary">
-                        <span className="text-xl">{item.items[0]?.info.emoji || '❓'}</span>
+                        <span className="text-xl">{item.info.emoji}</span>
                       </div>
                     )}
 
                     {/* Info */}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-1">
-                        <p className="truncate text-sm font-semibold text-foreground">
-                          {item.items.length === 1 
-                            ? item.items[0].info.displayName 
-                            : `${item.items.length} Items Detected`}
-                        </p>
+                        <p className="truncate text-sm font-semibold text-foreground">{item.info.displayName}</p>
                       </div>
-                      <p className="mt-0.5 truncate font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
-                        {item.items.map(i => i.info.displayName).join(', ')}
+                      <p className="mt-0.5 font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
+                        {new Date(item.timestamp).toLocaleDateString()} · {item.info.material}
                       </p>
                     </div>
 
-                    {/* Meta */}
+                    {/* Confidence */}
                     <div className="shrink-0 text-right">
-                      <p className="font-mono text-[9px] text-muted-foreground">
-                        {new Date(item.timestamp).toLocaleDateString()}
-                      </p>
-                      <p className="font-mono text-[8px] font-bold text-primary uppercase mt-1">
-                        View Details
-                      </p>
+                      <p className="font-mono text-sm font-bold text-foreground capitalize">{item.info.recyclable}</p>
+                      <p className="font-mono text-[9px] text-muted-foreground">{Math.round(item.detection.confidence * 100)}% confidence</p>
                     </div>
                   </div>
                 </button>

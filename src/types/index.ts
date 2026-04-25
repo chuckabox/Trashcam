@@ -40,17 +40,13 @@ export interface Detection {
   bbox: BoundingBox;
 }
 
-export interface ScanItem {
-  detection: Detection;
-  info: DegradationInfo;
-}
-
 export interface ScanResult {
   id: string;
   timestamp: number;
   photoUri?: string;
+  detection: Detection;
   ocrText?: string;
-  items: ScanItem[];
+  info: DegradationInfo;
 }
 
 export interface DashboardStats {

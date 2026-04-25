@@ -24,23 +24,28 @@ export async function clearScans(): Promise<void> {
 
 export function computeStats(scans: ScanResult[]): DashboardStats {
   const breakdown: Record<MaterialCategory, number> = {
-    plastic: 0, metal: 0, glass: 0, paper: 0, cardboard: 0, organic: 0,
-    textile: 0, styrofoam: 0, electronic: 0, hazardous: 0, composite: 0,
+    plastic: 0,
+    metal: 0,
+    glass: 0,
+    paper: 0,
+    cardboard: 0,
+    organic: 0,
+    textile: 0,
+    styrofoam: 0,
+    electronic: 0,
+    hazardous: 0,
+    composite: 0,
   }
 
   const counts = new Map<string, number>()
   let co2 = 0
   let water = 0
-  let totalItems = 0
 
   for (const s of scans) {
-    for (const item of s.items) {
-      breakdown[item.info.material] = (breakdown[item.info.material] ?? 0) + 1
-      co2 += item.info.co2KgPerItem
-      water += item.info.waterLitresPerItem
-      counts.set(item.info.displayName, (counts.get(item.info.displayName) ?? 0) + 1)
-      totalItems++
-    }
+    breakdown[s.info.material] = (breakdown[s.info.material] ?? 0) + 1
+    co2 += s.info.co2KgPerItem
+    water += s.info.waterLitresPerItem
+    counts.set(s.info.displayName, (counts.get(s.info.displayName) ?? 0) + 1)
   }
 
   const topItems = [...counts.entries()]
@@ -49,7 +54,7 @@ export function computeStats(scans: ScanResult[]): DashboardStats {
     .map(([name, count]) => ({ name, count }))
 
   return {
-    totalScans: totalItems,
+    totalScans: scans.length,
     totalCo2Kg: co2,
     totalWaterLitres: water,
     materialBreakdown: breakdown,
@@ -63,23 +68,18 @@ export function computeEnhancedStats(scans: ScanResult[]): EnhancedStats {
 
   const todayStart = new Date()
   todayStart.setHours(0, 0, 0, 0)
-  
-  const scannedToday = scans
-    .filter((s) => s.timestamp >= todayStart.getTime())
-    .reduce((acc, s) => acc + s.items.length, 0)
+  const scannedToday = scans.filter((s) => s.timestamp >= todayStart.getTime()).length
 
   let recyclableCount = 0, landfillCount = 0, compostableCount = 0, hazardousCount = 0
   for (const s of scans) {
-    for (const item of s.items) {
-      if (item.info.recyclable === 'recyclable') recyclableCount++
-      else if (item.info.recyclable === 'landfill') landfillCount++
-      else if (item.info.recyclable === 'compostable') compostableCount++
-      else if (item.info.recyclable === 'hazardous') hazardousCount++
-    }
+    if (s.info.recyclable === 'recyclable') recyclableCount++
+    else if (s.info.recyclable === 'landfill') landfillCount++
+    else if (s.info.recyclable === 'compostable') compostableCount++
+    else if (s.info.recyclable === 'hazardous') hazardousCount++
   }
 
-  const recyclablePercent = base.totalScans > 0
-    ? Math.round((recyclableCount / base.totalScans) * 100)
+  const recyclablePercent = scans.length > 0
+    ? Math.round((recyclableCount / scans.length) * 100)
     : 0
 
   const weeklyData: WeeklyBucket[] = Array.from({ length: 7 }, (_, i) => {
@@ -90,18 +90,14 @@ export function computeEnhancedStats(scans: ScanResult[]): EnhancedStats {
     next.setDate(next.getDate() + 1)
     return {
       day: d.toLocaleDateString('en', { weekday: 'short' }),
-      count: scans
-        .filter((s) => s.timestamp >= d.getTime() && s.timestamp < next.getTime())
-        .reduce((acc, s) => acc + s.items.length, 0),
+      count: scans.filter((s) => s.timestamp >= d.getTime() && s.timestamp < next.getTime()).length,
     }
   })
 
-  const thisWeekCount = scans
-    .filter((s) => s.timestamp >= now - 7 * 86_400_000)
-    .reduce((acc, s) => acc + s.items.length, 0)
-  const prevWeekCount = scans
-    .filter((s) => s.timestamp >= now - 14 * 86_400_000 && s.timestamp < now - 7 * 86_400_000)
-    .reduce((acc, s) => acc + s.items.length, 0)
+  const thisWeekCount = scans.filter((s) => s.timestamp >= now - 7 * 86_400_000).length
+  const prevWeekCount = scans.filter(
+    (s) => s.timestamp >= now - 14 * 86_400_000 && s.timestamp < now - 7 * 86_400_000,
+  ).length
   const reductionPercent = prevWeekCount > 0
     ? Math.round(((prevWeekCount - thisWeekCount) / prevWeekCount) * 100)
     : null
