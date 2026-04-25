@@ -1,6 +1,18 @@
 [
   {
-    "yoloClass": "recyclable",
+    "yoloClass": "plastic",
+    "displayName": "Plastic Recyclable",
+    "material": "plastic",
+    "decompositionYears": 450,
+    "co2KgPerItem": 0.3,
+    "waterLitresPerItem": 2.0,
+    "toxicity": "low",
+    "recyclable": "recyclable",
+    "emoji": "🥤",
+    "disposalTip": "This is likely PET or HDPE plastic. Rinse it out and put it in the yellow-lid recycling bin."
+  },
+  {
+    "yoloClass": "metal",
     "displayName": "Metal Recyclable",
     "material": "metal",
     "decompositionYears": 500,
@@ -8,8 +20,20 @@
     "waterLitresPerItem": 0.5,
     "toxicity": "low",
     "recyclable": "recyclable",
-    "emoji": "♻️",
+    "emoji": "🥫",
     "disposalTip": "This is valuable scrap. Put it in your yellow-lid recycling bin so it can be melted down and reused."
+  },
+  {
+    "yoloClass": "glass",
+    "displayName": "Glass Recyclable",
+    "material": "glass",
+    "decompositionYears": 1000,
+    "co2KgPerItem": 0.4,
+    "waterLitresPerItem": 1.0,
+    "toxicity": "low",
+    "recyclable": "recyclable",
+    "emoji": "🍾",
+    "disposalTip": "Glass can be recycled forever! Place it in the yellow-lid bin or a glass-specific collection point."
   },
   {
     "yoloClass": "e-waste",
@@ -57,7 +81,7 @@
     "toxicity": "medium",
     "recyclable": "landfill",
     "emoji": "🗑️",
-    "disposalTip": "This is tricky to recycle (like chip bags). It usually goes in the red-lid landfill bin, but some specialized recyclers can still use it."
+    "disposalTip": "This is tricky to recycle (like chip bags). It usually goes in the red-lid landfill bin."
   },
   {
     "yoloClass": "unknown",

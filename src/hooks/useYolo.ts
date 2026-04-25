@@ -52,7 +52,7 @@ export function useYolo(videoRef: React.RefObject<HTMLVideoElement>) {
           const ctx = cvs.getContext('2d', { willReadFrequently: true })
           if (ctx) {
             // Improve lighting and contrast before inference
-            ctx.filter = 'contrast(1.2) brightness(1.1)'
+            ctx.filter = 'contrast(1.1) brightness(1.1) saturate(1.2)'
             // Resize to 640x640 consistently
             ctx.drawImage(video, 0, 0, 640, 640)
 
@@ -60,8 +60,8 @@ export function useYolo(videoRef: React.RefObject<HTMLVideoElement>) {
             const dets: Detection[] = preds
               .filter((p) => p.score >= DETECTION_CONFIDENCE_THRESHOLD)
               .map((p) => ({
-                // Hard constraint: If confidence < 0.7 -> force unknown
-                class: p.score < 0.7 ? 'unknown' : trashClassForName(p.class),
+                // Lower threshold for identification
+                class: p.score < 0.5 ? 'unknown' : trashClassForName(p.class),
                 confidence: p.score,
                 bbox: {
                   x: p.bbox[0] / 640,
@@ -92,14 +92,14 @@ export function useYolo(videoRef: React.RefObject<HTMLVideoElement>) {
     const ctx = cvs.getContext('2d', { willReadFrequently: true })
     if (!ctx) return []
 
-    ctx.filter = 'contrast(1.2) brightness(1.1)'
+    ctx.filter = 'contrast(1.1) brightness(1.1) saturate(1.2)'
     ctx.drawImage(source, 0, 0, 640, 640)
     const preds = await modelRef.current.detect(cvs)
     
     return preds
       .filter((p) => p.score >= DETECTION_CONFIDENCE_THRESHOLD)
       .map((p) => ({
-        class: p.score < 0.7 ? 'unknown' : trashClassForName(p.class),
+        class: p.score < 0.5 ? 'unknown' : trashClassForName(p.class),
         confidence: p.score,
         bbox: {
           x: p.bbox[0] / 640,
