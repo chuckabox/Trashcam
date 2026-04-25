@@ -46,7 +46,15 @@ export function BottomNav() {
       className="fixed bottom-0 inset-x-0 z-50 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:w-[393px]"
       style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 0px)' }}
     >
-      <div className="rounded-t-[40px] border border-b-0 border-border bg-white shadow-[0_-8px_24px_rgba(0,0,0,0.04)] overflow-hidden">
+      <div className="relative border-t-0 border-border bg-white shadow-[0_-8px_24px_rgba(0,0,0,0.04)]">
+        {/* Left upward curve */}
+        <svg className="absolute bottom-full left-0 text-white" width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M0 24H24C10.7452 24 0 13.2548 0 0V24Z" fill="currentColor"/>
+        </svg>
+        {/* Right upward curve */}
+        <svg className="absolute bottom-full right-0 text-white" width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M24 24H0C13.2548 24 24 13.2548 24 0V24Z" fill="currentColor"/>
+        </svg>
         <div className="flex items-end justify-around px-4 pt-2 pb-3">
 
           {/* Stats */}
