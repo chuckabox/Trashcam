@@ -75,7 +75,6 @@ function Chip({ label, value, sub, accent, hint }: { label: string; value: strin
           <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">{label}</p>
           <p className="mt-1 font-mono text-xl font-bold" style={{ color: accent ?? '#0F1713' }}>{value}</p>
         </div>
-        </div>
       </div>
       {sub && <p className="mt-0.5 font-mono text-[9px] text-muted-foreground">{sub}</p>}
     </div>
