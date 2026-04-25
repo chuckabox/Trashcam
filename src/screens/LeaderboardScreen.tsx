@@ -16,11 +16,11 @@ const MOCK_GLOBAL: { name: string; items: number; score: number; avatar: string 
 ]
 
 const MOCK_FRIENDS: { name: string; items: number; score: number; avatar: string }[] = [
-  { name: 'Sam K.', items: 156, score: 6450, avatar: '🐼' },
-  { name: 'Jess', items: 124, score: 5890, avatar: '🦄' },
-  { name: 'Rohan', items: 98, score: 4450, avatar: '🐙' },
-  { name: 'Mia', items: 74, score: 3980, avatar: '🌻' },
-  { name: 'Liam', items: 42, score: 3560, avatar: '🐶' },
+  { name: 'Sam K.', items: 156, score: 12450, avatar: '🐼' },
+  { name: 'Jess', items: 124, score: 9890, avatar: '🦄' },
+  { name: 'Rohan', items: 98, score: 7450, avatar: '🐙' },
+  { name: 'Mia', items: 74, score: 5980, avatar: '🌻' },
+  { name: 'Liam', items: 42, score: 4250, avatar: '🐶' },
   { name: 'Zoe', items: 28, score: 3120, avatar: '🦋' },
 ]
 
