@@ -78,27 +78,32 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
 
     setProcessingUpload(true)
     try {
-      const reader = new FileReader()
-      reader.onload = async (event) => {
-        const dataUrl = event.target?.result as string
-        const img = new Image()
-        img.onload = async () => {
-          const results = await runInference(img)
-          const top = [...results].sort((a, b) => b.confidence - a.confidence)[0]
-          
-          const scan: ScanResult = {
-            id: `upload-${Date.now()}`,
-            timestamp: Date.now(),
-            photoUri: dataUrl,
-            detection: top || { class: 'unknown', confidence: 0, bbox: { x: 0, y: 0, width: 1, height: 1 } },
-            info: lookup(top?.class || 'unknown'),
-          }
-          await saveScan(scan)
-          navigate('/results', { state: { scan } })
-        }
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = (ev) => resolve(ev.target?.result as string)
+        reader.onerror = reject
+        reader.readAsDataURL(file)
+      })
+
+      const img = new Image()
+      await new Promise((resolve, reject) => {
+        img.onload = resolve
+        img.onerror = reject
         img.src = dataUrl
+      })
+
+      const results = await runInference(img)
+      const top = [...results].sort((a, b) => b.confidence - a.confidence)[0]
+      
+      const scan: ScanResult = {
+        id: `upload-${Date.now()}`,
+        timestamp: Date.now(),
+        photoUri: dataUrl,
+        detection: top || { class: 'unknown', confidence: 0, bbox: { x: 0, y: 0, width: 1, height: 1 } },
+        info: lookup(top?.class || 'unknown'),
       }
-      reader.readAsDataURL(file)
+      await saveScan(scan)
+      navigate('/results', { state: { scan } })
     } catch (err) {
       setProcessingUpload(false)
     }
@@ -176,7 +181,7 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
       )}
 
       {/* Bottom controls */}
-      <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-20 pt-6 gap-6">
+      <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-10 pt-6 gap-6">
         {/* Action Buttons */}
         <div className="flex items-center gap-8">
           <input
@@ -211,7 +216,7 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
             {/* Inner */}
             <span className={cn(
               'flex h-14 w-14 items-center justify-center rounded-full border border-border shadow-md transition-all duration-300',
-              ready ? 'bg-primary scale-100' : 'bg-white'
+              ready ? 'bg-primary' : 'bg-secondary'
             )}>
               {busy ? (
                 <span className="h-4 w-4 rounded-full border-2 border-primary-foreground border-t-transparent animate-spin" />
