@@ -77,4 +77,5 @@ export interface EnhancedStats extends DashboardStats {
   allScans: ScanResult[];
   uniqueItemsScanned: number;
   decompositionYearsSaved: number;
+  uniqueCo2KgSaved: number;
 }

@@ -165,7 +165,7 @@ function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
           {stats.mostWastedCategory && (
             <div className="flex items-center justify-between border-b border-border pb-3">
               <div>
-                <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Most Wasted</p>
+                <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Material Focus</p>
                 <p className="mt-0.5 font-semibold capitalize text-foreground">{stats.mostWastedCategory}</p>
               </div>
               <span className="font-mono text-xs text-muted-foreground">{stats.materialBreakdown[stats.mostWastedCategory]}×</span>

@@ -4,24 +4,24 @@ import type { EnhancedStats } from '../types'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 
 const MOCK_GLOBAL: { name: string; items: number; score: number; avatar: string }[] = [
-  { name: 'Ava Chen', items: 842, score: 12450, avatar: '🌿' },
-  { name: 'Marcus Reed', items: 756, score: 10890, avatar: '🦊' },
-  { name: 'Priya Patel', items: 612, score: 9240, avatar: '🌸' },
-  { name: 'Jonas Müller', items: 589, score: 8760, avatar: '🐢' },
-  { name: 'Layla Hassan', items: 474, score: 7120, avatar: '🍃' },
-  { name: 'Diego Romero', items: 412, score: 6450, avatar: '🌍' },
-  { name: 'Sienna Brooks', items: 388, score: 5980, avatar: '🐝' },
-  { name: 'Tomoko Sato', items: 312, score: 4890, avatar: '🌱' },
-  { name: 'Rafael Costa', items: 256, score: 3450, avatar: '🦉' },
+  { name: 'Ava Chen', items: 842, score: 32450, avatar: '🌿' },
+  { name: 'Marcus Reed', items: 756, score: 28890, avatar: '🦊' },
+  { name: 'Priya Patel', items: 612, score: 25240, avatar: '🌸' },
+  { name: 'Jonas Müller', items: 589, score: 21760, avatar: '🐢' },
+  { name: 'Layla Hassan', items: 474, score: 18120, avatar: '🍃' },
+  { name: 'Diego Romero', items: 412, score: 14450, avatar: '🌍' },
+  { name: 'Sienna Brooks', items: 388, score: 11980, avatar: '🐝' },
+  { name: 'Tomoko Sato', items: 312, score: 9890, avatar: '🌱' },
+  { name: 'Rafael Costa', items: 256, score: 7450, avatar: '🦉' },
 ]
 
 const MOCK_FRIENDS: { name: string; items: number; score: number; avatar: string }[] = [
-  { name: 'Sam K.', items: 156, score: 2450, avatar: '🐼' },
-  { name: 'Jess', items: 124, score: 1890, avatar: '🦄' },
-  { name: 'Rohan', items: 98, score: 1450, avatar: '🐙' },
-  { name: 'Mia', items: 74, score: 980, avatar: '🌻' },
-  { name: 'Liam', items: 42, score: 560, avatar: '🐶' },
-  { name: 'Zoe', items: 28, score: 320, avatar: '🦋' },
+  { name: 'Sam K.', items: 156, score: 6450, avatar: '🐼' },
+  { name: 'Jess', items: 124, score: 5890, avatar: '🦄' },
+  { name: 'Rohan', items: 98, score: 4450, avatar: '🐙' },
+  { name: 'Mia', items: 74, score: 3980, avatar: '🌻' },
+  { name: 'Liam', items: 42, score: 3560, avatar: '🐶' },
+  { name: 'Zoe', items: 28, score: 3120, avatar: '🦋' },
 ]
 
 function computeScore(items: number, co2Kg: number, yrsSaved: number): number {
@@ -39,7 +39,7 @@ export default function LeaderboardScreen() {
   if (!stats) return null
 
   const pool = scope === 'global' ? MOCK_GLOBAL : MOCK_FRIENDS
-  const userScore = computeScore(stats.uniqueItemsScanned, stats.totalCo2Kg, stats.decompositionYearsSaved)
+  const userScore = computeScore(stats.uniqueItemsScanned, stats.uniqueCo2KgSaved, stats.decompositionYearsSaved)
   const rows = [
     ...pool,
     {
@@ -64,10 +64,6 @@ export default function LeaderboardScreen() {
           <div>
             <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Trashcams</p>
             <h1 className="text-2xl font-800 text-foreground">Rankings</h1>
-          </div>
-          <div className="flex items-center gap-2 rounded-md border border-border bg-white px-3 py-1.5 shadow-sm">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-blink" />
-            <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-foreground">Global</span>
           </div>
         </div>
 

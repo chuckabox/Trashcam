@@ -114,10 +114,12 @@ export function computeEnhancedStats(scans: ScanResult[]): EnhancedStats {
 
   const seen = new Set<string>()
   let decompositionYearsSaved = 0
+  let uniqueCo2KgSaved = 0
   for (const s of scans) {
     if (seen.has(s.info.displayName)) continue
     seen.add(s.info.displayName)
     decompositionYearsSaved += s.info.decompositionYears
+    uniqueCo2KgSaved += s.info.co2KgPerItem
   }
 
   return {
@@ -135,5 +137,6 @@ export function computeEnhancedStats(scans: ScanResult[]): EnhancedStats {
     allScans: scans,
     uniqueItemsScanned,
     decompositionYearsSaved,
+    uniqueCo2KgSaved,
   }
 }
