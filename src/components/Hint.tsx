@@ -25,14 +25,14 @@ export function Hint({ text, className }: HintProps) {
       </button>
 
       {show && (
-        <div className="absolute bottom-full left-1/2 z-[60] mb-2 w-48 -translate-x-1/2 animate-scale-in">
+        <div className="absolute bottom-full right-0 z-[60] mb-2 w-48 animate-scale-in">
           <div className="rounded-md border border-border bg-popover p-2 shadow-lg backdrop-blur-xl">
-            <p className="font-mono text-[9px] leading-tight text-foreground">
+            <p className="font-mono text-[9px] leading-tight text-foreground text-right">
               {text}
             </p>
           </div>
           {/* Arrow */}
-          <div className="absolute left-1/2 top-full h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rotate-45 border-b border-r border-border bg-popover" />
+          <div className="absolute right-1 top-full h-1.5 w-1.5 -translate-y-1/2 rotate-45 border-b border-r border-border bg-popover" />
         </div>
       )}
     </div>

@@ -137,8 +137,8 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
       )}
 
       {/* Targeting reticle */}
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <div className="relative h-72 w-72 overflow-hidden">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 overflow-hidden">
           {/* Corner brackets */}
           {(['tl', 'tr', 'bl', 'br'] as const).map((pos) => (
             <span
@@ -167,11 +167,9 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
           )}
 
           {/* Center crosshair */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="relative h-5 w-5">
-              <span className={`absolute left-0 right-0 top-1/2 h-px -translate-y-1/2 ${ready ? 'bg-primary/60' : 'bg-muted-foreground/20'}`} />
-              <span className={`absolute top-0 bottom-0 left-1/2 w-px -translate-x-1/2 ${ready ? 'bg-primary/60' : 'bg-muted-foreground/20'}`} />
-            </div>
+          <div className="absolute left-1/2 top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2">
+            <span className={`absolute left-0 right-0 top-1/2 h-px -translate-y-1/2 ${ready ? 'bg-primary/60' : 'bg-muted-foreground/20'}`} />
+            <span className={`absolute top-0 bottom-0 left-1/2 w-px -translate-x-1/2 ${ready ? 'bg-primary/60' : 'bg-muted-foreground/20'}`} />
           </div>
         </div>
       </div>
