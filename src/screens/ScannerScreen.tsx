@@ -108,7 +108,10 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
   return (
     <div className="relative h-full w-full overflow-hidden bg-background touch-none">
       {/* Camera feed */}
-      <video ref={videoRef} className="h-full w-full object-cover" autoPlay playsInline muted />
+      <video ref={videoRef} className="h-full w-full object-cover opacity-90" autoPlay playsInline muted />
+
+      {/* Subtle vignette */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.1)_100%)]" />
 
       {/* Targeting reticle */}
       <div className="pointer-events-none absolute inset-0">
@@ -119,11 +122,11 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
               key={pos}
               className={[
                 'absolute h-8 w-8 transition-colors duration-300',
-                pos === 'tl' ? 'top-0 left-0 border-t-4 border-l-4' : '',
-                pos === 'tr' ? 'top-0 right-0 border-t-4 border-r-4' : '',
-                pos === 'bl' ? 'bottom-0 left-0 border-b-4 border-l-4' : '',
-                pos === 'br' ? 'bottom-0 right-0 border-b-4 border-r-4' : '',
-                ready ? 'border-primary shadow-[4px_4px_0_0_#10BC79]' : 'border-foreground/20',
+                pos === 'tl' ? 'top-0 left-0 border-t-2 border-l-2' : '',
+                pos === 'tr' ? 'top-0 right-0 border-t-2 border-r-2' : '',
+                pos === 'bl' ? 'bottom-0 left-0 border-b-2 border-l-2' : '',
+                pos === 'br' ? 'bottom-0 right-0 border-b-2 border-r-2' : '',
+                ready ? 'border-primary shadow-[0_0_8px_rgba(16,188,121,0.6)]' : 'border-muted-foreground/30',
               ].join(' ')}
             />
           ))}
@@ -131,62 +134,63 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
           {/* Scan line */}
           {!modelLoading && (
             <div
-              className="absolute inset-x-4 h-1 animate-scan"
+              className="absolute inset-x-4 h-px animate-scan"
               style={{
-                backgroundColor: ready ? '#10BC79' : '#0F1713',
-                opacity: 0.4
+                background: ready
+                  ? 'linear-gradient(90deg, transparent, rgba(16,188,121,0.7), transparent)'
+                  : 'linear-gradient(90deg, transparent, rgba(15,23,19,0.2), transparent)',
               }}
             />
           )}
 
           {/* Center crosshair */}
           <div className="absolute left-1/2 top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2">
-            <span className={`absolute left-0 right-0 top-1/2 h-0.5 -translate-y-1/2 ${ready ? 'bg-primary' : 'bg-foreground/20'}`} />
-            <span className={`absolute top-0 bottom-0 left-1/2 w-0.5 -translate-x-1/2 ${ready ? 'bg-primary' : 'bg-foreground/20'}`} />
+            <span className={`absolute left-0 right-0 top-1/2 h-px -translate-y-1/2 ${ready ? 'bg-primary/60' : 'bg-muted-foreground/20'}`} />
+            <span className={`absolute top-0 bottom-0 left-1/2 w-px -translate-x-1/2 ${ready ? 'bg-primary/60' : 'bg-muted-foreground/20'}`} />
           </div>
         </div>
       </div>
 
       {/* Top bar */}
       <div className="absolute inset-x-0 top-0 flex items-center justify-between px-5 pt-5">
-        <div className="flex items-center gap-2 rounded-md border-2 border-foreground bg-white px-3 py-1.5 shadow-[4px_4px_0_0_#0F1713]">
-          <span className="h-2 w-2 rounded-full bg-primary animate-blink" />
-          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-foreground">Sensors Active</span>
+        <div className="flex items-center gap-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-primary animate-blink" />
+          <span className="font-mono text-[10px] uppercase tracking-widest text-primary">Live Sensors</span>
         </div>
       </div>
 
-      {/* Model loading banner */}
+      {/* Model loading or processing banner */}
       {(modelLoading || processingUpload) && (
-        <div className="absolute inset-x-0 top-16 flex justify-center z-50">
-          <div className="flex items-center gap-2 rounded-md border-2 border-foreground bg-white px-4 py-2 shadow-[4px_4px_0_0_#0F1713]">
-            <span className="h-3 w-3 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-            <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-foreground">
-              {processingUpload ? 'Analysing' : 'Syncing Model'}
+        <div className="absolute inset-x-0 top-14 flex justify-center z-50">
+          <div className="flex items-center gap-2 rounded border border-border bg-background/80 px-4 py-2 backdrop-blur-sm">
+            <span className="h-3 w-3 rounded-full border border-primary border-t-transparent animate-spin" />
+            <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+              {processingUpload ? 'Analysing' : 'Loading model'}
             </span>
           </div>
         </div>
       )}
 
       {/* Bottom controls */}
-      <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-36 pt-6 gap-6">
+      <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-36 pt-6 gap-5">
         {/* Confidence pill */}
-        <div className={`flex items-center gap-2 rounded-md border-2 px-4 py-2 transition-all ${
+        <div className={`flex items-center gap-2 rounded-full border px-4 py-1.5 backdrop-blur-sm transition-all ${
           ready
-            ? 'border-primary bg-primary/10 shadow-[4px_4px_0_0_#10BC79]'
+            ? 'border-primary/40 bg-primary/10'
             : bestConfidence > 0
-            ? 'border-yellow-400 bg-yellow-400/10 shadow-[4px_4px_0_0_#facc15]'
-            : 'border-foreground/10 bg-secondary/50'
+            ? 'border-yellow-400/30 bg-yellow-400/5'
+            : 'border-border bg-background/60'
         }`}>
           {bestConfidence > 0 && (
-            <span className={`h-2 w-2 rounded-full ${ready ? 'bg-primary animate-pulse' : 'bg-yellow-400'}`} />
+            <span className={`h-1.5 w-1.5 rounded-full ${ready ? 'bg-primary animate-pulse' : 'bg-yellow-400'}`} />
           )}
-          <span className={`font-mono text-[10px] font-bold uppercase tracking-widest ${ready ? 'text-primary' : bestConfidence > 0 ? 'text-yellow-600' : 'text-muted-foreground'}`}>
-            {bestConfidence > 0 ? `${pct}% Confidence` : 'Scan Material'}
+          <span className={`font-mono text-xs ${ready ? 'text-primary' : bestConfidence > 0 ? 'text-yellow-400' : 'text-muted-foreground'}`}>
+            {bestConfidence > 0 ? `${pct}% confidence` : 'No detection'}
           </span>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-12">
+        <div className="flex items-center gap-8">
           <input
             type="file"
             ref={fileInputRef}
@@ -196,10 +200,10 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
           />
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="flex h-14 w-14 items-center justify-center rounded-xl border-2 border-foreground bg-white shadow-[4px_4px_0_0_#0F1713] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:scale-95"
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-background/20 backdrop-blur-md hover:bg-background/40 transition-all active:scale-90"
             aria-label="Upload photo"
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
             </svg>
           </button>
@@ -209,31 +213,35 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
             onClick={handleSnap}
             disabled={busy || modelLoading || !ready}
             aria-label="Snap photo"
-            className="group relative flex h-20 w-20 items-center justify-center disabled:opacity-40 transition-transform active:scale-95"
+            className="relative flex h-20 w-20 items-center justify-center disabled:opacity-40 transition-transform active:scale-95"
           >
-            {/* Outer Ring */}
-            <span className={`absolute inset-0 rounded-full border-4 transition-all duration-300 ${ready ? 'border-primary scale-110' : 'border-muted-foreground/20'}`} />
-            {/* Inner Circle */}
-            <span className={`flex h-14 w-14 items-center justify-center rounded-full border-2 border-foreground transition-all duration-300 ${ready ? 'bg-primary scale-100 shadow-[0_0_20px_rgba(16,188,121,0.4)]' : 'bg-secondary/20'}`}>
+            {/* Pulse ring */}
+            {ready && (
+              <span className="absolute inset-0 rounded-full border-2 border-primary/30 animate-pulse-ring" />
+            )}
+            {/* Outer ring */}
+            <span className={`absolute inset-1 rounded-full border-2 transition-colors ${ready ? 'border-primary' : 'border-muted-foreground/20'}`} />
+            {/* Inner */}
+            <span className={`flex h-12 w-12 items-center justify-center rounded-full transition-all ${ready ? 'bg-primary' : 'bg-muted-foreground/10'}`}>
               {busy ? (
-                <span className="h-5 w-5 rounded-full border-2 border-primary-foreground border-t-transparent animate-spin" />
+                <span className="h-4 w-4 rounded-full border-2 border-primary-foreground border-t-transparent animate-spin" />
               ) : (
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                  stroke={ready ? '#FFFFFF' : 'rgba(15,23,19,0.2)'}
-                  strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke={ready ? '#FFFFFF' : 'rgba(15,23,19,0.3)'}
+                  strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
                   <circle cx="12" cy="13" r="3" />
                 </svg>
               )}
             </span>
           </button>
-
-          <div className="w-14" /> {/* Balanced spacer */}
+          
+          <div className="w-12" /> {/* Spacer to keep Snap centered */}
         </div>
 
-        <p className="font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground/60">
-          {modelLoading ? 'Calibrating Sensors' : ready ? 'Ready for Recovery' : 'Aim at Material'}
-        </p>
+        <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/40">
+          {modelLoading ? 'Loading model' : ready ? 'Tap to capture' : 'Aim at waste item'}
+        </div>
       </div>
     </div>
   )
