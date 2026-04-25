@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { clearScans, loadScans } from '../services/storage'
-import { scoreScan, CONDITION_LABEL, CONDITION_COLOR, CONDITION_BADGE_VARIANT } from '../services/degradationScore'
+
 import type { ScanResult } from '../types'
 import { Badge } from '../components/ui/badge'
 import { Tabs } from '../components/ui/tabs'
@@ -10,7 +10,6 @@ const FILTER_TABS = [
   { id: 'all', label: 'All' },
   { id: 'recyclable', label: 'Recycle' },
   { id: 'landfill', label: 'Landfill' },
-  { id: 'urgent', label: 'Urgent' },
 ]
 
 export default function DiaryScreen() {
@@ -40,8 +39,7 @@ export default function DiaryScreen() {
       result = result.filter((s) => s.info.displayName.toLowerCase().includes(q))
     }
     if (filter === 'recyclable') result = result.filter((s) => s.info.recyclable === 'recyclable')
-    else if (filter === 'landfill') result = result.filter((s) => s.info.recyclable === 'landfill')
-    else if (filter === 'urgent') result = result.filter((s) => scoreScan(s).score >= 61)
+    else if (filter === 'landfill') result = result.filter((s) => s.info.recyclable === 'landfill' || s.info.recyclable === 'hazardous')
     return result
   }, [scans, search, filter])
 
@@ -52,7 +50,7 @@ export default function DiaryScreen() {
         {/* Header */}
         <div className="flex items-end justify-between">
           <div>
-            <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">TrashLife</p>
+            <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Trashcams</p>
             <h1 className="text-2xl font-800 text-foreground">
               Diary
               <span className="ml-2 font-mono text-base font-normal text-muted-foreground">({scans.length})</span>
@@ -107,7 +105,6 @@ export default function DiaryScreen() {
         ) : (
           <div className="space-y-2">
             {filtered.map((item) => {
-              const { score, condition } = scoreScan(item)
               return (
                 <button
                   key={item.id}
@@ -128,22 +125,16 @@ export default function DiaryScreen() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-1">
                         <p className="truncate text-sm font-semibold text-foreground">{item.info.displayName}</p>
-                        <Badge label={CONDITION_LABEL[condition]} variant={CONDITION_BADGE_VARIANT[condition]} />
                       </div>
                       <p className="mt-0.5 font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
                         {new Date(item.timestamp).toLocaleDateString()} · {item.info.material}
                       </p>
-                      {/* Score bar */}
-                      <div className="mt-1.5 h-0.5 w-full overflow-hidden rounded-full bg-secondary">
-                        <div className="h-full rounded-full transition-all"
-                          style={{ width: `${score}%`, backgroundColor: CONDITION_COLOR[condition] }} />
-                      </div>
                     </div>
 
-                    {/* Score */}
+                    {/* Confidence */}
                     <div className="shrink-0 text-right">
-                      <p className="font-mono text-sm font-bold" style={{ color: CONDITION_COLOR[condition] }}>{score}</p>
-                      <p className="font-mono text-[9px] text-muted-foreground">{Math.round(item.detection.confidence * 100)}%</p>
+                      <p className="font-mono text-sm font-bold text-foreground capitalize">{item.info.recyclable}</p>
+                      <p className="font-mono text-[9px] text-muted-foreground">{Math.round(item.detection.confidence * 100)}% conf</p>
                     </div>
                   </div>
                 </button>

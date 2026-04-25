@@ -54,7 +54,6 @@ function Chip({ label, value, sub, accent }: { label: string; value: string; sub
 // ── Overview tab ──────────────────────────────────────────────────────────────
 
 function OverviewTab({ stats, navigate }: { stats: EnhancedStats; navigate: ReturnType<typeof useNavigate> }) {
-  const [showAllAlerts, setShowAllAlerts] = useState(false)
   const pieData = (Object.entries(stats.materialBreakdown) as [MaterialCategory, number][])
     .filter(([, v]) => v > 0)
     .map(([k, v]) => ({ name: k, value: v, color: MAT_COLOR[k] }))
@@ -65,6 +64,7 @@ function OverviewTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
     fill: b.day === todayLabel ? '#10BC79' : '#E1E4DF',
   }))
 
+  return (
     <div className="space-y-4 animate-fade-up">
       {/* KPI chips */}
       <div className="grid grid-cols-2 gap-2">
@@ -242,7 +242,7 @@ export default function DashboardScreen() {
         {/* Header */}
         <div className="flex items-end justify-between">
           <div>
-            <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">TrashLife</p>
+            <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Trashcams</p>
             <h1 className="text-2xl font-800 text-foreground">Dashboard</h1>
           </div>
           <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground pb-1">

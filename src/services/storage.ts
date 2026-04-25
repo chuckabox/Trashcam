@@ -1,6 +1,6 @@
 import type { ScanResult, DashboardStats, MaterialCategory, EnhancedStats, WeeklyBucket } from '../types'
 
-const KEY = 'trashlife:scans'
+const KEY = 'trashcams:scans'
 
 export async function loadScans(): Promise<ScanResult[]> {
   const raw = localStorage.getItem(KEY)
