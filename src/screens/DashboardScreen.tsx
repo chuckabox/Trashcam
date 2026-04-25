@@ -24,7 +24,7 @@ const MAT_COLOUR: Record<MaterialCategory, string> = {
 const TABS = [
   { id: 'overview', label: 'Overview' },
   { id: 'insights', label: 'Insights' },
-  { id: 'legend', label: 'Legend' },
+  { id: 'dictionary', label: 'Dictionary' },
 ]
 
 const TOOLTIP_STYLE = {
@@ -43,7 +43,7 @@ const TOOLTIP_STYLE = {
 /** Compact stat chip */
 function Chip({ label, value, sub, accent, hint }: { label: string; value: string; sub?: string; accent?: string; hint?: string }) {
   return (
-    <div className="relative rounded-xl border border-border bg-card p-3 card-hover-effect">
+    <div className="relative rounded-lg border border-border bg-card p-3 card-hover-effect">
       <div className="flex items-start justify-between">
         <div>
           <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">{label}</p>
@@ -248,7 +248,7 @@ function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
 
 // ── Dictionary tab ────────────────────────────────────────────────────────────
 
-const LEGEND = [
+const DICTIONARY = [
   { term: 'Metal', def: 'Cans, foil, and scrap metal. These are melted down and turned into new things.' },
   { term: 'E-Waste', def: 'Anything with a battery or plug. These have toxic parts and need to go to a special tech recycling point.' },
   { term: 'Organic', def: 'Food scraps and garden waste. These rot away naturally into compost for gardens.' },
@@ -257,11 +257,11 @@ const LEGEND = [
   { term: 'Unknown', def: 'Items the scanner doesn’t recognize yet. Look for a recycling symbol on the label to help.' },
 ]
 
-function LegendTab() {
+function DictionaryTab() {
   return (
     <div className="space-y-3 animate-fade-up">
-      {LEGEND.map((item) => (
-        <div key={item.term} className="rounded-xl border border-border bg-card p-4 card-hover-effect">
+      {DICTIONARY.map((item) => (
+        <div key={item.term} className="rounded-lg border border-border bg-card p-4 card-hover-effect">
           <p className="font-mono text-[10px] uppercase tracking-widest text-primary font-bold">{item.term}</p>
           <p className="mt-2 text-sm text-foreground leading-relaxed">{item.def}</p>
         </div>
@@ -305,7 +305,7 @@ export default function DashboardScreen() {
           <>
             {tab === 'overview' && <OverviewTab stats={stats} navigate={navigate} />}
             {tab === 'insights' && <InsightsTab stats={stats} navigate={navigate} />}
-            {tab === 'legend' && <LegendTab />}
+            {tab === 'dictionary' && <DictionaryTab />}
           </>
         )}
       </div>
