@@ -30,10 +30,11 @@ function PermDenied({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
 // ── Active camera view ────────────────────────────────────────────────────────
 
 function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: ReturnType<typeof useNavigate> }) {
-  const videoRef = useRef<HTMLVideoElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
+  const [processingUpload, setProcessingUpload] = useState(false)
 
-  const { detections, bestConfidence, modelLoading, modelError } = useYolo(videoRef)
+  const { detections, bestConfidence, modelLoading, modelError, runInference } = useYolo(videoRef)
   const ready = bestConfidence >= SNAP_CONFIDENCE_THRESHOLD
 
   useEffect(() => {
@@ -69,6 +70,38 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
     }
   }, [busy, detections, navigate])
 
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || modelLoading) return
+
+    setProcessingUpload(true)
+    try {
+      const reader = new FileReader()
+      reader.onload = async (event) => {
+        const dataUrl = event.target?.result as string
+        const img = new Image()
+        img.onload = async () => {
+          const results = await runInference(img)
+          const top = [...results].sort((a, b) => b.confidence - a.confidence)[0]
+          
+          const scan: ScanResult = {
+            id: `upload-${Date.now()}`,
+            timestamp: Date.now(),
+            photoUri: dataUrl,
+            detection: top || { class: 'unknown', confidence: 0, bbox: { x: 0, y: 0, width: 1, height: 1 } },
+            info: lookup(top?.class || 'unknown'),
+          }
+          await saveScan(scan)
+          navigate('/results', { state: { scan } })
+        }
+        img.src = dataUrl
+      }
+      reader.readAsDataURL(file)
+    } catch (err) {
+      setProcessingUpload(false)
+    }
+  }
+
   const pct = Math.round(bestConfidence * 100)
 
   return (
@@ -88,16 +121,34 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
           <span className="h-1.5 w-1.5 rounded-full bg-primary animate-blink" />
           <span className="font-mono text-[10px] uppercase tracking-widest text-primary">Live</span>
         </div>
-        <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/40">BioScan</span>
+        <div className="flex items-center gap-4">
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleUpload}
+            accept="image/*"
+            className="hidden"
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="flex items-center gap-1.5 rounded-full border border-white/20 bg-black/20 px-3 py-1.5 backdrop-blur-md hover:bg-black/40 transition-colors"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <span className="font-mono text-[10px] uppercase tracking-widest text-white">Upload</span>
+          </button>
+          <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/40">BioScan</span>
+        </div>
       </div>
 
-      {/* Model loading banner */}
-      {modelLoading && (
-        <div className="absolute inset-x-0 top-14 flex justify-center">
+      {/* Model loading or processing banner */}
+      {(modelLoading || processingUpload) && (
+        <div className="absolute inset-x-0 top-14 flex justify-center z-50">
           <div className="flex items-center gap-2 rounded border border-border bg-background/80 px-4 py-2 backdrop-blur-sm">
             <span className="h-3 w-3 rounded-full border border-primary border-t-transparent animate-spin" />
             <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-              {modelError ? 'Model error' : 'Loading model'}
+              {processingUpload ? 'Analyzing image' : modelError ? 'Model error' : 'Loading model'}
             </span>
           </div>
         </div>

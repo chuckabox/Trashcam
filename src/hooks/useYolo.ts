@@ -85,5 +85,30 @@ export function useYolo(videoRef: React.RefObject<HTMLVideoElement>) {
     return () => cancelAnimationFrame(rafRef.current)
   }, [modelLoading, videoRef])
 
-  return { detections, bestConfidence, modelLoading, modelError }
+  const runInference = async (source: CanvasImageSource): Promise<Detection[]> => {
+    if (!modelRef.current) return []
+    const cvs = canvasRef.current
+    if (!cvs) return []
+    const ctx = cvs.getContext('2d', { willReadFrequently: true })
+    if (!ctx) return []
+
+    ctx.filter = 'contrast(1.2) brightness(1.1)'
+    ctx.drawImage(source, 0, 0, 640, 640)
+    const preds = await modelRef.current.detect(cvs)
+    
+    return preds
+      .filter((p) => p.score >= DETECTION_CONFIDENCE_THRESHOLD)
+      .map((p) => ({
+        class: p.score < 0.7 ? 'unknown' : trashClassForName(p.class),
+        confidence: p.score,
+        bbox: {
+          x: p.bbox[0] / 640,
+          y: p.bbox[1] / 640,
+          width: p.bbox[2] / 640,
+          height: p.bbox[3] / 640,
+        },
+      }))
+  }
+
+  return { detections, bestConfidence, modelLoading, modelError, runInference }
 }
