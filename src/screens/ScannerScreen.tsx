@@ -242,14 +242,14 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
 function OnboardingModal({ onDismiss }: { onDismiss: () => void }) {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-6 backdrop-blur-[2px] animate-fade-in">
-      <div className="w-full max-w-xs rounded-2xl bg-white p-8 shadow-2xl animate-scale-in">
+      <div className="w-full max-w-[340px] rounded-2xl bg-white p-8 shadow-2xl animate-scale-in">
         <h2 className="text-2xl font-bold text-foreground">Welcome!</h2>
-        <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+        <p className="mt-4 text-sm leading-normal text-muted-foreground">
           Point your camera at some waste to see where it goes. You can also upload a photo from your gallery.
         </p>
         <button
           onClick={onDismiss}
-          className="mt-8 w-full rounded-xl bg-primary py-3.5 font-sans text-sm font-semibold tracking-wide text-white transition-all hover:bg-primary/90 active:scale-95"
+          className="mt-8 w-full rounded-xl bg-primary py-4 font-sans text-sm font-semibold tracking-wide text-white transition-all hover:bg-primary/90 active:scale-95"
         >
           Start Scanning
         </button>
