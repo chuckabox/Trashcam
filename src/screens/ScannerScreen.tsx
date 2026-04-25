@@ -301,19 +301,32 @@ export default function ScannerScreen() {
 
   useEffect(() => {
     let cancelled = false
-    streamRef.current?.getTracks().forEach((t) => t.stop())
 
     navigator.mediaDevices
       .getUserMedia({ video: { facingMode: { ideal: facingMode }, width: { ideal: 1280 }, height: { ideal: 720 } } })
       .then((s) => {
-        if (cancelled) { s.getTracks().forEach((t) => t.stop()); return }
+        if (cancelled) {
+          s.getTracks().forEach((t) => t.stop())
+          return
+        }
+        
+        const oldStream = streamRef.current
         streamRef.current = s
         setStream(s)
         setPermState('granted')
-      })
-      .catch(() => { if (!cancelled) setPermState('denied') })
 
-    return () => { cancelled = true }
+        // Stop old tracks after the new stream is set to avoid cut-to-black
+        if (oldStream) {
+          oldStream.getTracks().forEach((t) => t.stop())
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setPermState('denied')
+      })
+
+    return () => {
+      cancelled = true
+    }
   }, [facingMode])
 
   useEffect(() => () => streamRef.current?.getTracks().forEach((t) => t.stop()), [])

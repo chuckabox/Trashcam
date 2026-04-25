@@ -10,7 +10,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
 import { Tabs } from '../components/ui/tabs'
 import { Button } from '../components/ui/button'
-import { Hint } from '../components/Hint'
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 
@@ -76,7 +75,7 @@ function Chip({ label, value, sub, accent, hint }: { label: string; value: strin
           <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">{label}</p>
           <p className="mt-1 font-mono text-xl font-bold" style={{ color: accent ?? '#0F1713' }}>{value}</p>
         </div>
-        {hint && <Hint text={hint} />}
+        </div>
       </div>
       {sub && <p className="mt-0.5 font-mono text-[9px] text-muted-foreground">{sub}</p>}
     </div>
@@ -105,8 +104,7 @@ function OverviewTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
         <Chip label="Today" value={String(stats.scannedToday)} sub="items scanned" />
         <Chip label="Recyclable" value={`${stats.recyclablePercent}%`} sub="vs landfill" accent="#10BC79" />
         <Chip label="Compostable" value={String(stats.compostableCount)} sub="organic items" accent="#f0c040" />
-        <Chip label="Total Co2" value={`${stats.totalCo2Kg.toFixed(1)}kg`} sub="carbon footprint" accent="#0F1713" 
-          hint="Greenhouse gases released during production" />
+        <Chip label="Total Co2" value={`${stats.totalCo2Kg.toFixed(1)}kg`} sub="carbon footprint" accent="#0F1713" />
       </div>
 
       {/* Material breakdown */}
@@ -189,7 +187,6 @@ function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
         <CardHeader>
           <div className="flex items-center">
             <CardTitle>Habits</CardTitle>
-            <Hint text="Insights based on your scan history" />
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -232,7 +229,6 @@ function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
         <CardHeader>
           <div className="flex items-center">
             <CardTitle>Recovery Impact</CardTitle>
-            <Hint text="How your sorting helps industrial reuse" />
           </div>
         </CardHeader>
         <CardContent className="space-y-2">

@@ -3,7 +3,6 @@ import type { ScanResult } from '../types'
 
 import { Badge } from '../components/ui/badge'
 import { Button } from '../components/ui/button'
-import { Hint } from '../components/Hint'
 import { cn } from '../lib/utils'
 
 const TOX_VARIANT = { low: 'success', medium: 'warning', high: 'danger' } as const
@@ -81,7 +80,6 @@ export default function ResultsScreen() {
             <div key={label} className="rounded-lg border border-border bg-card p-3 text-center card-hover-effect">
               <div className="flex items-center justify-center gap-1">
                 <p className="font-mono text-[8px] font-bold uppercase tracking-widest text-primary">{label}</p>
-                <Hint text={hint} />
               </div>
               <p className={cn("mt-1 font-mono text-sm font-bold", color)}>{value}</p>
             </div>

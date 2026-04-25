@@ -5,7 +5,7 @@ import AlbumScreen from './screens/AlbumScreen'
 import DashboardScreen from './screens/DashboardScreen'
 import { BottomNav } from './components/BottomNav'
 
-const NAV_ROUTES = new Set(['/scan', '/album', '/dashboard'])
+const NAV_ROUTES = new Set(['/scan', '/album', '/dashboard', '/results'])
 const FULLSCREEN_ROUTES = new Set(['/scan'])
 
 function Index() {
