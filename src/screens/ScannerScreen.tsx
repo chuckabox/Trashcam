@@ -124,7 +124,7 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
 
       {/* Targeting reticle */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2">
+        <div className="absolute left-1/2 top-[45%] h-72 w-72 -translate-x-1/2 -translate-y-1/2">
           {/* Corner brackets */}
           {(['tl', 'tr', 'bl', 'br'] as const).map((pos) => (
             <span
@@ -181,7 +181,7 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
       )}
 
       {/* Bottom controls */}
-      <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-24 pt-6 gap-6">
+      <div className="absolute inset-x-0 bottom-[12%] flex flex-col items-center pt-6 gap-6">
         {/* Action Buttons */}
         <div className="flex items-center gap-8">
           <input
