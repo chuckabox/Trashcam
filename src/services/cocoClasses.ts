@@ -23,7 +23,8 @@ export function trashClassForName(cocoName: string): string {
     'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat',
     'traffic light', 'fire hydrant', 'stop sign', 'parking meter', 'bottle',
     'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'sink', 'scissors',
-    'handbag', 'frisbee', 'skis', 'snowboard', 'skateboard', 'surfboard', 'vase'
+    'handbag', 'backpack', 'umbrella', 'frisbee', 'skis', 'snowboard', 'skateboard', 
+    'surfboard', 'vase'
   ]);
 
   const compostable = new Set([
@@ -34,7 +35,7 @@ export function trashClassForName(cocoName: string): string {
   const paper = new Set(['book']);
 
   const waste = new Set([
-    'backpack', 'umbrella', 'tie', 'suitcase',
+    'tie', 'suitcase',
     'sports ball', 'kite', 'baseball bat', 'baseball glove',
     'tennis racket', 'chair', 'couch', 'bed',
     'dining table', 'toilet', 'clock', 'teddy bear', 'toothbrush'

@@ -22,6 +22,8 @@ export async function clearScans(): Promise<void> {
   localStorage.removeItem(KEY)
 }
 
+import { lookup } from './degradation'
+
 export function computeStats(scans: ScanResult[]): DashboardStats {
   const breakdown: Record<MaterialCategory, number> = {
     plastic: 0,
@@ -42,10 +44,14 @@ export function computeStats(scans: ScanResult[]): DashboardStats {
   let water = 0
 
   for (const s of scans) {
-    breakdown[s.info.material] = (breakdown[s.info.material] ?? 0) + 1
-    co2 += s.info.co2KgPerItem
-    water += s.info.waterLitresPerItem
-    counts.set(s.info.displayName, (counts.get(s.info.displayName) ?? 0) + 1)
+    // Process ALL detections in this scan
+    for (const d of s.detections) {
+      const info = lookup(d.class)
+      breakdown[info.material] = (breakdown[info.material] ?? 0) + 1
+      co2 += info.co2KgPerItem
+      water += info.waterLitresPerItem
+      counts.set(info.displayName, (counts.get(info.displayName) ?? 0) + 1)
+    }
   }
 
   const topItems = [...counts.entries()]
@@ -72,14 +78,18 @@ export function computeEnhancedStats(scans: ScanResult[]): EnhancedStats {
 
   let recyclableCount = 0, landfillCount = 0, compostableCount = 0, hazardousCount = 0
   for (const s of scans) {
-    if (s.info.recyclable === 'recyclable') recyclableCount++
-    else if (s.info.recyclable === 'landfill') landfillCount++
-    else if (s.info.recyclable === 'compostable') compostableCount++
-    else if (s.info.recyclable === 'hazardous') hazardousCount++
+    for (const d of s.detections) {
+      const info = lookup(d.class)
+      if (info.recyclable === 'recyclable') recyclableCount++
+      else if (info.recyclable === 'landfill') landfillCount++
+      else if (info.recyclable === 'compostable') compostableCount++
+      else if (info.recyclable === 'hazardous') hazardousCount++
+    }
   }
 
-  const recyclablePercent = scans.length > 0
-    ? Math.round((recyclableCount / scans.length) * 100)
+  const totalItems = recyclableCount + landfillCount + compostableCount + hazardousCount
+  const recyclablePercent = totalItems > 0
+    ? Math.round((recyclableCount / totalItems) * 100)
     : 0
 
   const weeklyData: WeeklyBucket[] = Array.from({ length: 7 }, (_, i) => {

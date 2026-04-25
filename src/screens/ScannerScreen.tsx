@@ -45,9 +45,10 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
 
   const handleSnap = useCallback(async () => {
     if (busy || !videoRef.current || !detections.length) return
-    const top = [...detections].sort((a, b) => b.confidence - a.confidence)[0]
+    const sorted = [...detections].sort((a, b) => b.confidence - a.confidence)
+    const top = sorted[0]
     if (!top) return
-
+    
     setBusy(true)
     try {
       const video = videoRef.current
@@ -62,7 +63,7 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         timestamp: Date.now(),
         photoUri,
-        detection: top,
+        detections: sorted,
         info,
       }
       await saveScan(scan)
@@ -84,13 +85,14 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
         const img = new Image()
         img.onload = async () => {
           const results = await runInference(img)
-          const top = [...results].sort((a, b) => b.confidence - a.confidence)[0]
+          const sorted = [...results].sort((a, b) => b.confidence - a.confidence)
+          const top = sorted[0]
           
           const scan: ScanResult = {
             id: `upload-${Date.now()}`,
             timestamp: Date.now(),
             photoUri: dataUrl,
-            detection: top || { class: 'unknown', confidence: 0, bbox: { x: 0, y: 0, width: 1, height: 1 } },
+            detections: sorted.length > 0 ? sorted : [{ class: 'unknown', confidence: 0, bbox: { x: 0, y: 0, width: 1, height: 1 } }],
             info: lookup(top?.class || 'unknown'),
           }
           await saveScan(scan)
