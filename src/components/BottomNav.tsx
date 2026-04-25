@@ -53,39 +53,36 @@ export function BottomNav() {
           <button
             onClick={() => navigate('/dashboard')}
             className={cn(
-              'flex flex-col items-center gap-1.5 transition-all',
-              dashActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground',
+              'flex flex-col items-center gap-1 transition-all duration-200 active:scale-95',
+              dashActive ? 'text-primary scale-110' : 'text-muted-foreground hover:text-foreground',
             )}
           >
             <StatsIcon active={dashActive} />
             <span className="font-mono text-[9px] uppercase tracking-widest">Stats</span>
-            {dashActive && <span className="h-px w-4 bg-primary rounded-full" />}
           </button>
 
           {/* Scanner */}
           <button
             onClick={() => navigate('/')}
             className={cn(
-              'flex flex-col items-center gap-1.5 transition-all',
-              scanActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground',
+              'flex flex-col items-center gap-1 transition-all duration-200 active:scale-95',
+              scanActive ? 'text-primary scale-110' : 'text-muted-foreground hover:text-foreground',
             )}
           >
             <CameraIcon active={scanActive} />
             <span className="font-mono text-[9px] uppercase tracking-widest">Scan</span>
-            {scanActive && <span className="h-px w-4 bg-primary rounded-full" />}
           </button>
 
           {/* Diary */}
           <button
             onClick={() => navigate('/diary')}
             className={cn(
-              'flex flex-col items-center gap-1.5 transition-all',
-              diaryActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground',
+              'flex flex-col items-center gap-1 transition-all duration-200 active:scale-95',
+              diaryActive ? 'text-primary scale-110' : 'text-muted-foreground hover:text-foreground',
             )}
           >
             <DiaryIcon active={diaryActive} />
             <span className="font-mono text-[9px] uppercase tracking-widest">Diary</span>
-            {diaryActive && <span className="h-px w-4 bg-primary rounded-full" />}
           </button>
 
         </div>

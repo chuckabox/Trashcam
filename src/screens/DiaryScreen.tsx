@@ -45,7 +45,7 @@ export default function DiaryScreen() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-lg px-4 pb-6 pt-6 space-y-4">
+      <div className="mx-auto max-w-lg px-4 pb-6 pt-6 space-y-4 animate-fade-up">
 
         {/* Header */}
         <div className="flex items-end justify-between">
@@ -111,7 +111,7 @@ export default function DiaryScreen() {
                   className="w-full text-left group"
                   onClick={() => navigate('/results', { state: { scan: item } })}
                 >
-                  <div className="flex items-center gap-3 rounded-lg border border-border bg-card p-3 transition-colors group-hover:border-border/60">
+                  <div className="flex items-center gap-3 rounded-lg border border-border bg-card p-3 card-hover-effect">
                     {/* Thumbnail */}
                     {item.photoUri ? (
                       <img src={item.photoUri} alt="" className="h-12 w-12 shrink-0 rounded-md object-cover" />
