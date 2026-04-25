@@ -25,14 +25,20 @@ export default function ResultsScreen() {
     )
   }
 
-  const { info, detection, photoUri } = scan
-  const decompStr = info.decompositionYears >= 1000 ? '1000+ yrs'
-    : info.decompositionYears < 1 ? `${Math.round(info.decompositionYears * 365)}d`
-    : `${info.decompositionYears} yrs`
+  const { items, photoUri } = scan
+  
+  // Aggregate stats across all items
+  const totalCo2 = items.reduce((acc, item) => acc + item.info.co2KgPerItem, 0)
+  const totalWater = items.reduce((acc, item) => acc + item.info.waterLitresPerItem, 0)
+  const maxDecomp = Math.max(...items.map(item => item.info.decompositionYears))
+  
+  const decompStr = maxDecomp >= 1000 ? '1000+ yrs'
+    : maxDecomp < 1 ? `${Math.round(maxDecomp * 365)}d`
+    : `${maxDecomp} yrs`
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-lg px-4 pb-8 pt-6 space-y-4">
+      <div className="mx-auto max-w-lg px-4 pb-8 pt-6 space-y-6">
 
         {/* Back */}
         <button onClick={() => navigate(-1)}
@@ -43,63 +49,67 @@ export default function ResultsScreen() {
           Back
         </button>
 
-        {/* Hero */}
-        <div className="rounded-lg border border-border bg-card overflow-hidden">
-          {photoUri ? (
-            <div className="relative h-52 w-full overflow-hidden">
-              <img src={photoUri} alt={info.displayName} className="h-full w-full object-cover opacity-80" />
-              <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <p className="text-xl font-bold text-foreground">{info.displayName}</p>
-                <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mt-0.5">
-                  {Math.round(detection.confidence * 100)}% confidence · {info.material}
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="flex items-center gap-4 p-4">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-secondary text-4xl">
-                {info.emoji}
-              </div>
-              <div>
-                <p className="text-xl font-bold text-foreground">{info.displayName}</p>
-                <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mt-0.5">
-                  {Math.round(detection.confidence * 100)}% confidence · {info.material}
+        {/* Hero Image */}
+        <div className="rounded-xl border border-border bg-card overflow-hidden shadow-sm">
+          {photoUri && (
+            <div className="relative h-48 w-full overflow-hidden">
+              <img src={photoUri} alt="Scan capture" className="h-full w-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+              <div className="absolute bottom-3 left-4">
+                <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-white">
+                  {items.length} {items.length === 1 ? 'Item' : 'Items'} Detected
                 </p>
               </div>
             </div>
           )}
         </div>
 
-
-
+        {/* Total Impact Summary */}
         <div className="grid grid-cols-3 gap-2">
           {[
             { label: 'Decomposes', value: decompStr, color: 'text-primary' },
-            { label: 'CO₂', value: `${info.co2KgPerItem}kg`, color: 'text-cyan-600' },
-            { label: 'Water', value: `${info.waterLitresPerItem}L`, color: 'text-blue-600' },
+            { label: 'Total CO₂', value: `${totalCo2.toFixed(2)}kg`, color: 'text-cyan-600' },
+            { label: 'Total Water', value: `${totalWater.toFixed(0)}L`, color: 'text-blue-600' },
           ].map(({ label, value, color }) => (
-            <div key={label} className="rounded-lg border border-border bg-card p-3 text-center card-hover-effect">
+            <div key={label} className="rounded-lg border border-border bg-white p-3 text-center shadow-sm">
               <p className="font-mono text-[8px] font-bold uppercase tracking-widest text-primary">{label}</p>
               <p className={cn("mt-1 font-mono text-sm font-bold", color)}>{value}</p>
             </div>
           ))}
         </div>
 
-        {/* Badges */}
-        <div className="flex flex-wrap gap-2">
-          <Badge variant={TOX_VARIANT[info.toxicity]} label={`Toxicity: ${info.toxicity}`} />
-          <Badge variant={REC_VARIANT[info.recyclable]} label={info.recyclable} />
-        </div>
+        {/* Individual Items List */}
+        <div className="space-y-3">
+          <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Scan Details</p>
+          {items.map((item, idx) => (
+            <div key={`${item.info.yoloClass}-${idx}`} className="rounded-xl border border-border bg-white p-4 shadow-sm space-y-3">
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-secondary text-2xl">
+                  {item.info.emoji}
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-foreground">{item.info.displayName}</p>
+                  <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mt-0.5">
+                    {Math.round(item.detection.confidence * 100)}% Confidence · {item.info.material}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex flex-wrap gap-2">
+                <Badge variant={TOX_VARIANT[item.info.toxicity]} label={`Toxicity: ${item.info.toxicity}`} />
+                <Badge variant={REC_VARIANT[item.info.recyclable]} label={item.info.recyclable} />
+              </div>
 
-        {/* Disposal tip */}
-        <div className="rounded-lg border border-border bg-card p-4">
-          <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mb-2">How to dispose</p>
-          <p className="text-sm text-foreground leading-relaxed">{info.disposalTip}</p>
+              <div className="rounded-lg bg-secondary/30 p-3">
+                <p className="font-mono text-[8px] uppercase tracking-widest text-muted-foreground mb-1">Disposal Tip</p>
+                <p className="text-xs text-foreground leading-relaxed">{item.info.disposalTip}</p>
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* Actions */}
-        <div className="flex gap-2 pt-1">
+        <div className="flex gap-2 pt-2">
           <Button className="flex-1" onClick={() => navigate('/')}>Scan Another</Button>
           <Button variant="outline" className="flex-1" onClick={() => navigate('/diary')}>View Diary</Button>
         </div>
