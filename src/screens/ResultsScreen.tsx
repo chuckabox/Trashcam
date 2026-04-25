@@ -4,6 +4,7 @@ import type { ScanResult } from '../types'
 import { Badge } from '../components/ui/badge'
 import { Button } from '../components/ui/button'
 import { Hint } from '../components/Hint'
+import { cn } from '../lib/utils'
 
 const TOX_VARIANT = { low: 'success', medium: 'warning', high: 'danger' } as const
 const REC_VARIANT = {
@@ -74,16 +75,16 @@ export default function ResultsScreen() {
 
         <div className="grid grid-cols-3 gap-2">
           {[
-            { label: 'Breakdown', value: decompStr, color: '#10BC79', hint: 'Time to vanish' },
-            { label: 'CO₂', value: `${info.co2KgPerItem}kg`, color: '#06b6d4', hint: 'Carbon footprint' },
-            { label: 'Water', value: `${info.waterLitresPerItem}L`, color: '#3b82f6', hint: 'Manufacturing usage' },
+            { label: 'Breakdown', value: decompStr, color: 'text-primary', hint: 'Time to vanish' },
+            { label: 'CO₂', value: `${info.co2KgPerItem}kg`, color: 'text-cyan-600', hint: 'Carbon footprint' },
+            { label: 'Water', value: `${info.waterLitresPerItem}L`, color: 'text-blue-600', hint: 'Manufacturing usage' },
           ].map(({ label, value, color, hint }) => (
-            <div key={label} className="rounded-lg border border-border bg-card p-3 text-center">
-              <div className="flex items-center justify-center">
-                <p className="font-mono text-[8px] uppercase tracking-widest text-muted-foreground">{label}</p>
+            <div key={label} className="rounded-lg border border-border bg-card p-3 text-center card-hover-effect">
+              <div className="flex items-center justify-center gap-1">
+                <p className="font-mono text-[8px] font-bold uppercase tracking-widest text-primary">{label}</p>
                 <Hint text={hint} />
               </div>
-              <p className="mt-1 font-mono text-sm font-bold" style={{ color }}>{value}</p>
+              <p className={cn("mt-1 font-mono text-sm font-bold", color)}>{value}</p>
             </div>
           ))}
         </div>
