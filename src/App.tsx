@@ -1,11 +1,11 @@
 import { HashRouter, Routes, Route, useLocation } from 'react-router-dom'
 import ScannerScreen from './screens/ScannerScreen'
 import ResultsScreen from './screens/ResultsScreen'
-import DiaryScreen from './screens/DiaryScreen'
+import AlbumScreen from './screens/AlbumScreen'
 import DashboardScreen from './screens/DashboardScreen'
 import { BottomNav } from './components/BottomNav'
 
-const NAV_ROUTES = new Set(['/', '/diary', '/dashboard'])
+const NAV_ROUTES = new Set(['/', '/album', '/dashboard'])
 const FULLSCREEN_ROUTES = new Set(['/'])
 
 function Layout() {
@@ -19,7 +19,7 @@ function Layout() {
         <Routes>
           <Route path="/" element={<ScannerScreen />} />
           <Route path="/results" element={<ResultsScreen />} />
-          <Route path="/diary" element={<DiaryScreen />} />
+          <Route path="/album" element={<AlbumScreen />} />
           <Route path="/dashboard" element={<DashboardScreen />} />
         </Routes>
       </div>

@@ -24,7 +24,7 @@ const MAT_COLOUR: Record<MaterialCategory, string> = {
 const TABS = [
   { id: 'overview', label: 'Overview' },
   { id: 'insights', label: 'Insights' },
-  { id: 'dictionary', label: 'Dictionary' },
+  { id: 'legend', label: 'Legend' },
 ]
 
 const TOOLTIP_STYLE = {
@@ -246,10 +246,12 @@ function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
   )
 }
 
-// ── Dictionary tab ────────────────────────────────────────────────────────────
+// ── Legend tab ────────────────────────────────────────────────────────────
 
-const DICTIONARY = [
+const LEGEND = [
+  { term: 'Plastic', def: 'Bottles, cups, and plastic containers. Rinse and recycle in yellow bin.' },
   { term: 'Metal', def: 'Cans, foil, and scrap metal. These are melted down and turned into new things.' },
+  { term: 'Glass', def: 'Glass bottles and jars. Highly recyclable, put in yellow bin.' },
   { term: 'E-Waste', def: 'Anything with a battery or plug. These have toxic parts and need to go to a special tech recycling point.' },
   { term: 'Organic', def: 'Food scraps and garden waste. These rot away naturally into compost for gardens.' },
   { term: 'Paper', def: 'Clean cardboard and paper. These are recycled into new paper if they are dry and clean.' },
@@ -257,10 +259,10 @@ const DICTIONARY = [
   { term: 'Unknown', def: 'Items the scanner doesn’t recognize yet. Look for a recycling symbol on the label to help.' },
 ]
 
-function DictionaryTab() {
+function LegendTab() {
   return (
     <div className="space-y-3 animate-fade-up">
-      {DICTIONARY.map((item) => (
+      {LEGEND.map((item) => (
         <div key={item.term} className="rounded-lg border border-border bg-card p-4 card-hover-effect">
           <p className="font-mono text-[10px] uppercase tracking-widest text-primary font-bold">{item.term}</p>
           <p className="mt-2 text-sm text-foreground leading-relaxed">{item.def}</p>
@@ -305,7 +307,7 @@ export default function DashboardScreen() {
           <>
             {tab === 'overview' && <OverviewTab stats={stats} navigate={navigate} />}
             {tab === 'insights' && <InsightsTab stats={stats} navigate={navigate} />}
-            {tab === 'dictionary' && <DictionaryTab />}
+            {tab === 'legend' && <LegendTab />}
           </>
         )}
       </div>

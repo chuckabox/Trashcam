@@ -89,10 +89,25 @@ export default function ResultsScreen() {
           ))}
         </div>
 
-        {/* Badges */}
-        <div className="flex flex-wrap gap-2">
-          <Badge variant={TOX_VARIANT[info.toxicity]} label={`Toxicity: ${info.toxicity}`} />
-          <Badge variant={REC_VARIANT[info.recyclable]} label={info.recyclable} />
+        {/* Characteristics */}
+        <div className="grid grid-cols-2 gap-2">
+          <div className="rounded-lg border border-border bg-card p-3">
+            <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mb-1">Toxicity: {info.toxicity}</p>
+            <p className="text-xs text-foreground leading-relaxed">
+              {info.toxicity === 'high' ? 'Contains hazardous parts. Special handling needed.' : 
+               info.toxicity === 'medium' ? 'Moderate toxicity. Dispose carefully.' : 
+               'Low toxicity. Safe standard disposal.'}
+            </p>
+          </div>
+          <div className="rounded-lg border border-border bg-card p-3">
+            <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mb-1">Class: {info.recyclable}</p>
+            <p className="text-xs text-foreground leading-relaxed">
+              {info.recyclable === 'recyclable' ? 'Can be processed into new materials.' :
+               info.recyclable === 'compostable' ? 'Breaks down naturally into compost.' :
+               info.recyclable === 'hazardous' ? 'Must go to a specialized facility.' :
+               'Sent to landfill. Hard to process.'}
+            </p>
+          </div>
         </div>
 
         {/* Disposal tip */}
@@ -104,7 +119,7 @@ export default function ResultsScreen() {
         {/* Actions */}
         <div className="flex gap-2 pt-1">
           <Button className="flex-1" onClick={() => navigate('/')}>Scan Another</Button>
-          <Button variant="outline" className="flex-1" onClick={() => navigate('/diary')}>View Diary</Button>
+          <Button variant="outline" className="flex-1" onClick={() => navigate('/album')}>View Album</Button>
         </div>
       </div>
     </div>
