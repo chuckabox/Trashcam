@@ -15,7 +15,7 @@ function Layout() {
 
   return (
     <div className="relative min-h-full w-full max-w-full overflow-x-hidden bg-background text-foreground">
-      <div className={showNav && !isFullscreen ? 'pb-24' : ''}>
+      <div className={showNav ? 'pb-24' : ''}>
         <Routes>
           <Route path="/" element={<ScannerScreen />} />
           <Route path="/results" element={<ResultsScreen />} />

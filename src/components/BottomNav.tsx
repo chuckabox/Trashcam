@@ -46,7 +46,7 @@ export function BottomNav() {
       className="fixed bottom-0 inset-x-0 z-50 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:w-[393px]"
       style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 0px)' }}
     >
-      <div className="border-t border-border bg-background/92 backdrop-blur-xl">
+      <div className="border-t-2 border-foreground bg-white">
         <div className="flex items-end justify-around px-4 pt-2 pb-3">
 
           {/* Stats */}

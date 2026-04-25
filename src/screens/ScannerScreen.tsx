@@ -106,35 +106,9 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
   const pct = Math.round(bestConfidence * 100)
 
   return (
-    <div className="relative h-screen w-full overflow-hidden bg-background touch-none">
+    <div className="relative h-full w-full overflow-hidden bg-background touch-none">
       {/* Camera feed */}
-      <video ref={videoRef} className="h-full w-full object-cover opacity-90" autoPlay playsInline muted />
-
-      {/* Subtle vignette */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.1)_100%)]" />
-
-      {/* Bounding boxes */}
-      <BoundingBoxOverlay detections={detections} />
-
-      {/* Top bar */}
-      <div className="absolute inset-x-0 top-0 flex items-center justify-between px-5 pt-5">
-        <div className="flex items-center gap-2">
-          <span className="h-1.5 w-1.5 rounded-full bg-primary animate-blink" />
-          <span className="font-mono text-[10px] uppercase tracking-widest text-primary">Live</span>
-        </div>
-      </div>
-
-      {/* Model loading or processing banner */}
-      {(modelLoading || processingUpload) && (
-        <div className="absolute inset-x-0 top-14 flex justify-center z-50">
-          <div className="flex items-center gap-2 rounded border border-border bg-background/80 px-4 py-2 backdrop-blur-sm">
-            <span className="h-3 w-3 rounded-full border border-primary border-t-transparent animate-spin" />
-            <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-              {processingUpload ? 'Analysing image' : modelError ? 'Model error' : 'Loading model'}
-            </span>
-          </div>
-        </div>
-      )}
+      <video ref={videoRef} className="h-full w-full object-cover" autoPlay playsInline muted />
 
       {/* Targeting reticle */}
       <div className="pointer-events-none absolute inset-0">
@@ -145,11 +119,11 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
               key={pos}
               className={[
                 'absolute h-8 w-8 transition-colors duration-300',
-                pos === 'tl' ? 'top-0 left-0 border-t-2 border-l-2' : '',
-                pos === 'tr' ? 'top-0 right-0 border-t-2 border-r-2' : '',
-                pos === 'bl' ? 'bottom-0 left-0 border-b-2 border-l-2' : '',
-                pos === 'br' ? 'bottom-0 right-0 border-b-2 border-r-2' : '',
-                ready ? 'border-primary shadow-[0_0_8px_rgba(16,188,121,0.6)]' : 'border-muted-foreground/30',
+                pos === 'tl' ? 'top-0 left-0 border-t-4 border-l-4' : '',
+                pos === 'tr' ? 'top-0 right-0 border-t-4 border-r-4' : '',
+                pos === 'bl' ? 'bottom-0 left-0 border-b-4 border-l-4' : '',
+                pos === 'br' ? 'bottom-0 right-0 border-b-4 border-r-4' : '',
+                ready ? 'border-primary shadow-[4px_4px_0_0_#10BC79]' : 'border-foreground/20',
               ].join(' ')}
             />
           ))}
@@ -157,22 +131,41 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
           {/* Scan line */}
           {!modelLoading && (
             <div
-              className="absolute inset-x-4 h-px animate-scan"
+              className="absolute inset-x-4 h-1 animate-scan"
               style={{
-                background: ready
-                  ? 'linear-gradient(90deg, transparent, rgba(16,188,121,0.7), transparent)'
-                  : 'linear-gradient(90deg, transparent, rgba(15,23,19,0.2), transparent)',
+                backgroundColor: ready ? '#10BC79' : '#0F1713',
+                opacity: 0.4
               }}
             />
           )}
 
           {/* Center crosshair */}
           <div className="absolute left-1/2 top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2">
-            <span className={`absolute left-0 right-0 top-1/2 h-px -translate-y-1/2 ${ready ? 'bg-primary/60' : 'bg-muted-foreground/20'}`} />
-            <span className={`absolute top-0 bottom-0 left-1/2 w-px -translate-x-1/2 ${ready ? 'bg-primary/60' : 'bg-muted-foreground/20'}`} />
+            <span className={`absolute left-0 right-0 top-1/2 h-0.5 -translate-y-1/2 ${ready ? 'bg-primary' : 'bg-foreground/20'}`} />
+            <span className={`absolute top-0 bottom-0 left-1/2 w-0.5 -translate-x-1/2 ${ready ? 'bg-primary' : 'bg-foreground/20'}`} />
           </div>
         </div>
       </div>
+
+      {/* Top bar */}
+      <div className="absolute inset-x-0 top-0 flex items-center justify-between px-5 pt-5">
+        <div className="flex items-center gap-2 rounded-md border-2 border-foreground bg-white px-3 py-1.5 shadow-[4px_4px_0_0_#0F1713]">
+          <span className="h-2 w-2 rounded-full bg-primary animate-blink" />
+          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-foreground">Sensors Active</span>
+        </div>
+      </div>
+
+      {/* Model loading banner */}
+      {(modelLoading || processingUpload) && (
+        <div className="absolute inset-x-0 top-16 flex justify-center z-50">
+          <div className="flex items-center gap-2 rounded-md border-2 border-foreground bg-white px-4 py-2 shadow-[4px_4px_0_0_#0F1713]">
+            <span className="h-3 w-3 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+            <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-foreground">
+              {processingUpload ? 'Analysing' : 'Syncing Model'}
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Bottom controls */}
       <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-36 pt-6 gap-6">
