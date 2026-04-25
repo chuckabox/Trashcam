@@ -42,7 +42,13 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
   }, [])
 
   const { detections, bestConfidence, modelLoading, modelError, runInference } = useYolo(videoRef)
-  const ready = bestConfidence >= SNAP_CONFIDENCE_THRESHOLD
+  const [ready, setReady] = useState(false)
+
+  // Hysteresis — enter ready at threshold, leave only well below to stop flicker
+  useEffect(() => {
+    if (!ready && bestConfidence >= SNAP_CONFIDENCE_THRESHOLD) setReady(true)
+    else if (ready && bestConfidence < SNAP_CONFIDENCE_THRESHOLD - 0.15) setReady(false)
+  }, [bestConfidence, ready])
 
   useEffect(() => {
     if (videoRef.current) videoRef.current.srcObject = stream

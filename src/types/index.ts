@@ -35,6 +35,7 @@ export interface BoundingBox {
 }
 
 export interface Detection {
+  id?: string;
   class: string;
   confidence: number;
   bbox: BoundingBox;

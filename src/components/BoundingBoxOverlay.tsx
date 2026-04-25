@@ -14,12 +14,13 @@ export function BoundingBoxOverlay({ detections }: Props) {
         const strong = d.confidence >= 0.6
         return (
           <div
-            key={i}
+            key={d.id ?? i}
             style={{
               left: `${d.bbox.x * 100}%`,
               top: `${d.bbox.y * 100}%`,
               width: `${d.bbox.width * 100}%`,
               height: `${d.bbox.height * 100}%`,
+              transition: 'left 180ms linear, top 180ms linear, width 180ms linear, height 180ms linear, border-color 200ms ease',
             }}
             className={cn(
               'absolute rounded-md border-4',
