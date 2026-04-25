@@ -30,6 +30,7 @@ function PermDenied({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
 // ── Active camera view ────────────────────────────────────────────────────────
 
 function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: ReturnType<typeof useNavigate> }) {
+  const videoRef = useRef<HTMLVideoElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
   const [processingUpload, setProcessingUpload] = useState(false)

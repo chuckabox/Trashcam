@@ -59,7 +59,7 @@ export function ResultsCard({ result }: Props) {
             <Stat label="CO₂" value={`${info.co2KgPerItem} kg`} tone="violet" className="flex-1" />
             <Stat
               label="Water"
-              value={`${info.waterLitersPerItem} L`}
+              value={`${info.waterLitresPerItem} L`}
               tone="cyan"
               className="flex-1"
             />

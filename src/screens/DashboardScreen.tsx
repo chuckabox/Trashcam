@@ -204,7 +204,7 @@ function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
         <CardContent className="space-y-2">
           {[
             { label: 'CO₂ Generated', value: `${stats.totalCo2Kg.toFixed(2)} kg`, icon: '🌍' },
-            { label: 'Water Used', value: `${stats.totalWaterLiters.toFixed(0)} L`, icon: '💧' },
+            { label: 'Water Used', value: `${stats.totalWaterLitres.toFixed(0)} L`, icon: '💧' },
             { label: 'Recyclable Items', value: String(stats.recyclableCount), icon: '♻️', accent: '#10BC79' },
             { label: 'Landfill Items', value: String(stats.landfillCount), icon: '🗑️', accent: '#ff4d4d' },
           ].map(({ label, value, icon, accent }) => (
