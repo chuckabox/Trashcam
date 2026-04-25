@@ -38,21 +38,45 @@ const TOOLTIP_STYLE = {
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
+/** SVG arc health gauge */
+function HealthArc({ score }: { score: number }) {
+  const r = 52
+  const cx = 64
+  const cy = 64
+  const circ = 2 * Math.PI * r
+  const arcLen = circ * 0.75
+  const filled = arcLen * (score / 100)
+  const color =
+    score >= 75 ? '#10BC79' : score >= 50 ? '#f0c040' : score >= 25 ? '#f97316' : '#ff4d4d'
+
+  return (
+    <div className="relative flex items-center justify-center">
+      <svg viewBox="0 0 128 128" className="w-44 h-44">
+        {/* Track */}
+        <circle cx={cx} cy={cy} r={r} fill="none" stroke="#E1E4DF" strokeWidth="7"
+          strokeDasharray={`${arcLen} ${circ - arcLen}`} strokeLinecap="round"
+          transform={`rotate(135 ${cx} ${cy})`} />
+        {/* Fill */}
+        <circle cx={cx} cy={cy} r={r} fill="none" stroke={color} strokeWidth="7"
+          strokeDasharray={`${filled} ${circ - filled}`} strokeLinecap="round"
+          transform={`rotate(135 ${cx} ${cy})`}
+          style={{ filter: `drop-shadow(0 0 6px ${color}55)`, transition: 'stroke-dasharray 0.8s ease-out' }} />
+      </svg>
+      <div className="absolute text-center pointer-events-none">
+        <p className="font-mono text-5xl font-bold leading-none" style={{ color }}>{score}</p>
+        <p className="mt-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">health</p>
+      </div>
+    </div>
+  )
+}
+
 /** Compact stat chip */
 function Chip({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent?: string }) {
   return (
-    <div className="relative border-l-2 border-border bg-card/50 p-3">
-      <div className="flex items-center gap-2">
-        <span className="h-1 w-1 bg-muted-foreground/30" />
-        <p className="font-mono text-[8px] uppercase tracking-tighter text-muted-foreground">{label}</p>
-      </div>
-      <p className="mt-1 font-mono text-2xl font-bold tracking-tighter" style={{ color: accent ?? '#0F1713' }}>{value}</p>
-      {sub && (
-        <div className="mt-1 flex items-center justify-between border-t border-border/50 pt-1">
-          <p className="font-mono text-[8px] uppercase text-muted-foreground/60">{sub}</p>
-          <div className="h-1 w-4 bg-muted-foreground/10" />
-        </div>
-      )}
+    <div className="rounded-lg border border-border bg-card p-3">
+      <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">{label}</p>
+      <p className="mt-1 font-mono text-xl font-bold" style={{ color: accent ?? '#0F1713' }}>{value}</p>
+      {sub && <p className="mt-0.5 font-mono text-[9px] text-muted-foreground">{sub}</p>}
     </div>
   )
 }
@@ -84,13 +108,24 @@ function OverviewTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
   const alertsShown = showAllAlerts ? stats.urgentScans : stats.urgentScans.slice(0, 3)
 
   return (
-    <div className="space-y-6 animate-fade-up">
+    <div className="space-y-4 animate-fade-up">
+      {/* Health gauge */}
+      <Card className="flex flex-col items-center py-6">
+        <p className="mb-3 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+          Waste Health Score
+        </p>
+        <HealthArc score={stats.wasteHealthScore} />
+        <p className="mt-3 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+          {stats.wasteHealthScore >= 75 ? 'Excellent' : stats.wasteHealthScore >= 50 ? 'Fair' : 'Needs attention'}
+        </p>
+      </Card>
+
       {/* KPI chips */}
-      <div className="grid grid-cols-2 border border-border bg-card/20 p-px">
+      <div className="grid grid-cols-2 gap-2">
         <Chip label="Today" value={String(stats.scannedToday)} sub="items scanned" />
-        <Chip label="Recovery" value={`${stats.recyclablePercent}%`} sub="recyclable" accent="#10BC79" />
-        <Chip label="Avg Degradation" value={String(stats.avgDegradationScore)} sub="score index" accent="#f0c040" />
-        <Chip label="Urgent" value={String(stats.urgentCount)} sub="action needed" accent={stats.urgentCount > 0 ? '#ff4d4d' : '#0F1713'} />
+        <Chip label="Recyclable" value={`${stats.recyclablePercent}%`} sub="vs landfill" accent="#10BC79" />
+        <Chip label="Avg Degradation" value={String(stats.avgDegradationScore)} sub="score 0–100" accent="#f0c040" />
+        <Chip label="Urgent" value={String(stats.urgentCount)} sub="need action" accent={stats.urgentCount > 0 ? '#ff4d4d' : '#0F1713'} />
       </div>
 
       {/* Alerts */}
@@ -104,9 +139,7 @@ function OverviewTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
           </div>
           {alertsShown.map(({ scan, score, condition, remainingDays }) => (
             <button key={scan.id} className="w-full text-left" onClick={() => navigate('/results', { state: { scan } })}>
-              <div className="relative border border-red-500/20 bg-red-500/5 p-4 transition-all hover:bg-red-500/10">
-                <div className="absolute left-0 top-0 h-2 w-2 border-l border-t border-red-500/40" />
-                <div className="absolute right-0 bottom-0 h-2 w-2 border-r border-b border-red-500/40" />
+              <Card className="border-red-500/20 bg-red-500/5 p-3 hover:border-red-500/40 transition-colors">
                 <div className="flex items-start gap-3">
                   <span className="text-xl">{scan.info.emoji}</span>
                   <div className="min-w-0 flex-1 space-y-1.5">
@@ -115,12 +148,12 @@ function OverviewTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
                       <Badge label={CONDITION_LABEL[condition]} variant={CONDITION_BADGE_VARIANT[condition]} />
                     </div>
                     <ScoreBar score={score} condition={condition} />
-                    <p className="font-mono text-[10px] text-muted-foreground">
-                      {remainingDays === 0 ? 'DISPOSE IMMEDIATELY' : `${remainingDays}d REMAINING · ${scan.info.disposalTip.slice(0, 48)}…`}
+                    <p className="font-mono text-[9px] text-muted-foreground">
+                      {remainingDays === 0 ? 'Dispose immediately' : `${remainingDays}d remaining · ${scan.info.disposalTip.slice(0, 48)}…`}
                     </p>
                   </div>
                 </div>
-              </div>
+              </Card>
             </button>
           ))}
           {stats.urgentScans.length > 3 && (
@@ -133,15 +166,9 @@ function OverviewTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
       )}
 
       {/* Material breakdown */}
-      <div className="border border-border bg-card/10">
-        <div className="flex items-center justify-between border-b border-border bg-card/30 px-4 py-2">
-          <p className="font-mono text-[10px] font-bold uppercase tracking-widest">Material Analysis</p>
-          <div className="flex gap-1">
-            <span className="h-1 w-1 bg-primary" />
-            <span className="h-1 w-1 bg-primary/40" />
-          </div>
-        </div>
-        <div className="p-4">
+      <Card>
+        <CardHeader><CardTitle>Waste Breakdown</CardTitle></CardHeader>
+        <CardContent>
           {pieData.length === 0 ? (
             <p className="py-6 text-center font-mono text-xs text-muted-foreground">No data</p>
           ) : (
@@ -173,17 +200,19 @@ function OverviewTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
         </CardContent>
       </Card>
 
-      {/* Weekly activity */}
-      <div className="border border-border bg-card/10">
-        <div className="flex items-center justify-between border-b border-border bg-card/30 px-4 py-2">
-          <CardTitle className="text-[10px]">Weekly Throughput</CardTitle>
-          {stats.reductionPercent !== null && (
-            <span className={`font-mono text-[9px] uppercase ${stats.reductionPercent >= 0 ? 'text-primary' : 'text-red-400'}`}>
-              {stats.reductionPercent >= 0 ? 'Δ NEG' : 'Δ POS'} {Math.abs(stats.reductionPercent)}%
-            </span>
-          )}
-        </div>
-        <div className="p-4">
+      {/* Weekly chart */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>Weekly Activity</CardTitle>
+            {stats.reductionPercent !== null && (
+              <span className={`font-mono text-[10px] ${stats.reductionPercent >= 0 ? 'text-primary' : 'text-red-400'}`}>
+                {stats.reductionPercent >= 0 ? '↓' : '↑'}{Math.abs(stats.reductionPercent)}% vs last wk
+              </span>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent>
           <ResponsiveContainer width="100%" height={110}>
             <BarChart data={barData} barSize={18}>
               <XAxis dataKey="day" tick={{ fill: '#4d6450', fontSize: 10, fontFamily: '"DM Mono"' }}
@@ -228,30 +257,26 @@ function TrackTab({ items }: { items: ScanWithDegradation[] }) {
       </p>
 
       {shown.map(({ scan, score, condition, remainingDays, confidence }) => (
-        <div key={scan.id} className="group relative border border-border bg-card/5 p-3 transition-colors hover:bg-card/20">
-          <div className="absolute right-0 top-0 h-4 w-4 overflow-hidden">
-            <div className="absolute right-0 top-0 h-px w-2 bg-border group-hover:bg-primary/40" />
-            <div className="absolute right-0 top-0 h-2 w-px bg-border group-hover:bg-primary/40" />
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-2xl grayscale transition-all group-hover:grayscale-0 shrink-0">{scan.info.emoji}</span>
-            <div className="min-w-0 flex-1 space-y-2">
+        <Card key={scan.id} className="p-3">
+          <div className="flex items-center gap-3">
+            <span className="text-xl shrink-0">{scan.info.emoji}</span>
+            <div className="min-w-0 flex-1 space-y-1.5">
               <div className="flex items-center justify-between gap-2">
-                <p className="truncate font-mono text-xs font-bold uppercase tracking-tight text-foreground">{scan.info.displayName}</p>
-                <span className="font-mono text-lg font-bold tabular-nums shrink-0" style={{ color: CONDITION_COLOR[condition] }}>
-                  {score.toString().padStart(3, '0')}
+                <p className="truncate text-sm font-semibold text-foreground">{scan.info.displayName}</p>
+                <span className="font-mono text-sm font-bold shrink-0" style={{ color: CONDITION_COLOR[condition] }}>
+                  {score}
                 </span>
               </div>
               <ScoreBar score={score} condition={condition} />
-              <div className="flex items-center justify-between border-t border-border/30 pt-1.5">
+              <div className="flex items-center justify-between">
                 <Badge label={CONDITION_LABEL[condition]} variant={CONDITION_BADGE_VARIANT[condition]} />
-                <span className="font-mono text-[8px] uppercase tracking-widest text-muted-foreground">
-                  {remainingDays === 0 ? 'STATUS: CRITICAL' : `T-MINUS: ${remainingDays}D`} · {Math.round(confidence * 100)}% CONF
+                <span className="font-mono text-[9px] text-muted-foreground">
+                  {remainingDays === 0 ? 'Overdue' : `${remainingDays}d · ${Math.round(confidence * 100)}% conf`}
                 </span>
               </div>
             </div>
           </div>
-        </div>
+        </Card>
       ))}
 
       {sorted.length > 10 && (
@@ -272,69 +297,63 @@ function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
   return (
     <div className="space-y-4 animate-fade-up">
       {/* Behaviour */}
-      <div className="border border-border bg-card/10">
-        <div className="border-b border-border bg-card/30 px-4 py-2">
-          <p className="font-mono text-[10px] font-bold uppercase tracking-widest">User Behaviour Metrics</p>
-        </div>
-        <div className="p-4 space-y-3">
+      <Card>
+        <CardHeader><CardTitle>Behaviour</CardTitle></CardHeader>
+        <CardContent className="space-y-3">
           {stats.mostWastedCategory && (
-            <div className="flex items-center justify-between border-b border-border/50 pb-3">
+            <div className="flex items-center justify-between border-b border-border pb-3">
               <div>
-                <p className="font-mono text-[8px] uppercase tracking-widest text-muted-foreground">Primary Waste Stream</p>
-                <p className="mt-0.5 font-mono text-sm font-bold uppercase tracking-tight text-foreground">{stats.mostWastedCategory}</p>
+                <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Most Wasted</p>
+                <p className="mt-0.5 font-semibold capitalize text-foreground">{stats.mostWastedCategory}</p>
               </div>
-              <div className="bg-secondary px-2 py-1">
-                <span className="font-mono text-[10px] font-bold text-foreground">{stats.materialBreakdown[stats.mostWastedCategory]} UNITS</span>
-              </div>
+              <span className="font-mono text-xs text-muted-foreground">{stats.materialBreakdown[stats.mostWastedCategory]}×</span>
             </div>
           )}
           {stats.mostScannedItem && (
-            <div className="flex items-center justify-between border-b border-border/50 pb-3">
+            <div className="flex items-center justify-between border-b border-border pb-3">
               <div>
-                <p className="font-mono text-[8px] uppercase tracking-widest text-muted-foreground">High-Frequency Object</p>
-                <p className="mt-0.5 font-mono text-sm font-bold uppercase tracking-tight text-foreground">{stats.mostScannedItem}</p>
+                <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Top Item</p>
+                <p className="mt-0.5 font-semibold text-foreground">{stats.mostScannedItem}</p>
               </div>
-              <span className="font-mono text-[10px] text-muted-foreground">{stats.topItems[0]?.count} DETECTIONS</span>
+              <span className="font-mono text-xs text-muted-foreground">{stats.topItems[0]?.count}×</span>
             </div>
           )}
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-mono text-[8px] uppercase tracking-widest text-muted-foreground">Net Output Delta</p>
+              <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Weekly Trend</p>
               {stats.reductionPercent !== null ? (
                 <p className={`mt-0.5 font-mono text-xl font-bold ${stats.reductionPercent >= 0 ? 'text-primary' : 'text-red-400'}`}>
-                  {stats.reductionPercent >= 0 ? '∇ ' : 'Δ '}{Math.abs(stats.reductionPercent)}%
-                  <span className="ml-1 font-mono text-[8px] uppercase text-muted-foreground">vs previous cycle</span>
+                  {stats.reductionPercent >= 0 ? '↓ ' : '↑ '}{Math.abs(stats.reductionPercent)}%
+                  <span className="ml-1 font-mono text-xs text-muted-foreground">vs last week</span>
                 </p>
               ) : (
-                <p className="mt-0.5 font-mono text-[8px] text-muted-foreground italic uppercase">Insufficient historical data</p>
+                <p className="mt-0.5 font-mono text-xs text-muted-foreground">Need 2 weeks of data</p>
               )}
             </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Impact */}
-      <div className="border border-border bg-card/10">
-        <div className="border-b border-border bg-card/30 px-4 py-2">
-          <p className="font-mono text-[10px] font-bold uppercase tracking-widest">Environmental Extraction Data</p>
-        </div>
-        <div className="p-4 space-y-2">
+      <Card>
+        <CardHeader><CardTitle>Environmental Impact</CardTitle></CardHeader>
+        <CardContent className="space-y-2">
           {[
-            { label: 'Carbon Output (Est)', value: `${stats.totalCo2Kg.toFixed(2)} KG`, icon: '🌍' },
-            { label: 'H2O Utilization', value: `${stats.totalWaterLiters.toFixed(0)} L`, icon: '💧' },
-            { label: 'Recovery Potential', value: String(stats.recyclableCount), icon: '♻️', accent: '#10BC79' },
-            { label: 'Landfill Allocation', value: String(stats.landfillCount), icon: '🗑️', accent: '#ff4d4d' },
+            { label: 'CO₂ Generated', value: `${stats.totalCo2Kg.toFixed(2)} kg`, icon: '🌍' },
+            { label: 'Water Used', value: `${stats.totalWaterLiters.toFixed(0)} L`, icon: '💧' },
+            { label: 'Recyclable Items', value: String(stats.recyclableCount), icon: '♻️', accent: '#10BC79' },
+            { label: 'Landfill Items', value: String(stats.landfillCount), icon: '🗑️', accent: '#ff4d4d' },
           ].map(({ label, value, icon, accent }) => (
-            <div key={label} className="flex items-center justify-between border-b border-border/30 py-2 last:border-0">
-              <div className="flex items-center gap-3">
-                <span className="text-sm opacity-60">{icon}</span>
-                <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">{label}</span>
+            <div key={label} className="flex items-center justify-between py-1.5 border-b border-border last:border-0">
+              <div className="flex items-center gap-2">
+                <span className="text-base">{icon}</span>
+                <span className="font-mono text-xs text-muted-foreground">{label}</span>
               </div>
-              <span className="font-mono text-xs font-bold tracking-widest" style={{ color: accent ?? '#0F1713' }}>{value}</span>
+              <span className="font-mono text-sm font-bold" style={{ color: accent ?? '#0F1713' }}>{value}</span>
             </div>
           ))}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Deal with soon */}
       {midLife.length > 0 && (
