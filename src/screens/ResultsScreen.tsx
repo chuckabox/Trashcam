@@ -74,9 +74,9 @@ export default function ResultsScreen() {
         {/* Stats grid */}
         <div className="grid grid-cols-3 gap-2">
           {[
-            { label: 'Decomposes', value: decompStr, color: '#10BC79' },
+            { label: 'Breakdown', value: decompStr, color: '#10BC79' },
             { label: 'CO₂', value: `${info.co2KgPerItem}kg`, color: '#06b6d4' },
-            { label: 'Water', value: `${info.waterLitersPerItem}L`, color: '#3b82f6' },
+            { label: 'Water', value: `${info.waterLitresPerItem}L`, color: '#3b82f6' },
           ].map(({ label, value, color }) => (
             <div key={label} className="rounded-lg border border-border bg-card p-3 text-center">
               <p className="font-mono text-[8px] uppercase tracking-widest text-muted-foreground">{label}</p>

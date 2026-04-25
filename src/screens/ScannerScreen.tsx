@@ -138,7 +138,7 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
             </svg>
             <span className="font-mono text-[10px] uppercase tracking-widest text-white">Upload</span>
           </button>
-          <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/40">BioScan</span>
+          <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/40">BinScan</span>
         </div>
       </div>
 
@@ -148,7 +148,7 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
           <div className="flex items-center gap-2 rounded border border-border bg-background/80 px-4 py-2 backdrop-blur-sm">
             <span className="h-3 w-3 rounded-full border border-primary border-t-transparent animate-spin" />
             <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-              {processingUpload ? 'Analyzing image' : modelError ? 'Model error' : 'Loading model'}
+              {processingUpload ? 'Analysing image' : modelError ? 'Model error' : 'Loading model'}
             </span>
           </div>
         </div>

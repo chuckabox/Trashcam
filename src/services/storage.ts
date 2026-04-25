@@ -44,7 +44,7 @@ export function computeStats(scans: ScanResult[]): DashboardStats {
   for (const s of scans) {
     breakdown[s.info.material] = (breakdown[s.info.material] ?? 0) + 1
     co2 += s.info.co2KgPerItem
-    water += s.info.waterLitersPerItem
+    water += s.info.waterLitresPerItem
     counts.set(s.info.displayName, (counts.get(s.info.displayName) ?? 0) + 1)
   }
 
@@ -56,7 +56,7 @@ export function computeStats(scans: ScanResult[]): DashboardStats {
   return {
     totalScans: scans.length,
     totalCo2Kg: co2,
-    totalWaterLiters: water,
+    totalWaterLitres: water,
     materialBreakdown: breakdown,
     topItems,
   }

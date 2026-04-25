@@ -20,7 +20,7 @@ export interface DegradationInfo {
   material: MaterialCategory;
   decompositionYears: number;
   co2KgPerItem: number;
-  waterLitersPerItem: number;
+  waterLitresPerItem: number;
   toxicity: 'low' | 'medium' | 'high';
   recyclable: RecyclableClass;
   disposalTip: string;
@@ -52,7 +52,7 @@ export interface ScanResult {
 export interface DashboardStats {
   totalScans: number;
   totalCo2Kg: number;
-  totalWaterLiters: number;
+  totalWaterLitres: number;
   materialBreakdown: Record<MaterialCategory, number>;
   topItems: { name: string; count: number }[];
 }

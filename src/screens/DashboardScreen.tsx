@@ -13,7 +13,7 @@ import { Button } from '../components/ui/button'
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 
-const MAT_COLOR: Record<MaterialCategory, string> = {
+const MAT_COLOUR: Record<MaterialCategory, string> = {
   plastic: '#ef4444', metal: '#3b82f6', glass: '#06b6d4',
   paper: '#a3a3a3', cardboard: '#b45309', organic: '#84cc16',
   textile: '#ec4899', styrofoam: '#f97316', electronic: '#8b5cf6',
@@ -56,7 +56,7 @@ function Chip({ label, value, sub, accent }: { label: string; value: string; sub
 function OverviewTab({ stats, navigate }: { stats: EnhancedStats; navigate: ReturnType<typeof useNavigate> }) {
   const pieData = (Object.entries(stats.materialBreakdown) as [MaterialCategory, number][])
     .filter(([, v]) => v > 0)
-    .map(([k, v]) => ({ name: k, value: v, color: MAT_COLOR[k] }))
+    .map(([k, v]) => ({ name: k, value: v, color: MAT_COLOUR[k] }))
 
   const todayLabel = new Date().toLocaleDateString('en', { weekday: 'short' })
   const barData = stats.weeklyData.map((b) => ({
@@ -71,7 +71,7 @@ function OverviewTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
         <Chip label="Today" value={String(stats.scannedToday)} sub="items scanned" />
         <Chip label="Recyclable" value={`${stats.recyclablePercent}%`} sub="vs landfill" accent="#10BC79" />
         <Chip label="Compostable" value={String(stats.compostableCount)} sub="organic items" accent="#f0c040" />
-        <Chip label="Total Co2" value={`${stats.totalCo2Kg.toFixed(1)}kg`} sub="embedded impact" accent="#0F1713" />
+        <Chip label="Total Co2" value={`${stats.totalCo2Kg.toFixed(1)}kg`} sub="carbon footprint" accent="#0F1713" />
       </div>
 
       {/* Material breakdown */}
@@ -148,7 +148,7 @@ function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
     <div className="space-y-4 animate-fade-up">
       {/* Behaviour */}
       <Card>
-        <CardHeader><CardTitle>Behaviour</CardTitle></CardHeader>
+        <CardHeader><CardTitle>Habits</CardTitle></CardHeader>
         <CardContent className="space-y-3">
           {stats.mostWastedCategory && (
             <div className="flex items-center justify-between border-b border-border pb-3">
@@ -186,7 +186,7 @@ function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
 
       {/* Impact */}
       <Card>
-        <CardHeader><CardTitle>Environmental Impact</CardTitle></CardHeader>
+        <CardHeader><CardTitle>Recovery Impact</CardTitle></CardHeader>
         <CardContent className="space-y-2">
           {[
             { label: 'CO₂ Generated', value: `${stats.totalCo2Kg.toFixed(2)} kg`, icon: '🌍' },
@@ -210,7 +210,7 @@ function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
       {/* Frequently scanned */}
       {stats.topItems.length > 0 && (
         <Card>
-          <CardHeader><CardTitle>Frequently Scanned</CardTitle></CardHeader>
+          <CardHeader><CardTitle>Common Items</CardTitle></CardHeader>
           <CardContent>
             {stats.topItems.map((item, idx) => (
               <div key={item.name} className={`flex justify-between py-2 ${idx !== stats.topItems.length - 1 ? 'border-b border-border' : ''}`}>
