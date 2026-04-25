@@ -9,39 +9,22 @@ export default {
         mono: ['"DM Mono"', 'monospace'],
       },
       colors: {
-        background: '#FDFDFB',
-        foreground: '#0F1713',
+        background: '#FAF8F5',
+        foreground: '#2A2A28',
         card: '#FFFFFF',
-        'card-foreground': '#0F1713',
-        border: '#E1E4DF',
-        primary: '#10BC79',
+        'card-foreground': '#2A2A28',
+        border: '#E8E5DF',
+        primary: '#D85A42', /* Terracotta */
         'primary-foreground': '#FFFFFF',
-        secondary: '#F0F2EF',
-        'secondary-foreground': '#405045',
-        muted: '#F5F6F3',
-        'muted-foreground': '#607065',
-        destructive: '#E11D48',
+        secondary: '#F2EFE9',
+        'secondary-foreground': '#5C5B57',
+        muted: '#F5F3ED',
+        'muted-foreground': '#7A7873',
+        destructive: '#C94F4F',
         'destructive-foreground': '#FFFFFF',
-        
-        'tint-blue': '#EBF4FF',
-        'text-blue': '#1E40AF',
-        'border-blue': '#BFDBFE',
-        
-        'tint-emerald': '#ECFDF5',
-        'text-emerald': '#065F46',
-        'border-emerald': '#A7F3D0',
-
-        'tint-amber': '#FEF3C7',
-        'text-amber': '#92400E',
-        'border-amber': '#FDE68A',
-
-        'tint-rose': '#FFE4E6',
-        'text-rose': '#BE123C',
-        'border-rose': '#FECDD3',
-        
-        'tint-purple': '#F3E8FF',
-        'text-purple': '#6B21A8',
-        'border-purple': '#E9D5FF',
+        'accent-green': '#5A7D65', /* Sage */
+        'accent-yellow': '#E6A845', /* Ochre */
+        'accent-blue': '#4B6B7A', /* Slate Blue */
       },
       keyframes: {
         'pulse-ring': {

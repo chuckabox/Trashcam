@@ -101,10 +101,25 @@ trashlife/
 | Runtime | React 18 |
 | Build Tool | Vite 5 |
 | ML Runtime | TensorFlow.js + COCO-SSD |
-| Styling | Tailwind CSS (Semantic Tinted Palette: Blue, Emerald, Amber, Rose, Purple) |
+| Styling | Tailwind CSS |
 | Icons | Lucide React |A
 | Navigation | React Router Dom |
 | Charts | Recharts |
+
+---
+
+## Color Palette
+
+This project uses a custom, earthy, industrial design system to avoid generic AI aesthetics.
+- **Background (Oatmeal/Sand):** `#FAF8F5`
+- **Card (White):** `#FFFFFF`
+- **Foreground (Charcoal):** `#2A2A28`
+- **Primary (Terracotta):** `#D85A42`
+- **Accent Green (Sage):** `#5A7D65`
+- **Accent Yellow (Ochre):** `#E6A845`
+- **Accent Blue (Slate Blue):** `#4B6B7A`
+- **Destructive (Brick Red):** `#C94F4F`
+- **Muted (Grey/Sand):** `#F5F3ED` / `#7A7873`
 
 ---
 
