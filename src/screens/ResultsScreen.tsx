@@ -33,13 +33,14 @@ export default function ResultsScreen() {
     )
   }
 
-  const { items, photoUri } = scan
-  const totalCo2 = items.reduce((sum, i) => sum + i.info.co2KgPerItem, 0)
-  const totalWater = items.reduce((sum, i) => sum + i.info.waterLitresPerItem, 0)
+  const { info, detection, photoUri } = scan
+  const decompStr = info.decompositionYears >= 1000 ? '1000+ yrs'
+    : info.decompositionYears < 1 ? `${Math.round(info.decompositionYears * 365)}d`
+    : `${info.decompositionYears} yrs`
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-lg px-4 pb-12 pt-6 space-y-6">
+      <div className="mx-auto max-w-lg px-4 pb-8 pt-6 space-y-4">
 
         {/* Back */}
         <button onClick={() => navigate(-1)}
@@ -50,72 +51,71 @@ export default function ResultsScreen() {
           Back
         </button>
 
-        {/* Photo Header */}
-        {photoUri && (
-          <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-sm animate-scale-in">
-            <div className="relative h-48 w-full">
-              <img src={photoUri} alt="Scan" className="h-full w-full object-cover opacity-90" />
-              <div className="absolute inset-0 bg-gradient-to-t from-card/80 via-transparent to-transparent" />
-              <div className="absolute bottom-4 left-4">
-                <Badge variant="secondary" label={`${items.length} items detected`} />
+        {/* Hero */}
+        <div className="rounded-lg border border-border bg-card overflow-hidden">
+          {photoUri ? (
+            <div className="relative h-52 w-full overflow-hidden">
+              <img src={photoUri} alt={info.displayName} className="h-full w-full object-cover opacity-80" />
+              <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <p className="text-xl font-bold text-foreground">{info.displayName}</p>
+                <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mt-0.5">
+                  {Math.round(detection.confidence * 100)}% confidence · {info.material}
+                </p>
               </div>
             </div>
-          </div>
-        )}
-
-        {/* Global Impact Summary */}
-        <div className="grid grid-cols-2 gap-2">
-          <div className="rounded-xl border border-border bg-card p-4 text-center card-hover-effect">
-            <p className="font-mono text-[9px] font-bold uppercase tracking-widest text-primary">Total CO₂</p>
-            <p className="mt-1 font-mono text-xl font-bold text-foreground">{totalCo2.toFixed(2)}kg</p>
-          </div>
-          <div className="rounded-xl border border-border bg-card p-4 text-center card-hover-effect">
-            <p className="font-mono text-[9px] font-bold uppercase tracking-widest text-primary">Total Water</p>
-            <p className="mt-1 font-mono text-xl font-bold text-foreground">{totalWater.toFixed(0)}L</p>
-          </div>
+          ) : (
+            <div className="flex items-center gap-4 p-4">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-secondary text-4xl">
+                {info.emoji}
+              </div>
+              <div>
+                <p className="text-xl font-bold text-foreground">{info.displayName}</p>
+                <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mt-0.5">
+                  {Math.round(detection.confidence * 100)}% confidence · {info.material}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Itemized List */}
-        <div className="space-y-4">
-          <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground px-1">Detected Items</p>
-          {items.map((item, idx) => (
-            <div key={`${item.info.id}-${idx}`} className="space-y-3 animate-fade-up" style={{ animationDelay: `${idx * 0.1}s` }}>
-              <div className="rounded-2xl border border-border bg-card p-4 card-hover-effect">
-                <div className="flex items-start gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-secondary text-2xl shadow-inner">
-                    {item.info.emoji}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-lg font-bold text-foreground leading-tight">{item.info.displayName}</p>
-                    <p className="font-mono text-[9px] uppercase tracking-widest text-primary mt-1">
-                      {Math.round(item.detection.confidence * 100)}% confidence · {item.info.material}
-                    </p>
-                  </div>
-                </div>
 
-                <div className="mt-4 grid grid-cols-1 gap-2">
-                  <div className="rounded-lg bg-secondary/30 p-3">
-                    <p className="font-mono text-[8px] font-bold uppercase tracking-widest text-primary mb-1">Safety & Toxicity</p>
-                    <p className="text-xs text-foreground leading-relaxed">{TOX_TEXT[item.info.toxicity]}</p>
-                  </div>
-                  <div className="rounded-lg bg-secondary/30 p-3">
-                    <p className="font-mono text-[8px] font-bold uppercase tracking-widest text-primary mb-1">Recycling Info</p>
-                    <p className="text-xs text-foreground leading-relaxed">{REC_TEXT[item.info.recyclable]}</p>
-                  </div>
-                  <div className="rounded-lg bg-secondary/30 p-3">
-                    <p className="font-mono text-[8px] font-bold uppercase tracking-widest text-primary mb-1">Disposal Tip</p>
-                    <p className="text-xs text-foreground leading-relaxed">{item.info.disposalTip}</p>
-                  </div>
-                </div>
-              </div>
+
+        <div className="grid grid-cols-3 gap-2">
+          {[
+            { label: 'Decomposes', value: decompStr, color: 'text-primary' },
+            { label: 'CO₂', value: `${info.co2KgPerItem}kg`, color: 'text-cyan-600' },
+            { label: 'Water', value: `${info.waterLitresPerItem}L`, color: 'text-blue-600' },
+          ].map(({ label, value, color }) => (
+            <div key={label} className="rounded-lg border border-border bg-card p-3 text-center card-hover-effect">
+              <p className="font-mono text-[8px] font-bold uppercase tracking-widest text-primary">{label}</p>
+              <p className={cn("mt-1 font-mono text-sm font-bold", color)}>{value}</p>
             </div>
           ))}
         </div>
 
+        {/* Safety & Category */}
+        <div className="grid grid-cols-1 gap-2">
+          <div className="rounded-lg border border-border bg-card p-4">
+            <p className="font-mono text-[9px] font-bold uppercase tracking-widest text-primary mb-2">Safety & Toxicity</p>
+            <p className="text-sm text-foreground leading-relaxed">{TOX_TEXT[info.toxicity]}</p>
+          </div>
+          <div className="rounded-lg border border-border bg-card p-4">
+            <p className="font-mono text-[9px] font-bold uppercase tracking-widest text-primary mb-2">Recycling Info</p>
+            <p className="text-sm text-foreground leading-relaxed">{REC_TEXT[info.recyclable]}</p>
+          </div>
+        </div>
+
+        {/* Disposal tip */}
+        <div className="rounded-lg border border-border bg-card p-4">
+          <p className="font-mono text-[9px] font-bold uppercase tracking-widest text-primary mb-2">How to dispose</p>
+          <p className="text-sm text-foreground leading-relaxed">{info.disposalTip}</p>
+        </div>
+
         {/* Actions */}
-        <div className="flex flex-col gap-2 pt-4">
-          <Button size="lg" onClick={() => navigate('/')}>Scan Another</Button>
-          <Button variant="outline" size="lg" onClick={() => navigate('/diary')}>View Album</Button>
+        <div className="flex gap-2 pt-1">
+          <Button className="flex-1" onClick={() => navigate('/')}>Scan Another</Button>
+          <Button variant="outline" className="flex-1" onClick={() => navigate('/diary')}>View Album</Button>
         </div>
       </div>
     </div>

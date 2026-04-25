@@ -12,7 +12,7 @@ const FILTER_TABS = [
   { id: 'landfill', label: 'Landfill' },
 ]
 
-export default function AlbumScreen() {
+export default function DiaryScreen() {
   const navigate = useNavigate()
   const [scans, setScans] = useState<ScanResult[]>([])
   const [refreshing, setRefreshing] = useState(false)
@@ -33,15 +33,10 @@ export default function AlbumScreen() {
 
   const filtered = useMemo(() => {
     let result = scans
-    if (filter === 'recyclable') {
-      result = result.filter((s) => s.items.some((i) => i.info.recyclable === 'recyclable'))
-    } else if (filter === 'landfill') {
-      result = result.filter((s) => s.items.some((i) => i.info.recyclable === 'landfill' || i.info.recyclable === 'hazardous'))
-    }
+    if (filter === 'recyclable') result = result.filter((s) => s.info.recyclable === 'recyclable')
+    else if (filter === 'landfill') result = result.filter((s) => s.info.recyclable === 'landfill' || s.info.recyclable === 'hazardous')
     return result
   }, [scans, filter])
-
-  const totalItemsCount = scans.reduce((acc, s) => acc + s.items.length, 0)
 
   return (
     <div className="min-h-screen bg-background">
@@ -53,7 +48,7 @@ export default function AlbumScreen() {
             <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Trashcams</p>
             <h1 className="text-2xl font-800 text-foreground">
               Album
-              <span className="ml-2 font-mono text-base font-normal text-muted-foreground">({totalItemsCount})</span>
+              <span className="ml-2 font-mono text-base font-normal text-muted-foreground">({scans.length})</span>
             </h1>
           </div>
           {scans.length > 0 && (
@@ -65,6 +60,8 @@ export default function AlbumScreen() {
             </button>
           )}
         </div>
+
+
 
         <Tabs tabs={FILTER_TABS} active={filter} onChange={setFilter} />
 
@@ -89,45 +86,37 @@ export default function AlbumScreen() {
           </div>
         ) : (
           <div className="space-y-2">
-            {filtered.map((scan) => {
-              const primary = scan.items[0]
-              const otherCount = scan.items.length - 1
-              
+            {filtered.map((item) => {
               return (
                 <button
-                  key={scan.id}
+                  key={item.id}
                   className="w-full text-left group"
-                  onClick={() => navigate('/results', { state: { scan } })}
+                  onClick={() => navigate('/results', { state: { scan: item } })}
                 >
                   <div className="flex items-center gap-3 rounded-lg border border-border bg-card p-3 card-hover-effect">
                     {/* Thumbnail */}
-                    {scan.photoUri ? (
-                      <img src={scan.photoUri} alt="" className="h-12 w-12 shrink-0 rounded-md object-cover" />
+                    {item.photoUri ? (
+                      <img src={item.photoUri} alt="" className="h-12 w-12 shrink-0 rounded-md object-cover" />
                     ) : (
                       <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-secondary">
-                        <span className="text-xl">{primary.info.emoji}</span>
+                        <span className="text-xl">{item.info.emoji}</span>
                       </div>
                     )}
 
                     {/* Info */}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-1">
-                        <p className="truncate text-sm font-semibold text-foreground">
-                          {primary.info.displayName}
-                          {otherCount > 0 && <span className="ml-1.5 text-muted-foreground">+{otherCount} others</span>}
-                        </p>
+                        <p className="truncate text-sm font-semibold text-foreground">{item.info.displayName}</p>
                       </div>
                       <p className="mt-0.5 font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
-                        {new Date(scan.timestamp).toLocaleDateString()} · {primary.info.material}
+                        {new Date(item.timestamp).toLocaleDateString()} · {item.info.material}
                       </p>
                     </div>
 
-                    {/* Summary */}
+                    {/* Confidence */}
                     <div className="shrink-0 text-right">
-                      <p className="font-mono text-sm font-bold text-primary">
-                        {scan.items.length} {scan.items.length === 1 ? 'item' : 'items'}
-                      </p>
-                      <p className="font-mono text-[9px] text-muted-foreground uppercase tracking-tighter">View details</p>
+                      <p className="font-mono text-sm font-bold text-foreground capitalize">{item.info.recyclable}</p>
+                      <p className="font-mono text-[9px] text-muted-foreground">{Math.round(item.detection.confidence * 100)}% confidence</p>
                     </div>
                   </div>
                 </button>
