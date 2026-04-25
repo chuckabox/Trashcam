@@ -54,8 +54,6 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
 
   const handleSnap = useCallback(async () => {
     if (busy || !videoRef.current || !detections.length) return
-    const top = [...detections].sort((a, b) => b.confidence - a.confidence)[0]
-    if (!top) return
 
     setBusy(true)
     try {
@@ -66,13 +64,12 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
       canvas.getContext('2d')!.drawImage(video, 0, 0)
       const photoUri = canvas.toDataURL('image/jpeg', 0.8)
 
-      const info = lookup(top.class)
       const scan: ScanResult = {
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         timestamp: Date.now(),
         photoUri,
-        detection: top,
-        info,
+        detections: detections,
+        items: detections.map(d => lookup(d.class)),
       }
       await saveScan(scan)
       navigate('/results', { state: { scan } })

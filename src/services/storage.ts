@@ -42,10 +42,12 @@ export function computeStats(scans: ScanResult[]): DashboardStats {
   let water = 0
 
   for (const s of scans) {
-    breakdown[s.info.material] = (breakdown[s.info.material] ?? 0) + 1
-    co2 += s.info.co2KgPerItem
-    water += s.info.waterLitresPerItem
-    counts.set(s.info.displayName, (counts.get(s.info.displayName) ?? 0) + 1)
+    for (const item of s.items) {
+      breakdown[item.material] = (breakdown[item.material] ?? 0) + 1
+      co2 += item.co2KgPerItem
+      water += item.waterLitresPerItem
+      counts.set(item.displayName, (counts.get(item.displayName) ?? 0) + 1)
+    }
   }
 
   const topItems = [...counts.entries()]
@@ -72,10 +74,12 @@ export function computeEnhancedStats(scans: ScanResult[]): EnhancedStats {
 
   let recyclableCount = 0, landfillCount = 0, compostableCount = 0, hazardousCount = 0
   for (const s of scans) {
-    if (s.info.recyclable === 'recyclable') recyclableCount++
-    else if (s.info.recyclable === 'landfill') landfillCount++
-    else if (s.info.recyclable === 'compostable') compostableCount++
-    else if (s.info.recyclable === 'hazardous') hazardousCount++
+    for (const item of s.items) {
+      if (item.recyclable === 'recyclable') recyclableCount++
+      else if (item.recyclable === 'landfill') landfillCount++
+      else if (item.recyclable === 'compostable') compostableCount++
+      else if (item.recyclable === 'hazardous') hazardousCount++
+    }
   }
 
   const recyclablePercent = scans.length > 0
@@ -110,16 +114,18 @@ export function computeEnhancedStats(scans: ScanResult[]): EnhancedStats {
 
   const mostScannedItem = base.topItems[0]?.name ?? null
 
-  const uniqueItemsScanned = new Set(scans.map((s) => s.info.displayName)).size
+  const uniqueItemsScanned = new Set(scans.flatMap(s => s.items.map(i => i.displayName))).size
 
   const seen = new Set<string>()
   let decompositionYearsSaved = 0
   let uniqueCo2KgSaved = 0
   for (const s of scans) {
-    if (seen.has(s.info.displayName)) continue
-    seen.add(s.info.displayName)
-    decompositionYearsSaved += s.info.decompositionYears
-    uniqueCo2KgSaved += s.info.co2KgPerItem
+    for (const item of s.items) {
+      if (seen.has(item.displayName)) continue
+      seen.add(item.displayName)
+      decompositionYearsSaved += item.decompositionYears
+      uniqueCo2KgSaved += item.co2KgPerItem
+    }
   }
 
   return {

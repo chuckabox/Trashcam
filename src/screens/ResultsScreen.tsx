@@ -24,10 +24,7 @@ export default function ResultsScreen() {
     )
   }
 
-  const { info, detection, photoUri } = scan
-  const decompStr = info.decompositionYears >= 1000 ? '1000+ yrs'
-    : info.decompositionYears < 1 ? `${Math.round(info.decompositionYears * 365)}d`
-    : `${info.decompositionYears} yrs`
+  const { items, detections, photoUri } = scan
 
   return (
     <div className="min-h-screen bg-background">
@@ -42,81 +39,99 @@ export default function ResultsScreen() {
           Back
         </button>
 
-        {/* Hero */}
-        <div className="rounded-lg border border-border bg-card overflow-hidden">
+        {/* Hero Photo */}
+        <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-sm">
           {photoUri ? (
-            <div className="relative h-52 w-full overflow-hidden">
-              <img src={photoUri} alt={info.displayName} className="h-full w-full object-cover opacity-80" />
-              <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <p className="text-xl font-bold text-foreground">{info.displayName}</p>
-                <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mt-0.5">
-                  {Math.round(detection.confidence * 100)}% confidence · {info.material}
-                </p>
-              </div>
+            <div className="relative h-56 w-full overflow-hidden bg-black">
+              <img src={photoUri} alt="Scan Result" className="h-full w-full object-contain" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
             </div>
           ) : (
-            <div className="flex items-center gap-4 p-4">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-secondary text-4xl">
-                {info.emoji}
-              </div>
-              <div>
-                <p className="text-xl font-bold text-foreground">{info.displayName}</p>
-                <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mt-0.5">
-                  {Math.round(detection.confidence * 100)}% confidence · {info.material}
-                </p>
-              </div>
+            <div className="flex h-40 items-center justify-center bg-secondary text-muted-foreground">
+              <span className="font-mono text-[10px] uppercase tracking-widest">No Image</span>
             </div>
           )}
-        </div>
-
-
-
-        <div className="grid grid-cols-2 gap-2">
-          {[
-            { label: 'Decomposition', value: decompStr, color: 'text-primary', hint: 'Time to vanish' },
-            { label: 'CO₂', value: `${info.co2KgPerItem}kg`, color: 'text-cyan-600', hint: 'Carbon footprint' },
-          ].map(({ label, value, color, hint }) => (
-            <div key={label} className="rounded-lg border border-border bg-card p-3 text-center card-hover-effect">
-              <div className="flex items-center justify-center gap-1">
-                <p className="font-mono text-[8px] font-bold uppercase tracking-widest text-primary">{label}</p>
-              </div>
-              <p className={cn("mt-1 font-mono text-sm font-bold", color)}>{value}</p>
+          <div className="p-4 border-t border-border">
+            <div className="flex items-center justify-between">
+              <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Summary</p>
+              <p className="font-mono text-[10px] text-muted-foreground">
+                {items.length} {items.length === 1 ? 'item' : 'items'} detected
+              </p>
             </div>
-          ))}
-        </div>
-
-        {/* Characteristics */}
-        <div className="grid grid-cols-2 gap-2">
-          <div className="rounded-lg border border-border bg-card p-4">
-            <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mb-2">Toxicity</p>
-            <p className="text-sm text-foreground leading-relaxed">
-              {info.toxicity === 'high' ? 'Contains hazardous parts. Special handling needed.' : 
-               info.toxicity === 'medium' ? 'Moderate toxicity. Dispose carefully.' : 
-               'Low toxicity. Safe standard disposal.'}
-            </p>
-          </div>
-          <div className="rounded-lg border border-border bg-card p-4">
-            <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mb-2">Class</p>
-            <p className="text-sm text-foreground leading-relaxed">
-              {info.recyclable === 'recyclable' ? 'Can be processed into new materials.' :
-               info.recyclable === 'compostable' ? 'Breaks down naturally into compost.' :
-               info.recyclable === 'hazardous' ? 'Must go to a specialized facility.' :
-               'Sent to landfill. Hard to process.'}
-            </p>
           </div>
         </div>
 
-        {/* Disposal tip */}
-        <div className="rounded-lg border border-border bg-card p-4">
-          <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mb-2">How to dispose</p>
-          <p className="text-sm text-foreground leading-relaxed">{info.disposalTip}</p>
+        {/* Items List */}
+        <div className="space-y-3">
+          {items.map((info, idx) => {
+            const detection = detections[idx]
+            const decompStr = info.decompositionYears >= 1000 ? '1000+ yrs'
+              : info.decompositionYears < 1 ? `${Math.round(info.decompositionYears * 365)}d`
+              : `${info.decompositionYears} yrs`
+
+            return (
+              <div key={idx} className="rounded-2xl border border-border bg-card p-4 space-y-4 animate-fade-up" style={{ animationDelay: `${idx * 0.1}s` }}>
+                <div className="flex items-center gap-4">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-secondary text-3xl shadow-inner">
+                    {info.emoji}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="text-lg font-bold text-foreground truncate">{info.displayName}</p>
+                      <Badge variant={TOX_VARIANT[info.toxicity]} className="text-[8px] uppercase px-1.5 py-0 h-4">
+                        {info.toxicity}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <Badge variant={REC_VARIANT[info.recyclable]} className="text-[8px] uppercase px-1.5 py-0 h-4 font-mono">
+                        {info.recyclable}
+                      </Badge>
+                      <span className="font-mono text-[9px] text-muted-foreground uppercase tracking-widest">
+                        {Math.round(detection.confidence * 100)}% Match
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Stats Grid */}
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="rounded-xl bg-muted/30 p-2.5 text-center">
+                    <p className="font-mono text-[8px] font-bold uppercase tracking-widest text-muted-foreground">Decomposition</p>
+                    <p className="mt-1 font-mono text-sm font-bold text-primary">{decompStr}</p>
+                  </div>
+                  <div className="rounded-xl bg-muted/30 p-2.5 text-center">
+                    <p className="font-mono text-[8px] font-bold uppercase tracking-widest text-muted-foreground">CO₂ Footprint</p>
+                    <p className="mt-1 font-mono text-sm font-bold text-cyan-600">{info.co2KgPerItem}kg</p>
+                  </div>
+                </div>
+
+                {/* Disposal Tip */}
+                <div className="rounded-xl bg-primary/5 border border-primary/10 p-3.5">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-primary">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="16" x2="12" y2="12" />
+                      <line x1="12" y1="8" x2="12.01" y2="8" />
+                    </svg>
+                    <p className="font-mono text-[9px] font-bold uppercase tracking-widest text-primary">Disposal Guide</p>
+                  </div>
+                  <p className="text-[13px] text-foreground leading-relaxed">
+                    {info.disposalTip}
+                  </p>
+                </div>
+              </div>
+            )
+          })}
         </div>
 
         {/* Actions */}
-        <div className="flex gap-2 pt-1">
-          <Button className="flex-1" onClick={() => navigate('/scan')}>Scan Another</Button>
-          <Button variant="outline" className="flex-1" onClick={() => navigate('/album')}>View Album</Button>
+        <div className="flex gap-2 pt-4">
+          <Button className="flex-1 h-12 text-xs font-bold uppercase tracking-widest" onClick={() => navigate('/scan')}>
+            Scan Another
+          </Button>
+          <Button variant="outline" className="flex-1 h-12 text-xs font-bold uppercase tracking-widest" onClick={() => navigate('/album')}>
+            View Album
+          </Button>
         </div>
       </div>
     </div>

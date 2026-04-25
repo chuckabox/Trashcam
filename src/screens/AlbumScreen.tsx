@@ -33,8 +33,8 @@ export default function AlbumScreen() {
 
   const filtered = useMemo(() => {
     let result = scans
-    if (filter === 'recyclable') result = result.filter((s) => s.info.recyclable === 'recyclable')
-    else if (filter === 'landfill') result = result.filter((s) => s.info.recyclable === 'landfill' || s.info.recyclable === 'hazardous')
+    if (filter === 'recyclable') result = result.filter((s) => s.items.some(i => i.recyclable === 'recyclable'))
+    else if (filter === 'landfill') result = result.filter((s) => s.items.some(i => i.recyclable === 'landfill' || i.recyclable === 'hazardous'))
     return result
   }, [scans, filter])
 
@@ -86,37 +86,53 @@ export default function AlbumScreen() {
           </div>
         ) : (
           <div className="space-y-2">
-            {filtered.map((item) => {
+            {filtered.map((scan) => {
+              const primaryItem = scan.items[0]
+              const primaryDetection = scan.detections[0]
+              const othersCount = scan.items.length - 1
+
               return (
                 <button
-                  key={item.id}
+                  key={scan.id}
                   className="w-full text-left group"
-                  onClick={() => navigate('/results', { state: { scan: item } })}
+                  onClick={() => navigate('/results', { state: { scan: scan } })}
                 >
                   <div className="flex items-center gap-3 rounded-lg border border-border bg-card p-3 card-hover-effect">
                     {/* Thumbnail */}
-                    {item.photoUri ? (
-                      <img src={item.photoUri} alt="" className="h-12 w-12 shrink-0 rounded-md object-cover" />
-                    ) : (
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-secondary">
-                        <span className="text-xl">{item.info.emoji}</span>
-                      </div>
-                    )}
+                    <div className="relative">
+                      {scan.photoUri ? (
+                        <img src={scan.photoUri} alt="" className="h-12 w-12 shrink-0 rounded-md object-cover" />
+                      ) : (
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-secondary text-xl">
+                          {primaryItem?.emoji}
+                        </div>
+                      )}
+                      {othersCount > 0 && (
+                        <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[8px] font-bold text-primary-foreground shadow-sm">
+                          +{othersCount}
+                        </span>
+                      )}
+                    </div>
 
                     {/* Info */}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-1">
-                        <p className="truncate text-sm font-semibold text-foreground">{item.info.displayName}</p>
+                        <p className="truncate text-sm font-semibold text-foreground">
+                          {primaryItem?.displayName || 'Unknown Object'}
+                          {othersCount > 0 && <span className="ml-1 text-muted-foreground font-normal">& {othersCount} more</span>}
+                        </p>
                       </div>
                       <p className="mt-0.5 font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
-                        {new Date(item.timestamp).toLocaleDateString()} · {item.info.material}
+                        {new Date(scan.timestamp).toLocaleDateString()} · {primaryItem?.material}
                       </p>
                     </div>
 
                     {/* Confidence */}
                     <div className="shrink-0 text-right">
-                      <p className="font-mono text-sm font-bold text-foreground capitalize">{item.info.recyclable}</p>
-                      <p className="font-mono text-[9px] text-muted-foreground">{Math.round(item.detection.confidence * 100)}% confidence</p>
+                      <p className="font-mono text-sm font-bold text-foreground capitalize">{primaryItem?.recyclable}</p>
+                      <p className="font-mono text-[9px] text-muted-foreground">
+                        {Math.round((primaryDetection?.confidence || 0) * 100)}% Match
+                      </p>
                     </div>
                   </div>
                 </button>
