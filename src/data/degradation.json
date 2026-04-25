@@ -84,18 +84,6 @@
     "disposalTip": "This is tricky to recycle (like chip bags). It usually goes in the red-lid landfill bin."
   },
   {
-    "yoloClass": "textile",
-    "displayName": "Textile",
-    "material": "textile",
-    "decompositionYears": 200.0,
-    "co2KgPerItem": 15.0,
-    "waterLitresPerItem": 2700.0,
-    "toxicity": "low",
-    "recyclable": "landfill",
-    "emoji": "👕",
-    "disposalTip": "Clothing and fabrics. If in good condition, donate to a charity shop. Otherwise, use a textile recycling bin if available."
-  },
-  {
     "yoloClass": "unknown",
     "displayName": "Unknown",
     "material": "composite",

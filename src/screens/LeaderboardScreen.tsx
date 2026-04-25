@@ -123,7 +123,7 @@ export default function LeaderboardScreen() {
             Score = items × 50 + CO₂ kg × 10 + years saved × 0.1
           </p>
           <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-            Repeat items don't count — each unique item scanned counts once.
+            Repeat items don't count - each unique item scanned counts once.
           </p>
         </div>
       </div>

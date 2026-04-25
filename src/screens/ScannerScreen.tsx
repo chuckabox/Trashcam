@@ -42,7 +42,7 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
   const { detections, bestConfidence, modelLoading, modelError, runInference } = useYolo(videoRef)
   const [ready, setReady] = useState(false)
 
-  // Hysteresis — enter ready at threshold, leave only well below to stop flicker
+  // Hysteresis - enter ready at threshold, leave only well below to stop flicker
   useEffect(() => {
     if (!ready && bestConfidence >= SNAP_CONFIDENCE_THRESHOLD) setReady(true)
     else if (ready && bestConfidence < SNAP_CONFIDENCE_THRESHOLD - 0.15) setReady(false)
@@ -137,23 +137,13 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
         </div>
       </div>
 
-      {/* Model loading banner */}
-      {modelLoading && (
-        <div className="absolute inset-x-0 top-14 flex justify-center z-50">
-          <div className="flex items-center gap-2 rounded-md border border-border bg-white px-4 py-2 shadow-sm">
-            <span className="h-3 w-3 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-            <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-foreground">
-              Syncing Model
-            </span>
-          </div>
-        </div>
-      )}
+      {/* Model loading placeholder or silent state */}
 
       {/* Bottom controls */}
       <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-24 pt-6 gap-6">
-        {/* Action Buttons — album / shutter / flip */}
+        {/* Action Buttons - album / shutter / flip */}
         <div className="flex w-[280px] items-center justify-between">
-          {/* Album (rounded square) — shows latest scan thumbnail if available */}
+          {/* Album (rounded square) - shows latest scan thumbnail if available */}
           <button
             onClick={() => navigate('/album')}
             className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-border bg-white shadow-sm transition-all hover:bg-secondary active:scale-90"
@@ -170,7 +160,7 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
             )}
           </button>
 
-          {/* Shutter — iOS-style ring directly hugging inner disc */}
+          {/* Shutter - iOS-style ring directly hugging inner disc */}
           <button
             onClick={handleSnap}
             disabled={busy || modelLoading || !ready}
@@ -182,7 +172,7 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
               'absolute inset-0 rounded-full border-[3px] transition-colors duration-300',
               ready ? 'border-primary' : 'border-foreground/80'
             )} />
-            {/* Inner disc — sits inside ring with hairline gap */}
+            {/* Inner disc - sits inside ring with hairline gap */}
             <span className={cn(
               'flex h-[60px] w-[60px] items-center justify-center rounded-full transition-all duration-200',
               ready ? 'bg-primary' : 'bg-white',
@@ -194,7 +184,7 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
             </span>
           </button>
 
-          {/* Flip camera (rounded square — matches gallery) */}
+          {/* Flip camera (rounded square - matches gallery) */}
           <button
             onClick={onFlip}
             className="flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-white shadow-sm transition-all hover:bg-secondary active:scale-90"
@@ -210,7 +200,7 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
         </div>
 
         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/80">
-          {modelLoading ? 'Syncing sensors' : ready ? 'Ready for capture' : 'Aim at material'}
+          {ready ? 'Ready for capture' : 'Aim at material'}
         </p>
       </div>
     </div>

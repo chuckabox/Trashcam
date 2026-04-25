@@ -7,11 +7,11 @@ import { DETECTION_CONFIDENCE_THRESHOLD } from '../services/detection'
 
 const FRAME_SKIP = 5
 
-// Tracker tuning — keeps boxes/buttons from flickering.
+// Tracker tuning - keeps boxes/buttons from flickering.
 const TRACK_MATCH_IOU = 0.2          // min IoU to match raw det to existing track
 const TRACK_BBOX_EMA = 0.35          // bbox smoothing (lower = smoother)
-const TRACK_CONF_UP_EMA = 0.5        // rising confidence — react fast
-const TRACK_CONF_DOWN_EMA = 0.15     // falling confidence — decay slow
+const TRACK_CONF_UP_EMA = 0.5        // rising confidence - react fast
+const TRACK_CONF_DOWN_EMA = 0.15     // falling confidence - decay slow
 const TRACK_DROP_AFTER_MISSED = 6    // drop track after this many inference cycles unseen
 const TRACK_HIDE_AFTER_MISSED = 2    // stop rendering after this many cycles unseen
 const BEST_CONF_UP_EMA = 0.5

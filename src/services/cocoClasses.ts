@@ -25,13 +25,10 @@ export function trashClassForName(cocoName: string, bbox?: BBox): string {
   ]);
 
   // Plastic & Containers
-  const plastic = new Set(['bottle', 'cup', 'bowl', 'frisbee', 'scissors']);
+  const plastic = new Set(['bottle', 'cup', 'bowl', 'frisbee', 'backpack', 'umbrella', 'handbag', 'suitcase']);
   
-  // Textile
-  const textile = new Set(['backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'teddy bear']);
-
   // Metal
-  const metal = new Set(['fork', 'knife', 'spoon', 'sink', 'fire hydrant', 'stop sign', 'parking meter']);
+  const metal = new Set(['fork', 'knife', 'spoon', 'sink', 'scissors', 'fire hydrant', 'stop sign', 'parking meter']);
   
   // Glass - Heuristic: wine glass is always glass, but cup/bottle depends on shape
   const glass = new Set(['wine glass', 'vase']); 
@@ -44,26 +41,24 @@ export function trashClassForName(cocoName: string, bbox?: BBox): string {
   ]);
 
   // Paper
-  const paper = new Set(['book']); 
+  const paper = new Set(['book', 'tie']); 
 
   // General Waste
   const waste = new Set([
     'sports ball', 'kite', 'baseball bat', 'baseball glove',
     'skateboard', 'surfboard', 'tennis racket', 'chair', 'couch', 'bed',
-    'dining table', 'toilet', 'toothbrush'
+    'dining table', 'toilet', 'teddy bear', 'toothbrush'
   ]);
 
   const vehicle = new Set(['bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat']);
 
-  // --- Heuristic Differentiation (Virtual Fine-Tuning) ---
+  // --- Logic Based Differentiation (Virtual Fine-Tuning) ---
   
   // Differentiation for 'bottle'
   if (cocoName === 'bottle') {
     // Tall, thin bottles are almost always plastic or glass.
     // If it's extremely tall/thin (like a wine bottle), we lean glass.
     if (aspectRatio > 2.8) return 'glass';
-    // If it's very small and wide, it's often a jar or a metal can misdetected.
-    if (aspectRatio < 1.2) return 'metal';
     return 'plastic';
   }
 
@@ -83,7 +78,6 @@ export function trashClassForName(cocoName: string, bbox?: BBox): string {
 
   if (eWaste.has(cocoName)) return 'e-waste';
   if (plastic.has(cocoName)) return 'plastic';
-  if (textile.has(cocoName)) return 'textile';
   if (metal.has(cocoName)) return 'metal';
   if (glass.has(cocoName)) return 'glass';
   if (compostable.has(cocoName)) return 'compostable';
