@@ -241,7 +241,7 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
 
         <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/40">
           {modelLoading ? 'Loading model' : ready ? 'Tap to capture' : 'Aim at waste item'}
-        </div>
+        </p>
       </div>
     </div>
   )
