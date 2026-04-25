@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { cn } from '../lib/utils'
 
 interface HintProps {
@@ -8,10 +8,25 @@ interface HintProps {
 
 export function Hint({ text, className }: HintProps) {
   const [show, setShow] = useState(false)
+  const [side, setSide] = useState<'left' | 'right'>('right')
+  const btnRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (show && btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect()
+      // If the button is on the right half of the screen, show tooltip on the left
+      if (rect.left > window.innerWidth / 2) {
+        setSide('left')
+      } else {
+        setSide('right')
+      }
+    }
+  }, [show])
 
   return (
     <div className={cn('relative inline-flex items-center ml-1.5', className)}>
       <button
+        ref={btnRef}
         type="button"
         onClick={(e) => {
           e.stopPropagation()
@@ -25,14 +40,25 @@ export function Hint({ text, className }: HintProps) {
       </button>
 
       {show && (
-        <div className="absolute bottom-full right-0 z-[60] mb-2 w-48 animate-scale-in">
+        <div 
+          className={cn(
+            "absolute bottom-full z-[60] mb-2 w-48 animate-scale-in",
+            side === 'left' ? "right-0" : "left-0"
+          )}
+        >
           <div className="rounded-md border border-border bg-popover p-2 shadow-lg backdrop-blur-xl">
-            <p className="font-mono text-[9px] leading-tight text-foreground text-right">
+            <p className={cn(
+              "font-mono text-[9px] leading-tight text-foreground break-words whitespace-normal",
+              side === 'left' ? "text-right" : "text-left"
+            )}>
               {text}
             </p>
           </div>
           {/* Arrow */}
-          <div className="absolute right-1 top-full h-1.5 w-1.5 -translate-y-1/2 rotate-45 border-b border-r border-border bg-popover" />
+          <div className={cn(
+            "absolute top-full h-1.5 w-1.5 -translate-y-1/2 rotate-45 border-b border-r border-border bg-popover",
+            side === 'left' ? "right-1.5" : "left-1.5"
+          )} />
         </div>
       )}
     </div>

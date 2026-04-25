@@ -14,7 +14,7 @@ function Layout() {
   const isFullscreen = FULLSCREEN_ROUTES.has(pathname)
 
   return (
-    <div className="relative min-h-full bg-background text-foreground">
+    <div className="relative min-h-full w-full max-w-full overflow-x-hidden bg-background text-foreground">
       <div className={showNav && !isFullscreen ? 'pb-24' : ''}>
         <Routes>
           <Route path="/" element={<ScannerScreen />} />
