@@ -4,28 +4,28 @@ import type { EnhancedStats } from '../types'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 
 const MOCK_GLOBAL: { name: string; items: number; score: number; avatar: string }[] = [
-  { name: 'Ava Chen', items: 842, score: 32450, avatar: '🌿' },
-  { name: 'Marcus Reed', items: 756, score: 28890, avatar: '🦊' },
-  { name: 'Priya Patel', items: 612, score: 25240, avatar: '🌸' },
-  { name: 'Jonas Müller', items: 589, score: 21760, avatar: '🐢' },
-  { name: 'Layla Hassan', items: 474, score: 18120, avatar: '🍃' },
-  { name: 'Diego Romero', items: 412, score: 14450, avatar: '🌍' },
-  { name: 'Sienna Brooks', items: 388, score: 11980, avatar: '🐝' },
-  { name: 'Tomoko Sato', items: 312, score: 9890, avatar: '🌱' },
-  { name: 'Rafael Costa', items: 256, score: 7450, avatar: '🦉' },
+  { name: 'Ava Chen', items: 842, score: 48500, avatar: '🌿' },
+  { name: 'Marcus Reed', items: 756, score: 42300, avatar: '🦊' },
+  { name: 'Priya Patel', items: 612, score: 35600, avatar: '🌸' },
+  { name: 'Jonas Müller', items: 589, score: 33200, avatar: '🐢' },
+  { name: 'Layla Hassan', items: 474, score: 26800, avatar: '🍃' },
+  { name: 'Diego Romero', items: 412, score: 22400, avatar: '🌍' },
+  { name: 'Sienna Brooks', items: 388, score: 20900, avatar: '🐝' },
+  { name: 'Tomoko Sato', items: 312, score: 16500, avatar: '🌱' },
+  { name: 'Rafael Costa', items: 256, score: 13200, avatar: '🦉' },
 ]
 
 const MOCK_FRIENDS: { name: string; items: number; score: number; avatar: string }[] = [
-  { name: 'Sam K.', items: 156, score: 12450, avatar: '🐼' },
-  { name: 'Jess', items: 124, score: 9890, avatar: '🦄' },
-  { name: 'Rohan', items: 98, score: 7450, avatar: '🐙' },
-  { name: 'Mia', items: 74, score: 5980, avatar: '🌻' },
-  { name: 'Liam', items: 42, score: 4250, avatar: '🐶' },
-  { name: 'Zoe', items: 28, score: 3120, avatar: '🦋' },
+  { name: 'Sam K.', items: 156, score: 9450, avatar: '🐼' },
+  { name: 'Jess', items: 124, score: 7890, avatar: '🦄' },
+  { name: 'Rohan', items: 98, score: 6450, avatar: '🐙' },
+  { name: 'Mia', items: 74, score: 4980, avatar: '🌻' },
+  { name: 'Liam', items: 42, score: 3250, avatar: '🐶' },
+  { name: 'Zoe', items: 28, score: 2120, avatar: '🦋' },
 ]
 
 function computeScore(items: number, co2Kg: number, yrsSaved: number): number {
-  return Math.round(items * 10 + co2Kg * 8 + yrsSaved * 1.5)
+  return Math.round(items * 50 + co2Kg * 10 + yrsSaved * 0.1)
 }
 
 export default function LeaderboardScreen() {
@@ -120,7 +120,7 @@ export default function LeaderboardScreen() {
 
         <div className="px-2 space-y-1 text-center">
           <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-            Score = items × 10 + CO₂ kg × 8 + years saved × 1.5
+            Score = items × 50 + CO₂ kg × 10 + years saved × 0.1
           </p>
           <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
             Repeat items don't count — each unique item scanned counts once.
