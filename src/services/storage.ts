@@ -110,6 +110,16 @@ export function computeEnhancedStats(scans: ScanResult[]): EnhancedStats {
 
   const mostScannedItem = base.topItems[0]?.name ?? null
 
+  const uniqueItemsScanned = new Set(scans.map((s) => s.info.displayName)).size
+
+  const seen = new Set<string>()
+  let decompositionYearsSaved = 0
+  for (const s of scans) {
+    if (seen.has(s.info.displayName)) continue
+    seen.add(s.info.displayName)
+    decompositionYearsSaved += s.info.decompositionYears
+  }
+
   return {
     ...base,
     scannedToday,
@@ -123,5 +133,7 @@ export function computeEnhancedStats(scans: ScanResult[]): EnhancedStats {
     mostScannedItem,
     reductionPercent,
     allScans: scans,
+    uniqueItemsScanned,
+    decompositionYearsSaved,
   }
 }

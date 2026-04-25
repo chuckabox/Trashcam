@@ -74,4 +74,6 @@ export interface EnhancedStats extends DashboardStats {
   mostScannedItem: string | null;
   reductionPercent: number | null;
   allScans: ScanResult[];
+  uniqueItemsScanned: number;
+  decompositionYearsSaved: number;
 }

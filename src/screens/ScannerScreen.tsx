@@ -4,7 +4,7 @@ import { useYolo } from '../hooks/useYolo'
 import { BoundingBoxOverlay } from '../components/BoundingBoxOverlay'
 import { SNAP_CONFIDENCE_THRESHOLD } from '../services/detection'
 import { lookup } from '../services/degradation'
-import { saveScan } from '../services/storage'
+import { saveScan, loadScans } from '../services/storage'
 import { cn } from '../lib/utils'
 import type { ScanResult } from '../types'
 
@@ -35,6 +35,11 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
   const [processingUpload, setProcessingUpload] = useState(false)
+  const [latestPhoto, setLatestPhoto] = useState<string | null>(null)
+
+  useEffect(() => {
+    loadScans().then((scans) => setLatestPhoto(scans[0]?.photoUri ?? null))
+  }, [])
 
   const { detections, bestConfidence, modelLoading, modelError, runInference } = useYolo(videoRef)
   const ready = bestConfidence >= SNAP_CONFIDENCE_THRESHOLD
@@ -186,17 +191,21 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
         />
         {/* Action Buttons — gallery / shutter / flip */}
         <div className="flex w-[280px] items-center justify-between">
-          {/* Gallery (rounded square) */}
+          {/* Gallery (rounded square) — shows latest scan thumbnail if available */}
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-white shadow-sm transition-all hover:bg-secondary active:scale-90"
+            className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-border bg-white shadow-sm transition-all hover:bg-secondary active:scale-90"
             aria-label="Upload photo"
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-              <circle cx="8.5" cy="8.5" r="1.5" />
-              <polyline points="21 15 16 10 5 21" />
-            </svg>
+            {latestPhoto ? (
+              <img src={latestPhoto} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                <circle cx="8.5" cy="8.5" r="1.5" />
+                <polyline points="21 15 16 10 5 21" />
+              </svg>
+            )}
           </button>
 
           {/* Shutter — iOS-style ring directly hugging inner disc */}
@@ -230,9 +239,10 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
             aria-label="Flip camera"
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
-              <path d="M11 19H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5l2-3h2l2 3h5a2 2 0 0 1 2 2v6" />
-              <path d="M14 19l3 3 3-3" />
-              <path d="M17 22v-8a4 4 0 0 0-4-4H9" />
+              <polyline points="23 4 23 10 17 10" />
+              <polyline points="1 20 1 14 7 14" />
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10" />
+              <path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14" />
             </svg>
           </button>
         </div>

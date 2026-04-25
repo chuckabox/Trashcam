@@ -24,7 +24,20 @@ const MAT_COLOUR: Record<MaterialCategory, string> = {
 const TABS = [
   { id: 'overview', label: 'Overview' },
   { id: 'insights', label: 'Insights' },
+  { id: 'leaderboard', label: 'Leaderboard' },
   { id: 'legend', label: 'Legend' },
+]
+
+const MOCK_LEADERBOARD: { name: string; items: number; avatar: string }[] = [
+  { name: 'Ava Chen', items: 47, avatar: '🌿' },
+  { name: 'Marcus Reed', items: 42, avatar: '🦊' },
+  { name: 'Priya Patel', items: 38, avatar: '🌸' },
+  { name: 'Jonas Müller', items: 33, avatar: '🐢' },
+  { name: 'Layla Hassan', items: 29, avatar: '🍃' },
+  { name: 'Diego Romero', items: 24, avatar: '🌍' },
+  { name: 'Sienna Brooks', items: 19, avatar: '🐝' },
+  { name: 'Tomoko Sato', items: 14, avatar: '🌱' },
+  { name: 'Rafael Costa', items: 9, avatar: '🦉' },
 ]
 
 const TOOLTIP_STYLE = {
@@ -210,8 +223,8 @@ function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
         </CardHeader>
         <CardContent className="space-y-2">
           {[
-            { label: 'CO₂ Generated', value: `${stats.totalCo2Kg.toFixed(2)} kg`, icon: '🌍' },
-            { label: 'Water Used', value: `${stats.totalWaterLitres.toFixed(0)} L`, icon: '💧' },
+            { label: 'CO₂ Saved', value: `${stats.totalCo2Kg.toFixed(2)} kg`, icon: '🌍', accent: '#10BC79' },
+            { label: 'Degradation Years Saved', value: `${stats.decompositionYearsSaved.toFixed(0)} yrs`, icon: '⏳', accent: '#10BC79' },
             { label: 'Recyclable Items', value: String(stats.recyclableCount), icon: '♻️', accent: '#10BC79' },
             { label: 'Landfill Items', value: String(stats.landfillCount), icon: '🗑️', accent: '#ff4d4d' },
           ].map(({ label, value, icon, accent }) => (
@@ -242,6 +255,59 @@ function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
           </CardContent>
         </Card>
       )}
+    </div>
+  )
+}
+
+// ── Leaderboard tab ───────────────────────────────────────────────────────
+
+function LeaderboardTab({ stats }: { stats: EnhancedStats }) {
+  const rows = [
+    ...MOCK_LEADERBOARD,
+    { name: 'You', items: stats.uniqueItemsScanned, avatar: '🫵', isUser: true as const },
+  ]
+    .sort((a, b) => b.items - a.items)
+    .map((r, idx) => ({ ...r, rank: idx + 1 }))
+
+  const medal = (rank: number) =>
+    rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : null
+
+  return (
+    <div className="space-y-4 animate-fade-up">
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>Leaderboard</CardTitle>
+            <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">By items scanned</span>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-1">
+          {rows.map((r) => {
+            const isUser = 'isUser' in r && r.isUser
+            return (
+              <div
+                key={r.name}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 border ${
+                  isUser ? 'border-primary bg-primary/5' : 'border-transparent'
+                }`}
+              >
+                <span className="w-6 font-mono text-xs font-bold text-muted-foreground">
+                  {medal(r.rank) ?? `#${r.rank}`}
+                </span>
+                <span className="text-xl leading-none">{r.avatar}</span>
+                <span className={`flex-1 text-sm ${isUser ? 'font-bold text-primary' : 'text-foreground'}`}>
+                  {r.name}
+                </span>
+                <span className="font-mono text-sm font-bold text-foreground">{r.items}</span>
+              </div>
+            )
+          })}
+        </CardContent>
+      </Card>
+
+      <p className="px-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground text-center">
+        Repeat items don't count — each unique item scanned counts once.
+      </p>
     </div>
   )
 }
@@ -307,6 +373,7 @@ export default function DashboardScreen() {
           <>
             {tab === 'overview' && <OverviewTab stats={stats} navigate={navigate} />}
             {tab === 'insights' && <InsightsTab stats={stats} navigate={navigate} />}
+            {tab === 'leaderboard' && <LeaderboardTab stats={stats} />}
             {tab === 'legend' && <LegendTab />}
           </>
         )}
