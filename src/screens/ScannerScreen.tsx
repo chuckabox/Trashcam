@@ -213,9 +213,9 @@ function OnboardingModal({ onDismiss }: { onDismiss: () => void }) {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-6 backdrop-blur-[2px] animate-fade-in">
       <div className="w-full max-w-[340px] rounded-2xl bg-white p-8 shadow-2xl animate-scale-in">
-        <h2 className="text-2xl font-bold text-foreground">Welcome!</h2>
-        <p className="mt-4 text-sm leading-normal text-muted-foreground">
-          Point your camera at some waste to see where it goes. You can also upload a photo from your gallery.
+        <h2 className="text-2xl font-bold text-foreground">Ready?</h2>
+        <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+          Point your camera at your waste or recyclable items (even if you don't know what they are!) and find out where they belong.
         </p>
         <button
           onClick={onDismiss}
