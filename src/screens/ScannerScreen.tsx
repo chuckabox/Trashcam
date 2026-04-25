@@ -125,12 +125,12 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
             <span
               key={pos}
               className={cn(
-                'absolute h-8 w-8 transition-colors duration-300 border-transparent',
+                'absolute h-8 w-8 transition-colors duration-300',
                 pos === 'tl' && 'top-0 left-0 border-t-2 border-l-2',
                 pos === 'tr' && 'top-0 right-0 border-t-2 border-r-2',
                 pos === 'bl' && 'bottom-0 left-0 border-b-2 border-l-2',
                 pos === 'br' && 'bottom-0 right-0 border-b-2 border-r-2',
-                ready ? 'border-primary shadow-[0_0_8px_rgba(16,188,121,0.6)]' : 'border-foreground/20'
+                ready ? 'border-primary' : 'border-foreground/30'
               )}
             />
           ))}
@@ -141,16 +141,16 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
               className="absolute inset-x-4 h-px animate-scan"
               style={{
                 background: ready
-                  ? 'linear-gradient(90deg, transparent, rgba(16,188,121,0.7), transparent)'
-                  : 'linear-gradient(90deg, transparent, rgba(15,23,19,0.2), transparent)',
+                  ? 'linear-gradient(90deg, transparent, rgba(16,188,121,0.5), transparent)'
+                  : 'linear-gradient(90deg, transparent, rgba(15,23,19,0.1), transparent)',
               }}
             />
           )}
 
           {/* Center crosshair */}
           <div className="absolute left-1/2 top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2">
-            <span className={`absolute left-0 right-0 top-1/2 h-px -translate-y-1/2 ${ready ? 'bg-primary/60' : 'bg-muted-foreground/20'}`} />
-            <span className={`absolute top-0 bottom-0 left-1/2 w-px -translate-x-1/2 ${ready ? 'bg-primary/60' : 'bg-muted-foreground/20'}`} />
+            <span className={`absolute left-0 right-0 top-1/2 h-px -translate-y-1/2 ${ready ? 'bg-primary/40' : 'bg-muted-foreground/20'}`} />
+            <span className={`absolute top-0 bottom-0 left-1/2 w-px -translate-x-1/2 ${ready ? 'bg-primary/40' : 'bg-muted-foreground/20'}`} />
           </div>
         </div>
       </div>
@@ -176,27 +176,7 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
       )}
 
       {/* Bottom controls */}
-      <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-24 pt-6 gap-5">
-        {/* Confidence pill */}
-        <div className={cn(
-          'flex items-center gap-2 rounded-md border px-4 py-2 transition-all shadow-sm',
-          ready
-            ? 'border-primary bg-primary/5'
-            : bestConfidence > 0
-            ? 'border-yellow-400 bg-yellow-400/5'
-            : 'border-border bg-white'
-        )}>
-          {bestConfidence > 0 && (
-            <span className={`h-2 w-2 rounded-full ${ready ? 'bg-primary animate-pulse' : 'bg-yellow-400'}`} />
-          )}
-          <span className={cn(
-            'font-mono text-[10px] font-bold uppercase tracking-widest',
-            ready ? 'text-primary' : bestConfidence > 0 ? 'text-yellow-600' : 'text-muted-foreground'
-          )}>
-            {bestConfidence > 0 ? `${pct}% Confidence` : 'Scan Material'}
-          </span>
-        </div>
-
+      <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-24 pt-6 gap-6">
         {/* Action Buttons */}
         <div className="flex items-center gap-8">
           <input
@@ -211,7 +191,7 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
             className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-white shadow-sm transition-all hover:bg-secondary active:scale-90"
             aria-label="Upload photo"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
             </svg>
           </button>
@@ -221,12 +201,12 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
             onClick={handleSnap}
             disabled={busy || modelLoading || !ready}
             aria-label="Snap photo"
-            className="group relative flex h-20 w-20 items-center justify-center disabled:opacity-40 transition-transform active:scale-95"
+            className="relative flex h-20 w-20 items-center justify-center disabled:opacity-40 transition-transform active:scale-95"
           >
-            {/* Outer ring */}
+            {/* Outer ring - Static */}
             <span className={cn(
-              'absolute inset-0 rounded-full border-2 transition-all duration-300',
-              ready ? 'border-primary scale-110' : 'border-muted-foreground/10'
+              'absolute inset-0 rounded-full border-2',
+              ready ? 'border-primary' : 'border-muted-foreground/20'
             )} />
             {/* Inner */}
             <span className={cn(
@@ -237,7 +217,7 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
                 <span className="h-4 w-4 rounded-full border-2 border-primary-foreground border-t-transparent animate-spin" />
               ) : (
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                  stroke={ready ? '#FFFFFF' : '#0F1713'}
+                  stroke={ready ? '#FFFFFF' : '#6b7280'}
                   strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
                   <circle cx="12" cy="13" r="3" />
@@ -249,8 +229,8 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
           <div className="w-12" /> {/* Spacer */}
         </div>
 
-        <p className="font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground/60">
-          {modelLoading ? 'Calibrating' : ready ? 'Ready' : 'Aim at Material'}
+        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/80">
+          {modelLoading ? 'Syncing sensors' : ready ? 'Ready for capture' : 'Aim at material'}
         </p>
       </div>
     </div>
