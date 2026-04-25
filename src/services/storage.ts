@@ -6,7 +6,18 @@ export async function loadScans(): Promise<ScanResult[]> {
   const raw = localStorage.getItem(KEY)
   if (!raw) return []
   try {
-    return JSON.parse(raw) as ScanResult[]
+    const rawScans = JSON.parse(raw) as any[]
+    // Migrate old scans to new format if needed
+    return rawScans.map((s) => {
+      if (!s.items && s.info) {
+        return {
+          ...s,
+          items: [s.info],
+          detections: [s.detection],
+        }
+      }
+      return s as ScanResult
+    })
   } catch {
     return []
   }
@@ -42,7 +53,8 @@ export function computeStats(scans: ScanResult[]): DashboardStats {
   let water = 0
 
   for (const s of scans) {
-    for (const item of s.items) {
+    const items = s.items || []
+    for (const item of items) {
       breakdown[item.material] = (breakdown[item.material] ?? 0) + 1
       co2 += item.co2KgPerItem
       water += item.waterLitresPerItem
@@ -74,7 +86,8 @@ export function computeEnhancedStats(scans: ScanResult[]): EnhancedStats {
 
   let recyclableCount = 0, landfillCount = 0, compostableCount = 0, hazardousCount = 0
   for (const s of scans) {
-    for (const item of s.items) {
+    const items = s.items || []
+    for (const item of items) {
       if (item.recyclable === 'recyclable') recyclableCount++
       else if (item.recyclable === 'landfill') landfillCount++
       else if (item.recyclable === 'compostable') compostableCount++
@@ -114,13 +127,14 @@ export function computeEnhancedStats(scans: ScanResult[]): EnhancedStats {
 
   const mostScannedItem = base.topItems[0]?.name ?? null
 
-  const uniqueItemsScanned = new Set(scans.flatMap(s => s.items.map(i => i.displayName))).size
+  const uniqueItemsScanned = new Set(scans.flatMap(s => (s.items || []).map(i => i.displayName))).size
 
   const seen = new Set<string>()
   let decompositionYearsSaved = 0
   let uniqueCo2KgSaved = 0
   for (const s of scans) {
-    for (const item of s.items) {
+    const items = s.items || []
+    for (const item of items) {
       if (seen.has(item.displayName)) continue
       seen.add(item.displayName)
       decompositionYearsSaved += item.decompositionYears
