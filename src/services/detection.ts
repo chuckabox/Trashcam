@@ -1,9 +1,9 @@
 import type { Detection } from '../types'
 import { trashClassFor } from './cocoClasses'
 
-export const DETECTION_CONFIDENCE_THRESHOLD = 0.4
+export const DETECTION_CONFIDENCE_THRESHOLD = 0.25
 export const SNAP_CONFIDENCE_THRESHOLD = 0.6
-export const NMS_IOU_THRESHOLD = 0.5
+export const NMS_IOU_THRESHOLD = 0.45
 
 export const MODEL_INPUT_SIZE = 640
 export const NUM_CLASSES = 80

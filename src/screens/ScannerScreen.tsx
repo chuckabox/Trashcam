@@ -45,10 +45,9 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
 
   const handleSnap = useCallback(async () => {
     if (busy || !videoRef.current || !detections.length) return
-    const sorted = [...detections].sort((a, b) => b.confidence - a.confidence)
-    const top = sorted[0]
+    const top = [...detections].sort((a, b) => b.confidence - a.confidence)[0]
     if (!top) return
-    
+
     setBusy(true)
     try {
       const video = videoRef.current
@@ -63,7 +62,7 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         timestamp: Date.now(),
         photoUri,
-        detections: sorted,
+        detection: top,
         info,
       }
       await saveScan(scan)
@@ -85,14 +84,13 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
         const img = new Image()
         img.onload = async () => {
           const results = await runInference(img)
-          const sorted = [...results].sort((a, b) => b.confidence - a.confidence)
-          const top = sorted[0]
+          const top = [...results].sort((a, b) => b.confidence - a.confidence)[0]
           
           const scan: ScanResult = {
             id: `upload-${Date.now()}`,
             timestamp: Date.now(),
             photoUri: dataUrl,
-            detections: sorted.length > 0 ? sorted : [{ class: 'unknown', confidence: 0, bbox: { x: 0, y: 0, width: 1, height: 1 } }],
+            detection: top || { class: 'unknown', confidence: 0, bbox: { x: 0, y: 0, width: 1, height: 1 } },
             info: lookup(top?.class || 'unknown'),
           }
           await saveScan(scan)
@@ -178,7 +176,7 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
       )}
 
       {/* Bottom controls */}
-      <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-16 pt-6 gap-6">
+      <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-28 pt-6 gap-6">
         {/* Action Buttons */}
         <div className="flex items-center gap-8">
           <input

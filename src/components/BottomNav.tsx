@@ -47,7 +47,7 @@ export function BottomNav() {
       style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 0px)' }}
     >
       <div className="border-t border-border bg-white">
-        <div className="flex items-center justify-around px-4 py-4">
+        <div className="flex items-center justify-around px-4 py-5">
 
           {/* Stats */}
           <button

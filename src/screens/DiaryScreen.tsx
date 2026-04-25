@@ -106,14 +106,7 @@ export default function DiaryScreen() {
                     {/* Info */}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-1">
-                        <p className="truncate text-sm font-semibold text-foreground">
-                          {item.info.displayName}
-                          {item.detections.length > 1 && (
-                            <span className="ml-2 inline-block rounded bg-primary/10 px-1 py-0.5 font-mono text-[8px] uppercase tracking-tighter text-primary">
-                              +{item.detections.length - 1} more
-                            </span>
-                          )}
-                        </p>
+                        <p className="truncate text-sm font-semibold text-foreground">{item.info.displayName}</p>
                       </div>
                       <p className="mt-0.5 font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
                         {new Date(item.timestamp).toLocaleDateString()} · {item.info.material}
@@ -123,7 +116,7 @@ export default function DiaryScreen() {
                     {/* Confidence */}
                     <div className="shrink-0 text-right">
                       <p className="font-mono text-sm font-bold text-foreground capitalize">{item.info.recyclable}</p>
-                      <p className="font-mono text-[9px] text-muted-foreground">{Math.round(item.detections[0].confidence * 100)}% confidence</p>
+                      <p className="font-mono text-[9px] text-muted-foreground">{Math.round(item.detection.confidence * 100)}% confidence</p>
                     </div>
                   </div>
                 </button>

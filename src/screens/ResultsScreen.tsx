@@ -24,7 +24,7 @@ export default function ResultsScreen() {
     )
   }
 
-  const { info, detections, photoUri } = scan
+  const { info, detection, photoUri } = scan
   const decompStr = info.decompositionYears >= 1000 ? '1000+ yrs'
     : info.decompositionYears < 1 ? `${Math.round(info.decompositionYears * 365)}d`
     : `${info.decompositionYears} yrs`
@@ -51,7 +51,7 @@ export default function ResultsScreen() {
               <div className="absolute bottom-0 left-0 right-0 p-4">
                 <p className="text-xl font-bold text-foreground">{info.displayName}</p>
                 <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mt-0.5">
-                  {Math.round(detections[0].confidence * 100)}% confidence · {info.material}
+                  {Math.round(detection.confidence * 100)}% confidence · {info.material}
                 </p>
               </div>
             </div>
@@ -63,7 +63,7 @@ export default function ResultsScreen() {
               <div>
                 <p className="text-xl font-bold text-foreground">{info.displayName}</p>
                 <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mt-0.5">
-                  {Math.round(detections[0].confidence * 100)}% confidence · {info.material}
+                  {Math.round(detection.confidence * 100)}% confidence · {info.material}
                 </p>
               </div>
             </div>

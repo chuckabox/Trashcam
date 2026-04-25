@@ -44,9 +44,9 @@ export interface ScanResult {
   id: string;
   timestamp: number;
   photoUri?: string;
-  detections: Detection[];
+  detection: Detection;
   ocrText?: string;
-  info: DegradationInfo; // Keeping info as the main detected item's info for legacy compatibility
+  info: DegradationInfo;
 }
 
 export interface DashboardStats {

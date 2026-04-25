@@ -16,7 +16,7 @@ const REC_VARIANT = {
 } as const
 
 export function ResultsCard({ result }: Props) {
-  const { info, detections, ocrText, photoUri } = result
+  const { info, detection, ocrText, photoUri } = result
   const years = info.decompositionYears
   const decompStr =
     years >= 1000
@@ -43,7 +43,7 @@ export function ResultsCard({ result }: Props) {
           <div className="flex flex-1 flex-col gap-1">
             <p className="text-lg font-bold text-foreground">{info.displayName}</p>
             <p className="text-sm text-muted-foreground">
-              {Math.round(detections[0].confidence * 100)}% · {info.material}
+              {Math.round(detection.confidence * 100)}% · {info.material}
             </p>
             {ocrText ? (
               <p className="text-xs italic text-yellow-400">"{ocrText}"</p>
