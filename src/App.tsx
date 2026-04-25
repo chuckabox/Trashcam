@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { HashRouter, Routes, Route, useLocation } from 'react-router-dom'
 import ScannerScreen from './screens/ScannerScreen'
 import ResultsScreen from './screens/ResultsScreen'
 import DiaryScreen from './screens/DiaryScreen'
@@ -30,8 +30,8 @@ function Layout() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Layout />
-    </BrowserRouter>
+    </HashRouter>
   )
 }
