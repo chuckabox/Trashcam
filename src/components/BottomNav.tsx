@@ -57,42 +57,48 @@ export function BottomNav() {
         <svg className="absolute bottom-full right-0 text-white" width="24" height="24" viewBox="0 0 24 24" fill="none">
           <path d="M24 24H0C13.2548 24 24 13.2548 24 0V24Z" fill="currentColor"/>
         </svg>
-        <div className="flex items-end justify-around px-4 pt-2 pb-3">
+        <div className="flex items-center justify-between px-6 pt-2 pb-3">
 
           {/* Home */}
           <button
             onClick={() => navigate('/dashboard')}
             className={cn(
-              'flex flex-col items-center gap-1 transition-all duration-200 active:scale-95',
-              dashActive ? 'text-primary scale-110' : 'text-muted-foreground hover:text-foreground',
+              'flex w-20 flex-col items-center justify-center gap-1.5 transition-all duration-200 active:scale-95',
+              dashActive ? 'text-primary scale-105' : 'text-muted-foreground hover:text-foreground',
             )}
           >
-            <HomeIcon active={dashActive} />
-            <span className="font-mono text-[9px] uppercase tracking-widest">Home</span>
+            <div className="flex h-6 items-center justify-center">
+              <HomeIcon active={dashActive} />
+            </div>
+            <span className="font-mono text-[9px] font-bold uppercase tracking-widest">Home</span>
           </button>
 
           {/* Scanner */}
           <button
             onClick={() => navigate('/scan')}
             className={cn(
-              'flex flex-col items-center gap-1 transition-all duration-200 active:scale-95',
-              scanActive ? 'text-primary scale-110' : 'text-muted-foreground hover:text-foreground',
+              'flex w-20 flex-col items-center justify-center gap-1.5 transition-all duration-200 active:scale-95',
+              scanActive ? 'text-primary scale-105' : 'text-muted-foreground hover:text-foreground',
             )}
           >
-            <CameraIcon active={scanActive} />
-            <span className="font-mono text-[9px] uppercase tracking-widest">Scan</span>
+            <div className="flex h-6 items-center justify-center">
+              <CameraIcon active={scanActive} />
+            </div>
+            <span className="font-mono text-[9px] font-bold uppercase tracking-widest">Scan</span>
           </button>
 
           {/* Leaderboard */}
           <button
             onClick={() => navigate('/leaderboard')}
             className={cn(
-              'flex flex-col items-center gap-1 transition-all duration-200 active:scale-95',
-              leaderActive ? 'text-primary scale-110' : 'text-muted-foreground hover:text-foreground',
+              'flex w-20 flex-col items-center justify-center gap-1.5 transition-all duration-200 active:scale-95',
+              leaderActive ? 'text-primary scale-105' : 'text-muted-foreground hover:text-foreground',
             )}
           >
-            <TrophyIcon active={leaderActive} />
-            <span className="font-mono text-[9px] uppercase tracking-widest">Rankings</span>
+            <div className="flex h-6 items-center justify-center">
+              <TrophyIcon active={leaderActive} />
+            </div>
+            <span className="font-mono text-[9px] font-bold uppercase tracking-widest">Rankings</span>
           </button>
 
         </div>
