@@ -1,7 +1,7 @@
 [
   {
     "yoloClass": "recyclable",
-    "displayName": "Industrial Recyclable",
+    "displayName": "Metal Recyclable",
     "material": "metal",
     "decompositionYears": 500,
     "co2KgPerItem": 0.5,
@@ -9,7 +9,7 @@
     "toxicity": "low",
     "recyclable": "recyclable",
     "emoji": "♻️",
-    "disposalTip": "High-value scrap. Sort by material type (steel, aluminum, copper) and send to smelting facility."
+    "disposalTip": "This is valuable scrap. Put it in your yellow-lid recycling bin so it can be melted down and reused."
   },
   {
     "yoloClass": "e-waste",
@@ -21,11 +21,11 @@
     "toxicity": "high",
     "recyclable": "hazardous",
     "emoji": "💻",
-    "disposalTip": "Contains hazardous heavy metals. Must be processed at a certified e-waste recovery plant."
+    "disposalTip": "Don't bin this! It has toxic parts inside. Take it to a local e-waste drop-off point or a tech recycling centre."
   },
   {
     "yoloClass": "compostable",
-    "displayName": "Organic/Compostable",
+    "displayName": "Organic/Food",
     "material": "organic",
     "decompositionYears": 0.1,
     "co2KgPerItem": 0.1,
@@ -33,11 +33,11 @@
     "toxicity": "low",
     "recyclable": "compostable",
     "emoji": "🍎",
-    "disposalTip": "Biodegradable material. Divert to industrial composting or anaerobic digestion facility."
+    "disposalTip": "This can rot away naturally. Put it in your green-lid FOGO bin or your home compost pile."
   },
   {
     "yoloClass": "paper",
-    "displayName": "Paper/Fiber",
+    "displayName": "Paper & Cardboard",
     "material": "paper",
     "decompositionYears": 0.2,
     "co2KgPerItem": 0.5,
@@ -45,7 +45,7 @@
     "toxicity": "low",
     "recyclable": "recyclable",
     "emoji": "📄",
-    "disposalTip": "Cellulose fibers are highly recyclable. Keep dry and avoid grease contamination."
+    "disposalTip": "Highly recyclable. Make sure it's dry and not covered in food or grease, then put it in the yellow bin."
   },
   {
     "yoloClass": "waste",
@@ -57,11 +57,11 @@
     "toxicity": "medium",
     "recyclable": "landfill",
     "emoji": "🗑️",
-    "disposalTip": "Mixed materials or multi-layer films (like metallized chip bags). While difficult for standard systems, industrial recovery now targets these high-grade polymers for specialized chemical processing."
+    "disposalTip": "This is tricky to recycle (like chip bags). It usually goes in the red-lid landfill bin, but some specialized recyclers can still use it."
   },
   {
     "yoloClass": "unknown",
-    "displayName": "Unidentified Material",
+    "displayName": "Unidentified Item",
     "material": "composite",
     "decompositionYears": 100,
     "co2KgPerItem": 1.0,
@@ -69,6 +69,6 @@
     "toxicity": "medium",
     "recyclable": "landfill",
     "emoji": "❓",
-    "disposalTip": "Confidence threshold not met. Manual inspection required to determine recovery path."
+    "disposalTip": "Not sure what this is yet. Check for a recycling symbol on the label to decide which bin to use."
   }
 ]

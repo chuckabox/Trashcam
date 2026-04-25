@@ -28,10 +28,10 @@ const TABS = [
 ]
 
 const TOOLTIP_STYLE = {
-  background: '#F5F6F3',
-  border: '1px solid #E1E4DF',
+  background: '#FFFFFF',
+  border: '2px solid #0F1713',
   color: '#0F1713',
-  borderRadius: '6px',
+  borderRadius: '4px',
   fontSize: 11,
   fontFamily: '"DM Mono", monospace',
 }
@@ -249,11 +249,11 @@ function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
 // ── Dictionary tab ────────────────────────────────────────────────────────────
 
 const DICTIONARY = [
-  { term: 'Residual Waste', def: 'Materials that cannot currently be recovered through standard sorting (e.g., multi-layer films, metallised chip bags). Industrial recovery aims to chemically process these into new polymers.' },
-  { term: 'Carbon Footprint', def: 'The total greenhouse gas emissions (in CO2 equivalent) caused by the manufacture and transport of an item.' },
-  { term: 'Recovery Path', def: 'The specific industrial journey an item takes to be reclaimed, such as mechanical shredding, smelting, or industrial composting.' },
-  { term: 'Compostable', def: 'Organic materials that can break down into nutrient-rich soil within industrial processing timeframes.' },
-  { term: 'Hazardous Recovery', def: 'Items containing toxic substances (e.g., heavy metals in batteries) that require strictly controlled extraction processes.' },
+  { term: 'Residual Waste', def: 'Items that can’t go in normal recycling bins, like chip bags or soft plastic wrappers. These usually need special industrial processing.' },
+  { term: 'Carbon Footprint', def: 'The amount of CO2 gas released into the air to make and ship this item.' },
+  { term: 'Recovery Path', def: 'The journey an item takes to be turned back into something useful, like being melted down or composted.' },
+  { term: 'Compostable', def: 'Food or plant-based items that can rot away naturally into soil.' },
+  { term: 'Hazardous Recovery', def: 'Items with toxic parts (like batteries) that need careful handling so they don’t leak into the ground.' },
 ]
 
 function DictionaryTab() {
