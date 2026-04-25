@@ -22,7 +22,8 @@ export function trashClassForName(cocoName: string): string {
   const recyclables = new Set([
     'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat',
     'traffic light', 'fire hydrant', 'stop sign', 'parking meter', 'bottle',
-    'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'sink', 'scissors'
+    'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'sink', 'scissors',
+    'handbag', 'frisbee', 'skis', 'snowboard', 'skateboard', 'surfboard', 'vase'
   ]);
 
   const compostable = new Set([
@@ -33,10 +34,10 @@ export function trashClassForName(cocoName: string): string {
   const paper = new Set(['book']);
 
   const waste = new Set([
-    'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee', 'skis',
-    'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove',
-    'skateboard', 'surfboard', 'tennis racket', 'chair', 'couch', 'bed',
-    'dining table', 'toilet', 'vase', 'clock', 'teddy bear', 'toothbrush'
+    'backpack', 'umbrella', 'tie', 'suitcase',
+    'sports ball', 'kite', 'baseball bat', 'baseball glove',
+    'tennis racket', 'chair', 'couch', 'bed',
+    'dining table', 'toilet', 'clock', 'teddy bear', 'toothbrush'
   ]);
 
   if (eWaste.has(cocoName)) return 'e-waste';

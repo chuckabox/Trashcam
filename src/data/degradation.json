@@ -57,7 +57,7 @@
     "toxicity": "medium",
     "recyclable": "landfill",
     "emoji": "🗑️",
-    "disposalTip": "Mixed or contaminated materials with no current recovery path. Send to controlled landfill."
+    "disposalTip": "Mixed materials or multi-layer films (like metallized chip bags). While difficult for standard systems, industrial recovery now targets these high-grade polymers for specialized chemical processing."
   },
   {
     "yoloClass": "unknown",
