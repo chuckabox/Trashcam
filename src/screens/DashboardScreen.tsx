@@ -33,25 +33,25 @@ function computeScore(items: number, co2Kg: number, yrsSaved: number): number {
   return Math.round(items * 10 + co2Kg * 8 + yrsSaved * 1.5)
 }
 
-const MOCK_GLOBAL: { name: string; score: number; items: number; avatar: string }[] = [
-  { name: 'Ava Chen', score: 4820, items: 312, avatar: '🌿' },
-  { name: 'Marcus Reed', score: 4510, items: 287, avatar: '🦊' },
-  { name: 'Priya Patel', score: 3970, items: 251, avatar: '🌸' },
-  { name: 'Jonas Müller', score: 3480, items: 228, avatar: '🐢' },
-  { name: 'Layla Hassan', score: 3105, items: 196, avatar: '🍃' },
-  { name: 'Diego Romero', score: 2740, items: 174, avatar: '🌍' },
-  { name: 'Sienna Brooks', score: 2280, items: 143, avatar: '🐝' },
-  { name: 'Tomoko Sato', score: 1860, items: 118, avatar: '🌱' },
-  { name: 'Rafael Costa', score: 1490, items: 92, avatar: '🦉' },
+const MOCK_GLOBAL: { name: string; items: number; score: number; avatar: string }[] = [
+  { name: 'Ava Chen', items: 842, score: 12450, avatar: '🌿' },
+  { name: 'Marcus Reed', items: 756, score: 10890, avatar: '🦊' },
+  { name: 'Priya Patel', items: 612, score: 9240, avatar: '🌸' },
+  { name: 'Jonas Müller', items: 589, score: 8760, avatar: '🐢' },
+  { name: 'Layla Hassan', items: 474, score: 7120, avatar: '🍃' },
+  { name: 'Diego Romero', items: 412, score: 6450, avatar: '🌍' },
+  { name: 'Sienna Brooks', items: 388, score: 5980, avatar: '🐝' },
+  { name: 'Tomoko Sato', items: 312, score: 4890, avatar: '🌱' },
+  { name: 'Rafael Costa', items: 256, score: 3450, avatar: '🦉' },
 ]
 
-const MOCK_FRIENDS: { name: string; score: number; items: number; avatar: string }[] = [
-  { name: 'Sam K.', score: 645, items: 41, avatar: '🐼' },
-  { name: 'Jess', score: 552, items: 35, avatar: '🦄' },
-  { name: 'Rohan', score: 438, items: 28, avatar: '🐙' },
-  { name: 'Mia', score: 351, items: 22, avatar: '🌻' },
-  { name: 'Liam', score: 274, items: 17, avatar: '🐶' },
-  { name: 'Zoe', score: 168, items: 11, avatar: '🦋' },
+const MOCK_FRIENDS: { name: string; items: number; score: number; avatar: string }[] = [
+  { name: 'Sam K.', items: 156, score: 2450, avatar: '🐼' },
+  { name: 'Jess', items: 124, score: 1890, avatar: '🦄' },
+  { name: 'Rohan', items: 98, score: 1450, avatar: '🐙' },
+  { name: 'Mia', items: 74, score: 980, avatar: '🌻' },
+  { name: 'Liam', items: 42, score: 560, avatar: '🐶' },
+  { name: 'Zoe', items: 28, score: 320, avatar: '🦋' },
 ]
 
 const TOOLTIP_STYLE = {
@@ -304,7 +304,7 @@ function LeaderboardTab({ stats }: { stats: EnhancedStats }) {
           <button
             key={s}
             onClick={() => setScope(s)}
-            className={`flex-1 rounded-md py-2 font-mono text-[10px] uppercase tracking-widest transition-colors ${
+            className={`flex-1 rounded-md py-2 font-mono text-[9px] uppercase tracking-wider transition-colors ${
               scope === s
                 ? 'bg-primary text-primary-foreground font-bold'
                 : 'text-muted-foreground hover:text-foreground'

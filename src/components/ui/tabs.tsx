@@ -20,9 +20,9 @@ export function Tabs({ tabs, active, onChange, className }: TabsProps) {
           key={tab.id}
           onClick={() => onChange(tab.id)}
           className={cn(
-            'flex-1 rounded-md py-2 font-mono text-xs uppercase tracking-widest transition-all',
+            'flex-1 rounded-md py-2 font-mono text-[9px] uppercase tracking-wider transition-all',
             active === tab.id
-              ? 'bg-secondary text-primary'
+              ? 'bg-secondary text-primary font-bold'
               : 'text-muted-foreground hover:text-foreground',
           )}
         >
