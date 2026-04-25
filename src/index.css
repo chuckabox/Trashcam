@@ -52,7 +52,7 @@ body::after {
     width: 393px;
     min-height: 100vh;
     position: relative;
-    background: #FDFDFB;
+    background: #E4E4E7;
     box-shadow:
       -1px 0 0 rgba(16, 188, 121, 0.07),
        1px 0 0 rgba(16, 188, 121, 0.07),
