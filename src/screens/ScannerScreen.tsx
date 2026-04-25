@@ -181,7 +181,7 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
       )}
 
       {/* Bottom controls */}
-      <div className="absolute inset-x-0 bottom-[12%] flex flex-col items-center pt-6 gap-6">
+      <div className="absolute inset-x-0 bottom-[16%] flex flex-col items-center pt-6 gap-6">
         {/* Action Buttons */}
         <div className="flex items-center gap-8">
           <input
@@ -234,7 +234,7 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
           <div className="w-12" /> {/* Spacer */}
         </div>
 
-        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/80">
+        <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-foreground drop-shadow-md">
           {modelLoading ? 'Syncing sensors' : ready ? 'Ready for capture' : 'Aim at material'}
         </p>
       </div>
