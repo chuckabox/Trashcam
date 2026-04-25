@@ -10,12 +10,16 @@ function HomeIcon({ active }: { active: boolean }) {
   )
 }
 
-function AlbumIcon({ active }: { active: boolean }) {
+function TrophyIcon({ active }: { active: boolean }) {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       strokeWidth={active ? 2 : 1.5} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+      <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+      <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+      <path d="M4 22h16" />
+      <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+      <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+      <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
     </svg>
   )
 }
@@ -36,7 +40,7 @@ export function BottomNav() {
 
   const dashActive = pathname === '/dashboard'
   const scanActive = pathname === '/scan'
-  const albumActive = pathname === '/album'
+  const leaderActive = pathname === '/leaderboard'
 
   return (
     /* On desktop, center-align within the 393px phone container */
@@ -79,16 +83,16 @@ export function BottomNav() {
             <span className="font-mono text-[9px] uppercase tracking-widest">Scan</span>
           </button>
 
-          {/* Album */}
+          {/* Leaderboard */}
           <button
-            onClick={() => navigate('/album')}
+            onClick={() => navigate('/leaderboard')}
             className={cn(
               'flex flex-col items-center gap-1 transition-all duration-200 active:scale-95',
-              albumActive ? 'text-primary scale-110' : 'text-muted-foreground hover:text-foreground',
+              leaderActive ? 'text-primary scale-110' : 'text-muted-foreground hover:text-foreground',
             )}
           >
-            <AlbumIcon active={albumActive} />
-            <span className="font-mono text-[9px] uppercase tracking-widest">Album</span>
+            <TrophyIcon active={leaderActive} />
+            <span className="font-mono text-[9px] uppercase tracking-widest">Rankings</span>
           </button>
 
         </div>

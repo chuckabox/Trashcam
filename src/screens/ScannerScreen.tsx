@@ -32,9 +32,7 @@ function PermDenied({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
 
 function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navigate: ReturnType<typeof useNavigate>; onFlip: () => void }) {
   const videoRef = useRef<HTMLVideoElement>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
-  const [processingUpload, setProcessingUpload] = useState(false)
   const [latestPhoto, setLatestPhoto] = useState<string | null>(null)
 
   useEffect(() => {
@@ -82,38 +80,6 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
       setBusy(false)
     }
   }, [busy, detections, navigate])
-
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file || modelLoading) return
-
-    setProcessingUpload(true)
-    try {
-      const reader = new FileReader()
-      reader.onload = async (event) => {
-        const dataUrl = event.target?.result as string
-        const img = new Image()
-        img.onload = async () => {
-          const results = await runInference(img)
-          const top = [...results].sort((a, b) => b.confidence - a.confidence)[0]
-          
-          const scan: ScanResult = {
-            id: `upload-${Date.now()}`,
-            timestamp: Date.now(),
-            photoUri: dataUrl,
-            detection: top || { class: 'unknown', confidence: 0, bbox: { x: 0, y: 0, width: 1, height: 1 } },
-            info: lookup(top?.class || 'unknown'),
-          }
-          await saveScan(scan)
-          navigate('/results', { state: { scan } })
-        }
-        img.src = dataUrl
-      }
-      reader.readAsDataURL(file)
-    } catch (err) {
-      setProcessingUpload(false)
-    }
-  }
 
   const pct = Math.round(bestConfidence * 100)
 
@@ -174,34 +140,26 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
         </div>
       </div>
 
-      {/* Model loading or processing banner */}
-      {(modelLoading || processingUpload) && (
+      {/* Model loading banner */}
+      {modelLoading && (
         <div className="absolute inset-x-0 top-14 flex justify-center z-50">
           <div className="flex items-center gap-2 rounded-md border border-border bg-white px-4 py-2 shadow-sm">
             <span className="h-3 w-3 rounded-full border-2 border-primary border-t-transparent animate-spin" />
             <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-foreground">
-              {processingUpload ? 'Analysing' : 'Syncing Model'}
+              Syncing Model
             </span>
           </div>
         </div>
       )}
 
       {/* Bottom controls */}
-      <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-24 pt-6 gap-6">
-        <input
-          type="file"
-          ref={fileInputRef}
-          onChange={handleUpload}
-          accept="image/*"
-          className="hidden"
-        />
-        {/* Action Buttons — gallery / shutter / flip */}
+        {/* Action Buttons — album / shutter / flip */}
         <div className="flex w-[280px] items-center justify-between">
-          {/* Gallery (rounded square) — shows latest scan thumbnail if available */}
+          {/* Album (rounded square) — shows latest scan thumbnail if available */}
           <button
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => navigate('/album')}
             className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-border bg-white shadow-sm transition-all hover:bg-secondary active:scale-90"
-            aria-label="Upload photo"
+            aria-label="View Album"
           >
             {latestPhoto ? (
               <img src={latestPhoto} alt="" className="h-full w-full object-cover" />
