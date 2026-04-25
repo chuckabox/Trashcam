@@ -76,8 +76,8 @@ export default function ResultsScreen() {
         <div className="grid grid-cols-3 gap-2">
           {[
             { label: 'Breakdown', value: decompStr, color: 'text-primary', hint: 'Time to vanish' },
-            { label: 'CO₂', value: `${info.co2KgPerItem}kg`, color: 'text-accent-green', hint: 'Carbon footprint' },
-            { label: 'Water', value: `${info.waterLitresPerItem}L`, color: 'text-accent-blue', hint: 'Manufacturing usage' },
+            { label: 'CO₂', value: `${info.co2KgPerItem}kg`, color: 'text-cyan-600', hint: 'Carbon footprint' },
+            { label: 'Water', value: `${info.waterLitresPerItem}L`, color: 'text-blue-600', hint: 'Manufacturing usage' },
           ].map(({ label, value, color, hint }) => (
             <div key={label} className="rounded-lg border border-border bg-card p-3 text-center card-hover-effect">
               <div className="flex items-center justify-center gap-1">

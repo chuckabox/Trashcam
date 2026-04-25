@@ -9,22 +9,19 @@ export default {
         mono: ['"DM Mono"', 'monospace'],
       },
       colors: {
-        background: '#FAF8F5',
-        foreground: '#2A2A28',
-        card: '#FFFFFF',
-        'card-foreground': '#2A2A28',
-        border: '#E8E5DF',
-        primary: '#D85A42', /* Terracotta */
+        background: '#FDFDFB',
+        foreground: '#0F1713',
+        card: '#F5F6F3',
+        'card-foreground': '#0F1713',
+        border: '#E1E4DF',
+        primary: '#10BC79',
         'primary-foreground': '#FFFFFF',
-        secondary: '#F2EFE9',
-        'secondary-foreground': '#5C5B57',
-        muted: '#F5F3ED',
-        'muted-foreground': '#7A7873',
-        destructive: '#C94F4F',
+        secondary: '#E8EBE6',
+        'secondary-foreground': '#405045',
+        muted: '#F0F2EF',
+        'muted-foreground': '#607065',
+        destructive: '#E53E3E',
         'destructive-foreground': '#FFFFFF',
-        'accent-green': '#5A7D65', /* Sage */
-        'accent-yellow': '#E6A845', /* Ochre */
-        'accent-blue': '#4B6B7A', /* Slate Blue */
       },
       keyframes: {
         'pulse-ring': {

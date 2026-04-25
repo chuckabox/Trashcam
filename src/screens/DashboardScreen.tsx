@@ -15,17 +15,10 @@ import { Hint } from '../components/Hint'
 // ── Design tokens ─────────────────────────────────────────────────────────────
 
 const MAT_COLOUR: Record<MaterialCategory, string> = {
-  plastic: '#E6A845', /* Ochre */
-  metal: '#4B6B7A', /* Slate Blue */
-  glass: '#5A7D65', /* Sage */
-  paper: '#A49C8D', /* Warm Grey */
-  cardboard: '#8C7A6B',
-  organic: '#3B5242', /* Deep Forest */
-  textile: '#9E6D5B',
-  styrofoam: '#D1CEC7',
-  electronic: '#D85A42', /* Terracotta */
-  hazardous: '#C94F4F', /* Destructive */
-  composite: '#4A4946', /* Charcoal Grey */
+  plastic: '#ef4444', metal: '#3b82f6', glass: '#06b6d4',
+  paper: '#a3a3a3', cardboard: '#b45309', organic: '#84cc16',
+  textile: '#ec4899', styrofoam: '#f97316', electronic: '#8b5cf6',
+  hazardous: '#dc2626', composite: '#eab308',
 }
 
 const TABS = [
@@ -36,8 +29,8 @@ const TABS = [
 
 const TOOLTIP_STYLE = {
   background: '#FFFFFF',
-  border: '2px solid #2A2A28',
-  color: '#2A2A28',
+  border: '2px solid #0F1713',
+  color: '#0F1713',
   borderRadius: '4px',
   fontSize: 11,
   fontFamily: '"DM Mono", monospace',
@@ -54,7 +47,7 @@ function Chip({ label, value, sub, accent, hint }: { label: string; value: strin
       <div className="flex items-start justify-between">
         <div>
           <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">{label}</p>
-          <p className="mt-1 font-mono text-xl font-bold" style={{ color: accent ?? '#2A2A28' }}>{value}</p>
+          <p className="mt-1 font-mono text-xl font-bold" style={{ color: accent ?? '#0F1713' }}>{value}</p>
         </div>
         {hint && <Hint text={hint} />}
       </div>
@@ -75,7 +68,7 @@ function OverviewTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
   const todayLabel = new Date().toLocaleDateString('en', { weekday: 'short' })
   const barData = stats.weeklyData.map((b) => ({
     ...b,
-    fill: b.day === todayLabel ? '#D85A42' : '#E8E5DF',
+    fill: b.day === todayLabel ? '#10BC79' : '#E1E4DF',
   }))
 
   return (
@@ -83,9 +76,9 @@ function OverviewTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
       {/* KPI chips */}
       <div className="grid grid-cols-2 gap-2">
         <Chip label="Today" value={String(stats.scannedToday)} sub="items scanned" />
-        <Chip label="Recyclable" value={`${stats.recyclablePercent}%`} sub="vs landfill" accent="#5A7D65" />
-        <Chip label="Compostable" value={String(stats.compostableCount)} sub="organic items" accent="#E6A845" />
-        <Chip label="Total Co2" value={`${stats.totalCo2Kg.toFixed(1)}kg`} sub="carbon footprint" accent="#2A2A28" 
+        <Chip label="Recyclable" value={`${stats.recyclablePercent}%`} sub="vs landfill" accent="#10BC79" />
+        <Chip label="Compostable" value={String(stats.compostableCount)} sub="organic items" accent="#f0c040" />
+        <Chip label="Total Co2" value={`${stats.totalCo2Kg.toFixed(1)}kg`} sub="carbon footprint" accent="#0F1713" 
           hint="Greenhouse gases released during production" />
       </div>
 
@@ -142,10 +135,10 @@ function OverviewTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
         <CardContent>
           <ResponsiveContainer width="100%" height={110}>
             <BarChart data={barData} barSize={18}>
-              <XAxis dataKey="day" tick={{ fill: '#7A7873', fontSize: 10, fontFamily: '"DM Mono"' }}
+              <XAxis dataKey="day" tick={{ fill: '#4d6450', fontSize: 10, fontFamily: '"DM Mono"' }}
                 axisLine={false} tickLine={false} />
               <YAxis hide allowDecimals={false} />
-              <Tooltip cursor={{ fill: 'rgba(216,90,66,0.04)' }} contentStyle={TOOLTIP_STYLE} />
+              <Tooltip cursor={{ fill: 'rgba(16,188,121,0.04)' }} contentStyle={TOOLTIP_STYLE} />
               <Bar dataKey="count" radius={[3, 3, 0, 0]}>
                 {barData.map((d, i) => <Cell key={i} fill={d.fill} />)}
               </Bar>
@@ -219,15 +212,15 @@ function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
           {[
             { label: 'CO₂ Generated', value: `${stats.totalCo2Kg.toFixed(2)} kg`, icon: '🌍' },
             { label: 'Water Used', value: `${stats.totalWaterLitres.toFixed(0)} L`, icon: '💧' },
-            { label: 'Recyclable Items', value: String(stats.recyclableCount), icon: '♻️', accent: '#5A7D65' },
-            { label: 'Landfill Items', value: String(stats.landfillCount), icon: '🗑️', accent: '#C94F4F' },
+            { label: 'Recyclable Items', value: String(stats.recyclableCount), icon: '♻️', accent: '#10BC79' },
+            { label: 'Landfill Items', value: String(stats.landfillCount), icon: '🗑️', accent: '#ff4d4d' },
           ].map(({ label, value, icon, accent }) => (
             <div key={label} className="flex items-center justify-between py-1.5 border-b border-border last:border-0">
               <div className="flex items-center gap-2">
                 <span className="text-base">{icon}</span>
                 <span className="font-mono text-xs text-muted-foreground">{label}</span>
               </div>
-              <span className="font-mono text-sm font-bold" style={{ color: accent ?? '#2A2A28' }}>{value}</span>
+              <span className="font-mono text-sm font-bold" style={{ color: accent ?? '#0F1713' }}>{value}</span>
             </div>
           ))}
         </CardContent>

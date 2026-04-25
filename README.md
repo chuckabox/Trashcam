@@ -108,21 +108,6 @@ trashlife/
 
 ---
 
-## Color Palette
-
-This project uses a custom, earthy, industrial design system to avoid generic AI aesthetics.
-- **Background (Oatmeal/Sand):** `#FAF8F5`
-- **Card (White):** `#FFFFFF`
-- **Foreground (Charcoal):** `#2A2A28`
-- **Primary (Terracotta):** `#D85A42`
-- **Accent Green (Sage):** `#5A7D65`
-- **Accent Yellow (Ochre):** `#E6A845`
-- **Accent Blue (Slate Blue):** `#4B6B7A`
-- **Destructive (Brick Red):** `#C94F4F`
-- **Muted (Grey/Sand):** `#F5F3ED` / `#7A7873`
-
----
-
 ### Prerequisites
 
 - **Node 18+**
