@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
 import { Tabs } from '../components/ui/tabs'
 import { Button } from '../components/ui/button'
+import { Hint } from '../components/Hint'
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 
@@ -71,7 +72,10 @@ function OverviewTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
         <Chip label="Today" value={String(stats.scannedToday)} sub="items scanned" />
         <Chip label="Recyclable" value={`${stats.recyclablePercent}%`} sub="vs landfill" accent="#10BC79" />
         <Chip label="Compostable" value={String(stats.compostableCount)} sub="organic items" accent="#f0c040" />
-        <Chip label="Total Co2" value={`${stats.totalCo2Kg.toFixed(1)}kg`} sub="carbon footprint" accent="#0F1713" />
+        <div className="flex items-center gap-1">
+          <Chip label="Total Co2" value={`${stats.totalCo2Kg.toFixed(1)}kg`} sub="carbon footprint" accent="#0F1713" />
+          <Hint text="Greenhouse gases released during production" className="absolute top-2 right-2" />
+        </div>
       </div>
 
       {/* Material breakdown */}
@@ -148,7 +152,12 @@ function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
     <div className="space-y-4 animate-fade-up">
       {/* Behaviour */}
       <Card>
-        <CardHeader><CardTitle>Habits</CardTitle></CardHeader>
+        <CardHeader>
+          <div className="flex items-center">
+            <CardTitle>Habits</CardTitle>
+            <Hint text="Insights based on your scan history" />
+          </div>
+        </CardHeader>
         <CardContent className="space-y-3">
           {stats.mostWastedCategory && (
             <div className="flex items-center justify-between border-b border-border pb-3">
@@ -186,7 +195,12 @@ function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
 
       {/* Impact */}
       <Card>
-        <CardHeader><CardTitle>Recovery Impact</CardTitle></CardHeader>
+        <CardHeader>
+          <div className="flex items-center">
+            <CardTitle>Recovery Impact</CardTitle>
+            <Hint text="How your sorting helps industrial reuse" />
+          </div>
+        </CardHeader>
         <CardContent className="space-y-2">
           {[
             { label: 'CO₂ Generated', value: `${stats.totalCo2Kg.toFixed(2)} kg`, icon: '🌍' },
