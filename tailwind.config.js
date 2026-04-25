@@ -9,7 +9,7 @@ export default {
         mono: ['"DM Mono"', 'monospace'],
       },
       colors: {
-        background: '#E4E4E7',
+        background: '#FDFDFB',
         foreground: '#0F1713',
         card: '#F5F6F3',
         'card-foreground': '#0F1713',
