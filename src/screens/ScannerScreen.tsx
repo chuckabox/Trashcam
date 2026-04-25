@@ -118,9 +118,9 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
   const pct = Math.round(bestConfidence * 100)
 
   return (
-    <div className="relative h-full w-full overflow-hidden bg-black touch-none">
+    <div className="relative h-full w-full overflow-hidden bg-background touch-none">
       {/* Camera feed */}
-      <video ref={videoRef} className="h-full w-full object-cover bg-black" autoPlay playsInline muted />
+      <video ref={videoRef} className="h-full w-full object-cover opacity-90" autoPlay playsInline muted />
 
       {/* Subtle vignette */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.1)_100%)]" />
@@ -341,8 +341,8 @@ export default function ScannerScreen() {
   if (permState === 'denied') return <PermDenied navigate={navigate} />
   if (permState === 'pending' || !stream) {
     return (
-      <div className="flex h-screen items-center justify-center bg-black">
-        <span className="font-mono text-[10px] uppercase tracking-widest text-white/40 animate-blink">Starting camera</span>
+      <div className="flex h-screen items-center justify-center bg-background">
+        <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/40 animate-blink">Starting camera</span>
       </div>
     )
   }
