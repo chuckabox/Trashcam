@@ -255,15 +255,15 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
 
 function OnboardingModal({ onDismiss }: { onDismiss: () => void }) {
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 px-6 backdrop-blur-sm animate-scale-in">
-      <div className="w-full max-w-xs rounded-xl border-2 border-foreground bg-white p-6 shadow-[8px_8px_0_0_#0F1713]">
-        <h2 className="text-xl font-bold text-foreground">Welcome!</h2>
-        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-6 backdrop-blur-[2px] animate-fade-in">
+      <div className="w-full max-w-xs rounded-2xl bg-white p-8 shadow-2xl animate-scale-in">
+        <h2 className="text-2xl font-bold text-foreground">Welcome!</h2>
+        <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
           Point your camera at some waste to see where it goes. You can also upload a photo from your gallery.
         </p>
         <button
           onClick={onDismiss}
-          className="mt-6 w-full rounded-md border-2 border-foreground bg-primary py-2.5 font-mono text-xs font-bold uppercase tracking-widest text-white shadow-[4px_4px_0_0_#0F1713] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+          className="mt-8 w-full rounded-xl bg-primary py-3.5 font-sans text-sm font-semibold tracking-wide text-white transition-all hover:bg-primary/90 active:scale-95"
         >
           Start Scanning
         </button>
