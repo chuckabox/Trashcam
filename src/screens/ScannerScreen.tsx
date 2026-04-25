@@ -5,6 +5,7 @@ import { BoundingBoxOverlay } from '../components/BoundingBoxOverlay'
 import { SNAP_CONFIDENCE_THRESHOLD } from '../services/detection'
 import { lookup } from '../services/degradation'
 import { saveScan } from '../services/storage'
+import { cn } from '../lib/utils'
 import type { ScanResult } from '../types'
 
 // ── Permission-denied screen ─────────────────────────────────────────────────
@@ -250,6 +251,27 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
   )
 }
 
+// ── Onboarding Modal ─────────────────────────────────────────────────────────
+
+function OnboardingModal({ onDismiss }: { onDismiss: () => void }) {
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 px-6 backdrop-blur-sm animate-scale-in">
+      <div className="w-full max-w-xs rounded-xl border-2 border-foreground bg-white p-6 shadow-[8px_8px_0_0_#0F1713]">
+        <h2 className="text-xl font-bold text-foreground">Welcome!</h2>
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+          Point your camera at some waste to see where it goes. You can also upload a photo from your gallery.
+        </p>
+        <button
+          onClick={onDismiss}
+          className="mt-6 w-full rounded-md border-2 border-foreground bg-primary py-2.5 font-mono text-xs font-bold uppercase tracking-widest text-white shadow-[4px_4px_0_0_#0F1713] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+        >
+          Start Scanning
+        </button>
+      </div>
+    </div>
+  )
+}
+
 // ── Shell ─────────────────────────────────────────────────────────────────────
 
 type PermState = 'pending' | 'granted' | 'denied'
@@ -258,14 +280,23 @@ export default function ScannerScreen() {
   const navigate = useNavigate()
   const streamRef = useRef<MediaStream | null>(null)
   const [permState, setPermState] = useState<PermState>('pending')
+  const [showOnboarding, setShowOnboarding] = useState(false)
 
   useEffect(() => {
+    const onboarded = localStorage.getItem('trashcams:onboarded')
+    if (!onboarded) setShowOnboarding(true)
+
     navigator.mediaDevices
       .getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } } })
       .then((stream) => { streamRef.current = stream; setPermState('granted') })
       .catch(() => setPermState('denied'))
     return () => streamRef.current?.getTracks().forEach((t) => t.stop())
   }, [])
+
+  const dismissOnboarding = () => {
+    localStorage.setItem('trashcams:onboarded', 'true')
+    setShowOnboarding(false)
+  }
 
   if (permState === 'denied') return <PermDenied navigate={navigate} />
   if (permState === 'pending') {
@@ -275,5 +306,11 @@ export default function ScannerScreen() {
       </div>
     )
   }
-  return <CameraActive stream={streamRef.current!} navigate={navigate} />
+  
+  return (
+    <>
+      <CameraActive stream={streamRef.current!} navigate={navigate} />
+      {showOnboarding && <OnboardingModal onDismiss={dismissOnboarding} />}
+    </>
+  )
 }

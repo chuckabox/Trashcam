@@ -249,12 +249,12 @@ function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
 // ── Dictionary tab ────────────────────────────────────────────────────────────
 
 const DICTIONARY = [
-  { term: 'Metal Recyclable', def: 'Solid metal items like cans, foil, and scrap. These are melted down to make new metal products.' },
-  { term: 'Electronic Waste', def: 'Anything with a battery or plug (phones, cables, toys). These contain toxic parts and must go to a special drop-off point.' },
-  { term: 'Organic/Food', def: 'Leftover food, garden waste, and natural fibers. These rot away into soil in a compost bin.' },
-  { term: 'Paper & Cardboard', def: 'Clean boxes, newspapers, and envelopes. These are turned back into new paper products if they stay dry.' },
-  { term: 'Residual Waste', def: 'Mixed items that are hard to separate, like chip bags, silver wrappers, and dirty packaging. These usually go to landfill.' },
-  { term: 'Unidentified Item', def: 'Things the scanner isn’t 100% sure about yet. Check for a recycling symbol to help decide where it goes.' },
+  { term: 'Metal', def: 'Cans, foil, and scrap metal. These are melted down and turned into new things.' },
+  { term: 'E-Waste', def: 'Anything with a battery or plug. These have toxic parts and need to go to a special tech recycling point.' },
+  { term: 'Organic', def: 'Food scraps and garden waste. These rot away naturally into compost for gardens.' },
+  { term: 'Paper', def: 'Clean cardboard and paper. These are recycled into new paper if they are dry and clean.' },
+  { term: 'Residual', def: 'Tricky items like chip bags or dirty wrappers that can’t be easily recycled. These usually go to landfill.' },
+  { term: 'Unknown', def: 'Items the scanner doesn’t recognize yet. Look for a recycling symbol on the label to help.' },
 ]
 
 function DictionaryTab() {
