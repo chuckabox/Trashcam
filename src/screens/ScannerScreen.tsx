@@ -30,7 +30,7 @@ function PermDenied({ navigate }: { navigate: ReturnType<typeof useNavigate> }) 
 
 // ── Active camera view ────────────────────────────────────────────────────────
 
-function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: ReturnType<typeof useNavigate> }) {
+function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navigate: ReturnType<typeof useNavigate>; onFlip: () => void }) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
@@ -177,56 +177,64 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
 
       {/* Bottom controls */}
       <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-24 pt-6 gap-6">
-        {/* Action Buttons */}
-        <div className="flex items-center gap-8">
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleUpload}
-            accept="image/*"
-            className="hidden"
-          />
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleUpload}
+          accept="image/*"
+          className="hidden"
+        />
+        {/* Action Buttons — gallery / shutter / flip */}
+        <div className="flex w-[280px] items-center justify-between">
+          {/* Gallery (rounded square) */}
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-white shadow-sm transition-all hover:bg-secondary active:scale-90"
+            className="flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-white shadow-sm transition-all hover:bg-secondary active:scale-90"
             aria-label="Upload photo"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+              <circle cx="8.5" cy="8.5" r="1.5" />
+              <polyline points="21 15 16 10 5 21" />
             </svg>
           </button>
 
-          {/* Snap button */}
+          {/* Shutter — iOS-style ring directly hugging inner disc */}
           <button
             onClick={handleSnap}
             disabled={busy || modelLoading || !ready}
             aria-label="Snap photo"
-            className="relative flex h-20 w-20 items-center justify-center disabled:opacity-40 transition-transform active:scale-95"
+            className="relative flex h-[72px] w-[72px] items-center justify-center rounded-full disabled:opacity-40 transition-transform active:scale-95"
           >
-            {/* Outer ring - Static */}
+            {/* Outer ring */}
             <span className={cn(
-              'absolute inset-0 rounded-full border-2',
-              ready ? 'border-primary' : 'border-muted-foreground/20'
+              'absolute inset-0 rounded-full border-[3px] transition-colors duration-300',
+              ready ? 'border-primary' : 'border-foreground/80'
             )} />
-            {/* Inner */}
+            {/* Inner disc — sits inside ring with hairline gap */}
             <span className={cn(
-              'flex h-14 w-14 items-center justify-center rounded-full border border-border shadow-md transition-all duration-300',
-              ready ? 'bg-primary scale-100' : 'bg-white'
+              'flex h-[60px] w-[60px] items-center justify-center rounded-full transition-all duration-200',
+              ready ? 'bg-primary' : 'bg-white',
+              busy && 'scale-90'
             )}>
-              {busy ? (
+              {busy && (
                 <span className="h-4 w-4 rounded-full border-2 border-primary-foreground border-t-transparent animate-spin" />
-              ) : (
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                  stroke={ready ? '#FFFFFF' : '#6b7280'}
-                  strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
-                  <circle cx="12" cy="13" r="3" />
-                </svg>
               )}
             </span>
           </button>
-          
-          <div className="w-12" /> {/* Spacer */}
+
+          {/* Flip camera (rounded square — matches gallery) */}
+          <button
+            onClick={onFlip}
+            className="flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-white shadow-sm transition-all hover:bg-secondary active:scale-90"
+            aria-label="Flip camera"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
+              <path d="M11 19H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5l2-3h2l2 3h5a2 2 0 0 1 2 2v6" />
+              <path d="M14 19l3 3 3-3" />
+              <path d="M17 22v-8a4 4 0 0 0-4-4H9" />
+            </svg>
+          </button>
         </div>
 
         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/80">
@@ -267,35 +275,52 @@ export default function ScannerScreen() {
   const streamRef = useRef<MediaStream | null>(null)
   const [permState, setPermState] = useState<PermState>('pending')
   const [showOnboarding, setShowOnboarding] = useState(false)
+  const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment')
+  const [stream, setStream] = useState<MediaStream | null>(null)
 
   useEffect(() => {
     const onboarded = localStorage.getItem('trashcams:onboarded')
     if (!onboarded) setShowOnboarding(true)
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    streamRef.current?.getTracks().forEach((t) => t.stop())
 
     navigator.mediaDevices
-      .getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } } })
-      .then((stream) => { streamRef.current = stream; setPermState('granted') })
-      .catch(() => setPermState('denied'))
-    return () => streamRef.current?.getTracks().forEach((t) => t.stop())
-  }, [])
+      .getUserMedia({ video: { facingMode: { ideal: facingMode }, width: { ideal: 1280 }, height: { ideal: 720 } } })
+      .then((s) => {
+        if (cancelled) { s.getTracks().forEach((t) => t.stop()); return }
+        streamRef.current = s
+        setStream(s)
+        setPermState('granted')
+      })
+      .catch(() => { if (!cancelled) setPermState('denied') })
+
+    return () => { cancelled = true }
+  }, [facingMode])
+
+  useEffect(() => () => streamRef.current?.getTracks().forEach((t) => t.stop()), [])
 
   const dismissOnboarding = () => {
     localStorage.setItem('trashcams:onboarded', 'true')
     setShowOnboarding(false)
   }
 
+  const handleFlip = () => setFacingMode((m) => (m === 'environment' ? 'user' : 'environment'))
+
   if (permState === 'denied') return <PermDenied navigate={navigate} />
-  if (permState === 'pending') {
+  if (permState === 'pending' || !stream) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
         <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/40 animate-blink">Starting camera</span>
       </div>
     )
   }
-  
+
   return (
     <>
-      <CameraActive stream={streamRef.current!} navigate={navigate} />
+      <CameraActive stream={stream} navigate={navigate} onFlip={handleFlip} />
       {showOnboarding && <OnboardingModal onDismiss={dismissOnboarding} />}
     </>
   )
