@@ -20,7 +20,7 @@ export default function ResultsScreen() {
     return (
       <div className="flex h-screen flex-col items-center justify-center gap-4 bg-background">
         <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">No scan data</p>
-        <Button variant="outline" onClick={() => navigate('/')}>Go to Scanner</Button>
+        <Button variant="outline" onClick={() => navigate('/scan')}>Go to Scanner</Button>
       </div>
     )
   }
@@ -117,7 +117,7 @@ export default function ResultsScreen() {
 
         {/* Actions */}
         <div className="flex gap-2 pt-1">
-          <Button className="flex-1" onClick={() => navigate('/')}>Scan Another</Button>
+          <Button className="flex-1" onClick={() => navigate('/scan')}>Scan Another</Button>
           <Button variant="outline" className="flex-1" onClick={() => navigate('/album')}>View Album</Button>
         </div>
       </div>

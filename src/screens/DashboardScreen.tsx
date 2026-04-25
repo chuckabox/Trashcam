@@ -405,7 +405,7 @@ export default function DashboardScreen() {
         <div className="flex items-end justify-between">
           <div>
             <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Trashcams</p>
-            <h1 className="text-2xl font-800 text-foreground">Dashboard</h1>
+            <h1 className="text-2xl font-800 text-foreground">Home</h1>
           </div>
           <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground pb-1">
             {new Date().toLocaleDateString('en', { weekday: 'short', month: 'short', day: 'numeric' })}

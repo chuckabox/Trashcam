@@ -1,13 +1,11 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { cn } from '../lib/utils'
 
-function StatsIcon({ active }: { active: boolean }) {
+function HomeIcon({ active }: { active: boolean }) {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       strokeWidth={active ? 2 : 1.5} strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="12" width="4" height="9" rx="1" />
-      <rect x="10" y="7" width="4" height="14" rx="1" />
-      <rect x="17" y="3" width="4" height="18" rx="1" />
+      <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1V9.5z" />
     </svg>
   )
 }
@@ -37,7 +35,7 @@ export function BottomNav() {
   const { pathname } = useLocation()
 
   const dashActive = pathname === '/dashboard'
-  const scanActive = pathname === '/'
+  const scanActive = pathname === '/scan'
   const albumActive = pathname === '/album'
 
   return (
@@ -57,7 +55,7 @@ export function BottomNav() {
         </svg>
         <div className="flex items-end justify-around px-4 pt-2 pb-3">
 
-          {/* Stats */}
+          {/* Home */}
           <button
             onClick={() => navigate('/dashboard')}
             className={cn(
@@ -65,13 +63,13 @@ export function BottomNav() {
               dashActive ? 'text-primary scale-110' : 'text-muted-foreground hover:text-foreground',
             )}
           >
-            <StatsIcon active={dashActive} />
-            <span className="font-mono text-[9px] uppercase tracking-widest">Stats</span>
+            <HomeIcon active={dashActive} />
+            <span className="font-mono text-[9px] uppercase tracking-widest">Home</span>
           </button>
 
           {/* Scanner */}
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/scan')}
             className={cn(
               'flex flex-col items-center gap-1 transition-all duration-200 active:scale-95',
               scanActive ? 'text-primary scale-110' : 'text-muted-foreground hover:text-foreground',
