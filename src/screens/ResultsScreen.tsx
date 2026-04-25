@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import type { ScanResult } from '../types'
 
@@ -14,6 +15,10 @@ export default function ResultsScreen() {
   const navigate = useNavigate()
   const location = useLocation()
   const scan = location.state?.scan as ScanResult | undefined
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
 
   if (!scan) {
     return (

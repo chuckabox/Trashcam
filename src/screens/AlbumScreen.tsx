@@ -24,7 +24,10 @@ export default function AlbumScreen() {
     setRefreshing(false)
   }, [])
 
-  useEffect(() => { refresh() }, [refresh])
+  useEffect(() => { 
+    window.scrollTo(0, 0)
+    refresh() 
+  }, [refresh])
 
   const handleClear = () => {
     if (!window.confirm('Clear all scan history on this device?')) return
