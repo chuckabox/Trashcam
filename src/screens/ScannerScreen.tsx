@@ -106,7 +106,7 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
   const pct = Math.round(bestConfidence * 100)
 
   return (
-    <div className="relative h-screen w-full overflow-hidden bg-background">
+    <div className="relative h-screen w-full overflow-hidden bg-background touch-none">
       {/* Camera feed */}
       <video ref={videoRef} className="h-full w-full object-cover opacity-90" autoPlay playsInline muted />
 
@@ -121,25 +121,6 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
         <div className="flex items-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-primary animate-blink" />
           <span className="font-mono text-[10px] uppercase tracking-widest text-primary">Live</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleUpload}
-            accept="image/*"
-            className="hidden"
-          />
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-1.5 rounded-full border border-white/20 bg-black/20 px-3 py-1.5 backdrop-blur-md hover:bg-black/40 transition-colors"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
-            </svg>
-            <span className="font-mono text-[10px] uppercase tracking-widest text-white">Upload</span>
-          </button>
-          <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/40">BinScan</span>
         </div>
       </div>
 
@@ -213,33 +194,55 @@ function CameraActive({ stream, navigate }: { stream: MediaStream; navigate: Ret
           </span>
         </div>
 
-        {/* Snap button */}
-        <button
-          onClick={handleSnap}
-          disabled={busy || modelLoading || !ready}
-          aria-label="Snap photo"
-          className="relative flex h-20 w-20 items-center justify-center disabled:opacity-40 transition-transform active:scale-95"
-        >
-          {/* Pulse ring */}
-          {ready && (
-            <span className="absolute inset-0 rounded-full border-2 border-primary/30 animate-pulse-ring" />
-          )}
-          {/* Outer ring */}
-          <span className={`absolute inset-1 rounded-full border-2 transition-colors ${ready ? 'border-primary' : 'border-muted-foreground/20'}`} />
-          {/* Inner */}
-          <span className={`flex h-12 w-12 items-center justify-center rounded-full transition-all ${ready ? 'bg-primary' : 'bg-muted-foreground/10'}`}>
-            {busy ? (
-              <span className="h-4 w-4 rounded-full border-2 border-primary-foreground border-t-transparent animate-spin" />
-            ) : (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                stroke={ready ? '#FFFFFF' : 'rgba(15,23,19,0.3)'}
-                strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
-                <circle cx="12" cy="13" r="3" />
-              </svg>
+        {/* Action Buttons */}
+        <div className="flex items-center gap-8">
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleUpload}
+            accept="image/*"
+            className="hidden"
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-background/20 backdrop-blur-md hover:bg-background/40 transition-all active:scale-90"
+            aria-label="Upload photo"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+          </button>
+
+          {/* Snap button */}
+          <button
+            onClick={handleSnap}
+            disabled={busy || modelLoading || !ready}
+            aria-label="Snap photo"
+            className="relative flex h-20 w-20 items-center justify-center disabled:opacity-40 transition-transform active:scale-95"
+          >
+            {/* Pulse ring */}
+            {ready && (
+              <span className="absolute inset-0 rounded-full border-2 border-primary/30 animate-pulse-ring" />
             )}
-          </span>
-        </button>
+            {/* Outer ring */}
+            <span className={`absolute inset-1 rounded-full border-2 transition-colors ${ready ? 'border-primary' : 'border-muted-foreground/20'}`} />
+            {/* Inner */}
+            <span className={`flex h-12 w-12 items-center justify-center rounded-full transition-all ${ready ? 'bg-primary' : 'bg-muted-foreground/10'}`}>
+              {busy ? (
+                <span className="h-4 w-4 rounded-full border-2 border-primary-foreground border-t-transparent animate-spin" />
+              ) : (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke={ready ? '#FFFFFF' : 'rgba(15,23,19,0.3)'}
+                  strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
+                  <circle cx="12" cy="13" r="3" />
+                </svg>
+              )}
+            </span>
+          </button>
+          
+          <div className="w-12" /> {/* Spacer to keep Snap centered */}
+        </div>
 
         <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/40">
           {modelLoading ? 'Loading model' : ready ? 'Tap to capture' : 'Aim at waste item'}

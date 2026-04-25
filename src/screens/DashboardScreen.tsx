@@ -24,6 +24,7 @@ const MAT_COLOUR: Record<MaterialCategory, string> = {
 const TABS = [
   { id: 'overview', label: 'Overview' },
   { id: 'insights', label: 'Insights' },
+  { id: 'dictionary', label: 'Dictionary' },
 ]
 
 const TOOLTIP_STYLE = {
@@ -40,11 +41,16 @@ const TOOLTIP_STYLE = {
 
 
 /** Compact stat chip */
-function Chip({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent?: string }) {
+function Chip({ label, value, sub, accent, hint }: { label: string; value: string; sub?: string; accent?: string; hint?: string }) {
   return (
-    <div className="rounded-lg border border-border bg-card p-3 card-hover-effect">
-      <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">{label}</p>
-      <p className="mt-1 font-mono text-xl font-bold" style={{ color: accent ?? '#0F1713' }}>{value}</p>
+    <div className="relative rounded-lg border border-border bg-card p-3 card-hover-effect">
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">{label}</p>
+          <p className="mt-1 font-mono text-xl font-bold" style={{ color: accent ?? '#0F1713' }}>{value}</p>
+        </div>
+        {hint && <Hint text={hint} />}
+      </div>
       {sub && <p className="mt-0.5 font-mono text-[9px] text-muted-foreground">{sub}</p>}
     </div>
   )
@@ -72,10 +78,8 @@ function OverviewTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
         <Chip label="Today" value={String(stats.scannedToday)} sub="items scanned" />
         <Chip label="Recyclable" value={`${stats.recyclablePercent}%`} sub="vs landfill" accent="#10BC79" />
         <Chip label="Compostable" value={String(stats.compostableCount)} sub="organic items" accent="#f0c040" />
-        <div className="flex items-center gap-1">
-          <Chip label="Total Co2" value={`${stats.totalCo2Kg.toFixed(1)}kg`} sub="carbon footprint" accent="#0F1713" />
-          <Hint text="Greenhouse gases released during production" className="absolute top-2 right-2" />
-        </div>
+        <Chip label="Total Co2" value={`${stats.totalCo2Kg.toFixed(1)}kg`} sub="carbon footprint" accent="#0F1713" 
+          hint="Greenhouse gases released during production" />
       </div>
 
       {/* Material breakdown */}
@@ -83,7 +87,10 @@ function OverviewTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
         <CardHeader><CardTitle>Waste Breakdown</CardTitle></CardHeader>
         <CardContent>
           {pieData.length === 0 ? (
-            <p className="py-6 text-center font-mono text-xs text-muted-foreground">No data</p>
+            <div className="py-10 text-center">
+              <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">No data yet</p>
+              <p className="mt-2 text-xs text-muted-foreground">Capture your first scan to see your recovery breakdown.</p>
+            </div>
           ) : (
             <>
               <ResponsiveContainer width="100%" height={180}>
@@ -239,6 +246,29 @@ function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
   )
 }
 
+// ── Dictionary tab ────────────────────────────────────────────────────────────
+
+const DICTIONARY = [
+  { term: 'Residual Waste', def: 'Materials that cannot currently be recovered through standard sorting (e.g., multi-layer films, metallised chip bags). Industrial recovery aims to chemically process these into new polymers.' },
+  { term: 'Carbon Footprint', def: 'The total greenhouse gas emissions (in CO2 equivalent) caused by the manufacture and transport of an item.' },
+  { term: 'Recovery Path', def: 'The specific industrial journey an item takes to be reclaimed, such as mechanical shredding, smelting, or industrial composting.' },
+  { term: 'Compostable', def: 'Organic materials that can break down into nutrient-rich soil within industrial processing timeframes.' },
+  { term: 'Hazardous Recovery', def: 'Items containing toxic substances (e.g., heavy metals in batteries) that require strictly controlled extraction processes.' },
+]
+
+function DictionaryTab() {
+  return (
+    <div className="space-y-3 animate-fade-up">
+      {DICTIONARY.map((item) => (
+        <div key={item.term} className="rounded-lg border border-border bg-card p-4 card-hover-effect">
+          <p className="font-mono text-[10px] uppercase tracking-widest text-primary font-bold">{item.term}</p>
+          <p className="mt-2 text-sm text-foreground leading-relaxed">{item.def}</p>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 // ── Main screen ───────────────────────────────────────────────────────────────
 
 export default function DashboardScreen() {
@@ -274,6 +304,7 @@ export default function DashboardScreen() {
           <>
             {tab === 'overview' && <OverviewTab stats={stats} navigate={navigate} />}
             {tab === 'insights' && <InsightsTab stats={stats} navigate={navigate} />}
+            {tab === 'dictionary' && <DictionaryTab />}
           </>
         )}
       </div>
