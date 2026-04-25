@@ -57,11 +57,11 @@ export function useYolo(videoRef: React.RefObject<HTMLVideoElement>) {
             ctx.drawImage(video, 0, 0, 640, 640)
 
             const preds = await modelRef.current.detect(cvs)
-            const dets: Detection[] = preds
+            let dets: Detection[] = preds
               .filter((p) => p.score >= DETECTION_CONFIDENCE_THRESHOLD)
               .map((p) => ({
-                // Hard constraint: If confidence < 0.7 -> force unknown
-                class: p.score < 0.7 ? 'unknown' : trashClassForName(p.class),
+                // Rule 6: Strong confidence for labels, otherwise unknown
+                class: p.score < 0.65 ? 'unknown' : trashClassForName(p.class),
                 confidence: p.score,
                 bbox: {
                   x: p.bbox[0] / 640,
@@ -71,8 +71,17 @@ export function useYolo(videoRef: React.RefObject<HTMLVideoElement>) {
                 },
               }))
 
-            setDetections(dets)
-            setBestConfidence(dets.reduce((m, d) => Math.max(m, d.confidence), 0))
+            // Rule 7: Sort detections by confidence descending
+            dets.sort((a, b) => b.confidence - a.confidence)
+
+            // Rule 5: Basic stability - if we had detections, and now none, 
+            // hold the previous ones for one frame to prevent flicker
+            if (dets.length === 0 && detections.length > 0 && frameCountRef.current !== 0) {
+              // keep current
+            } else {
+              setDetections(dets)
+              setBestConfidence(dets.length > 0 ? dets[0].confidence : 0)
+            }
           }
         } catch {
           // ignore transient inference errors
@@ -83,7 +92,7 @@ export function useYolo(videoRef: React.RefObject<HTMLVideoElement>) {
 
     rafRef.current = requestAnimationFrame(loop)
     return () => cancelAnimationFrame(rafRef.current)
-  }, [modelLoading, videoRef])
+  }, [modelLoading, videoRef, detections])
 
   const runInference = async (source: CanvasImageSource): Promise<Detection[]> => {
     if (!modelRef.current) return []
@@ -99,7 +108,7 @@ export function useYolo(videoRef: React.RefObject<HTMLVideoElement>) {
     return preds
       .filter((p) => p.score >= DETECTION_CONFIDENCE_THRESHOLD)
       .map((p) => ({
-        class: p.score < 0.7 ? 'unknown' : trashClassForName(p.class),
+        class: p.score < 0.65 ? 'unknown' : trashClassForName(p.class),
         confidence: p.score,
         bbox: {
           x: p.bbox[0] / 640,
@@ -108,6 +117,7 @@ export function useYolo(videoRef: React.RefObject<HTMLVideoElement>) {
           height: p.bbox[3] / 640,
         },
       }))
+      .sort((a, b) => b.confidence - a.confidence)
   }
 
   return { detections, bestConfidence, modelLoading, modelError, runInference }
