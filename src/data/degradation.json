@@ -1,38 +1,74 @@
 [
   {
     "yoloClass": "recyclable",
-    "displayName": "Recyclable Material",
-    "material": "Recyclable",
-    "decompositionYears": 500,
-    "co2KgPerItem": 0.5,
-    "waterLitersPerItem": 1.0,
+    "displayName": "Industrial Recyclable",
+    "material": "metal",
+    "decompositionYears": 200,
+    "co2KgPerItem": 0.3,
+    "waterLitersPerItem": 0.5,
     "toxicity": "low",
     "recyclable": "recyclable",
     "emoji": "♻️",
-    "disposalTip": "Clean and dry this item, then place it in the appropriate recycling bin. Value recovery is high."
+    "disposalTip": "High-value scrap. Sort by material type (steel, aluminum, copper) and send to smelting facility."
+  },
+  {
+    "yoloClass": "e-waste",
+    "displayName": "Electronic Waste",
+    "material": "electronic",
+    "decompositionYears": 1000,
+    "co2KgPerItem": 15.0,
+    "waterLitersPerItem": 50.0,
+    "toxicity": "high",
+    "recyclable": "hazardous",
+    "emoji": "💻",
+    "disposalTip": "Contains hazardous heavy metals. Must be processed at a certified e-waste recovery plant."
+  },
+  {
+    "yoloClass": "compostable",
+    "displayName": "Organic/Compostable",
+    "material": "organic",
+    "decompositionYears": 0.5,
+    "co2KgPerItem": 0.1,
+    "waterLitersPerItem": 0.2,
+    "toxicity": "low",
+    "recyclable": "compostable",
+    "emoji": "🍎",
+    "disposalTip": "Biodegradable material. Divert to industrial composting or anaerobic digestion facility."
+  },
+  {
+    "yoloClass": "paper",
+    "displayName": "Paper/Fiber",
+    "material": "paper",
+    "decompositionYears": 2,
+    "co2KgPerItem": 0.4,
+    "waterLitersPerItem": 2.0,
+    "toxicity": "low",
+    "recyclable": "recyclable",
+    "emoji": "📄",
+    "disposalTip": "Cellulose fibers are highly recyclable. Keep dry and avoid grease contamination."
   },
   {
     "yoloClass": "waste",
-    "displayName": "Waste/Contaminant",
-    "material": "Waste",
-    "decompositionYears": 1000,
-    "co2KgPerItem": 2.5,
-    "waterLitersPerItem": 5.0,
-    "toxicity": "high",
+    "displayName": "Residual Waste",
+    "material": "composite",
+    "decompositionYears": 500,
+    "co2KgPerItem": 2.0,
+    "waterLitersPerItem": 4.0,
+    "toxicity": "medium",
     "recyclable": "landfill",
     "emoji": "🗑️",
-    "disposalTip": "This item cannot be recycled and contaminates the stream. Place it in general waste."
+    "disposalTip": "Mixed or contaminated materials with no current recovery path. Send to controlled landfill."
   },
   {
     "yoloClass": "unknown",
-    "displayName": "Unknown Item",
-    "material": "Unknown",
+    "displayName": "Unidentified Material",
+    "material": "composite",
     "decompositionYears": 100,
     "co2KgPerItem": 0,
     "waterLitersPerItem": 0,
     "toxicity": "medium",
     "recyclable": "landfill",
     "emoji": "❓",
-    "disposalTip": "Model could not classify this item securely. Defaulting to general waste to prevent contamination."
+    "disposalTip": "Confidence threshold not met. Manual inspection required to determine recovery path."
   }
 ]

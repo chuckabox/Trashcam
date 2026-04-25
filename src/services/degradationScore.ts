@@ -43,7 +43,7 @@ export const CONDITION_LABEL: Record<DegradationCondition, string> = {
 }
 
 export const CONDITION_COLOR: Record<DegradationCondition, string> = {
-  fresh: '#b5f23d',
+  fresh: '#10BC79',
   'mid-life': '#f0c040',
   degrading: '#f97316',
   critical: '#ff4d4d',

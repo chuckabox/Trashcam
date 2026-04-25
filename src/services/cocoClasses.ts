@@ -14,20 +14,35 @@ export const COCO_CLASSES = [
 ] as const
 
 export function trashClassForName(cocoName: string): string {
-  const recyclables = new Set([
-    'bottle', 'wine glass', 'cup', 'bowl', 'laptop', 'cell phone', 'tv', 
-    'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'car', 'bus', 
-    'truck', 'motorcycle', 'bicycle', 'keyboard', 'mouse', 'remote'
+  const eWaste = new Set([
+    'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 'microwave',
+    'oven', 'toaster', 'refrigerator', 'refrigerator', 'hair drier'
   ]);
+
+  const recyclables = new Set([
+    'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat',
+    'traffic light', 'fire hydrant', 'stop sign', 'parking meter', 'bottle',
+    'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'sink', 'scissors'
+  ]);
+
+  const compostable = new Set([
+    'banana', 'apple', 'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog',
+    'pizza', 'donut', 'cake', 'potted plant'
+  ]);
+
+  const paper = new Set(['book']);
 
   const waste = new Set([
-    'banana', 'apple', 'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 
-    'pizza', 'donut', 'cake', 'toothbrush', 'fork', 'knife', 'spoon', 'book', 
-    'vase', 'scissors', 'teddy bear', 'hair drier', 'backpack', 'umbrella', 
-    'handbag', 'tie', 'suitcase'
+    'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee', 'skis',
+    'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove',
+    'skateboard', 'surfboard', 'tennis racket', 'chair', 'couch', 'bed',
+    'dining table', 'toilet', 'vase', 'clock', 'teddy bear', 'toothbrush'
   ]);
 
+  if (eWaste.has(cocoName)) return 'e-waste';
   if (recyclables.has(cocoName)) return 'recyclable';
+  if (compostable.has(cocoName)) return 'compostable';
+  if (paper.has(cocoName)) return 'paper';
   if (waste.has(cocoName)) return 'waste';
   return 'unknown';
 }

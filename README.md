@@ -102,7 +102,7 @@ trashlife/
 | Build Tool | Vite 5 |
 | ML Runtime | TensorFlow.js + COCO-SSD |
 | Styling | Tailwind CSS |
-| Icons | Lucide React |
+| Icons | Lucide React |A
 | Navigation | React Router Dom |
 | Charts | Recharts |
 
