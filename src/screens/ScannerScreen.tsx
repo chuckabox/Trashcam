@@ -153,6 +153,7 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
       )}
 
       {/* Bottom controls */}
+      <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-24 pt-6 gap-6">
         {/* Action Buttons — album / shutter / flip */}
         <div className="flex w-[280px] items-center justify-between">
           {/* Album (rounded square) — shows latest scan thumbnail if available */}

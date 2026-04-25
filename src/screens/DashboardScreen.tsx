@@ -241,11 +241,6 @@ function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
   )
 }
 
-      {/* frequently scanned removed for brevity if needed, but let's keep it */}
-    </div>
-  )
-}
-
 // ── Legend tab ────────────────────────────────────────────────────────────
 
 const LEGEND = [
