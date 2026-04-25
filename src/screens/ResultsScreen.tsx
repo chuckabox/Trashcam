@@ -126,7 +126,7 @@ export default function ResultsScreen() {
         {/* Actions */}
         <div className="flex gap-2 pt-2">
           <Button className="flex-1" onClick={() => navigate('/')}>Scan Another</Button>
-          <Button variant="outline" className="flex-1" onClick={() => navigate('/diary')}>View Diary</Button>
+          <Button variant="outline" className="flex-1" onClick={() => navigate('/diary')}>View Album</Button>
         </div>
       </div>
     </div>

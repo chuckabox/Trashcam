@@ -12,12 +12,13 @@ function StatsIcon({ active }: { active: boolean }) {
   )
 }
 
-function DiaryIcon({ active }: { active: boolean }) {
+function AlbumIcon({ active }: { active: boolean }) {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       strokeWidth={active ? 2 : 1.5} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <circle cx="8.5" cy="8.5" r="1.5" />
+      <path d="M21 15l-5-5L5 21" />
     </svg>
   )
 }
@@ -38,7 +39,7 @@ export function BottomNav() {
 
   const dashActive = pathname === '/dashboard'
   const scanActive = pathname === '/'
-  const diaryActive = pathname === '/diary'
+  const albumActive = pathname === '/diary'
 
   return (
     /* On desktop, center-align within the 393px phone container */
@@ -73,16 +74,16 @@ export function BottomNav() {
             <span className="font-mono text-[9px] uppercase tracking-widest">Scan</span>
           </button>
 
-          {/* Diary */}
+          {/* Album */}
           <button
             onClick={() => navigate('/diary')}
             className={cn(
               'flex flex-col items-center gap-1 transition-all duration-200 active:scale-95',
-              diaryActive ? 'text-primary scale-110' : 'text-muted-foreground hover:text-foreground',
+              albumActive ? 'text-primary scale-110' : 'text-muted-foreground hover:text-foreground',
             )}
           >
-            <DiaryIcon active={diaryActive} />
-            <span className="font-mono text-[9px] uppercase tracking-widest">Diary</span>
+            <AlbumIcon active={albumActive} />
+            <span className="font-mono text-[9px] uppercase tracking-widest">Album</span>
           </button>
 
         </div>

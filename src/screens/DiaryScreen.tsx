@@ -12,7 +12,7 @@ const FILTER_TABS = [
   { id: 'landfill', label: 'Landfill' },
 ]
 
-export default function DiaryScreen() {
+export default function AlbumScreen() {
   const navigate = useNavigate()
   const [scans, setScans] = useState<ScanResult[]>([])
   const [refreshing, setRefreshing] = useState(false)
@@ -33,8 +33,8 @@ export default function DiaryScreen() {
 
   const filtered = useMemo(() => {
     let result = scans
-    if (filter === 'recyclable') result = result.filter((s) => s.info.recyclable === 'recyclable')
-    else if (filter === 'landfill') result = result.filter((s) => s.info.recyclable === 'landfill' || s.info.recyclable === 'hazardous')
+    if (filter === 'recyclable') result = result.filter((s) => s.items.some(i => i.info.recyclable === 'recyclable'))
+    else if (filter === 'landfill') result = result.filter((s) => s.items.some(i => i.info.recyclable === 'landfill' || i.info.recyclable === 'hazardous'))
     return result
   }, [scans, filter])
 
@@ -47,7 +47,7 @@ export default function DiaryScreen() {
           <div>
             <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Trashcams</p>
             <h1 className="text-2xl font-800 text-foreground">
-              Diary
+              Album
               <span className="ml-2 font-mono text-base font-normal text-muted-foreground">({scans.length})</span>
             </h1>
           </div>
