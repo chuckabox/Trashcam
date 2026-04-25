@@ -13,24 +13,37 @@ export const COCO_CLASSES = [
   'toothbrush',
 ] as const
 
-export function trashClassForName(cocoName: string): string {
+export interface BBox { x: number; y: number; width: number; height: number }
+
+export function trashClassForName(cocoName: string, bbox?: BBox): string {
+  const aspectRatio = bbox ? bbox.height / bbox.width : 1;
+
+  // E-Waste Logic
   const eWaste = new Set([
     'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 'microwave',
     'oven', 'toaster', 'refrigerator', 'hair drier', 'clock'
   ]);
 
+  // Plastic & Containers
   const plastic = new Set(['bottle', 'cup', 'bowl', 'frisbee', 'backpack', 'umbrella', 'handbag', 'suitcase']);
-  const metal = new Set(['fork', 'knife', 'spoon', 'sink', 'scissors', 'fire hydrant', 'stop sign', 'parking meter']);
-  const glass = new Set(['wine glass', 'vase', 'cup']); // Some cups are glass, some plastic
   
+  // Metal
+  const metal = new Set(['fork', 'knife', 'spoon', 'sink', 'scissors', 'fire hydrant', 'stop sign', 'parking meter']);
+  
+  // Glass - Heuristic: wine glass is always glass, but cup/bottle depends on shape
+  const glass = new Set(['wine glass', 'vase']); 
+  
+  // Compostable
   const compostable = new Set([
     'banana', 'apple', 'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog',
     'pizza', 'donut', 'cake', 'potted plant', 'bird', 'cat', 'dog', 'horse', 
     'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe'
   ]);
 
-  const paper = new Set(['book', 'tie']); // Ties are often textile but sometimes paper-like/packaging
+  // Paper
+  const paper = new Set(['book', 'tie']); 
 
+  // General Waste
   const waste = new Set([
     'sports ball', 'kite', 'baseball bat', 'baseball glove',
     'skateboard', 'surfboard', 'tennis racket', 'chair', 'couch', 'bed',
@@ -39,6 +52,30 @@ export function trashClassForName(cocoName: string): string {
 
   const vehicle = new Set(['bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat']);
 
+  // --- Logic Based Differentiation (Virtual Fine-Tuning) ---
+  
+  // Differentiation for 'bottle'
+  if (cocoName === 'bottle') {
+    // Tall, thin bottles are almost always plastic or glass.
+    // If it's extremely tall/thin (like a wine bottle), we lean glass.
+    if (aspectRatio > 2.8) return 'glass';
+    return 'plastic';
+  }
+
+  // Differentiation for 'cup'
+  if (cocoName === 'cup') {
+    // Ceramic cups are often detected as 'cup'. 
+    // Heuristic: If it's squat and wide, it's more likely a ceramic mug (waste/landfill).
+    if (aspectRatio < 0.9) return 'waste'; 
+    return 'plastic';
+  }
+
+  // Differentiation for 'bowl'
+  if (cocoName === 'bowl') {
+    if (aspectRatio < 0.5) return 'plastic'; // shallow disposable bowl
+    return 'waste'; // likely ceramic
+  }
+
   if (eWaste.has(cocoName)) return 'e-waste';
   if (plastic.has(cocoName)) return 'plastic';
   if (metal.has(cocoName)) return 'metal';
@@ -46,12 +83,13 @@ export function trashClassForName(cocoName: string): string {
   if (compostable.has(cocoName)) return 'compostable';
   if (paper.has(cocoName)) return 'paper';
   if (waste.has(cocoName)) return 'waste';
-  if (vehicle.has(cocoName)) return 'waste'; // Large waste
+  if (vehicle.has(cocoName)) return 'waste'; 
+  
   return 'unknown';
 }
 
-export function trashClassFor(cocoIndex: number): string {
+export function trashClassFor(cocoIndex: number, bbox?: BBox): string {
   const cocoName = COCO_CLASSES[cocoIndex];
   if (!cocoName) return 'unknown';
-  return trashClassForName(cocoName);
+  return trashClassForName(cocoName, bbox);
 }

@@ -78,14 +78,10 @@ export default function ResultsScreen() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="text-lg font-bold text-foreground truncate">{info.displayName}</p>
-                      <Badge variant={TOX_VARIANT[info.toxicity]} className="text-[8px] uppercase px-1.5 py-0 h-4">
-                        {info.toxicity}
-                      </Badge>
+                      <Badge variant={TOX_VARIANT[info.toxicity]} className="text-[8px] uppercase px-1.5 py-0 h-4" label={info.toxicity} />
                     </div>
                     <div className="flex items-center gap-1.5 mt-0.5">
-                      <Badge variant={REC_VARIANT[info.recyclable]} className="text-[8px] uppercase px-1.5 py-0 h-4 font-mono">
-                        {info.recyclable}
-                      </Badge>
+                      <Badge variant={REC_VARIANT[info.recyclable]} className="text-[8px] uppercase px-1.5 py-0 h-4 font-mono" label={info.recyclable} />
                       <span className="font-mono text-[9px] text-muted-foreground uppercase tracking-widest">
                         {Math.round(detection.confidence * 100)}% Match
                       </span>
