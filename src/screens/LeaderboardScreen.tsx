@@ -158,9 +158,18 @@ export default function LeaderboardScreen() {
   const [session, setSession] = useState<Session | null>(() => getSession())
   const [confirmingSignOut, setConfirmingSignOut] = useState(false)
 
+  const isAuthed = session !== null
+
   useEffect(() => {
     loadScans().then((scans) => setStats(computeEnhancedStats(scans)))
   }, [])
+
+  useEffect(() => {
+    if (isAuthed) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = prev }
+  }, [isAuthed])
 
   if (!stats) return null
 
@@ -182,15 +191,6 @@ export default function LeaderboardScreen() {
 
   const medal = (rank: number) =>
     rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : null
-
-  const isAuthed = session !== null
-
-  useEffect(() => {
-    if (isAuthed) return
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = prev }
-  }, [isAuthed])
 
   return (
     <div className={`min-h-screen bg-background ${isAuthed ? '' : 'h-screen overflow-hidden'}`}>
