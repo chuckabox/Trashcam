@@ -1,4 +1,4 @@
-# 🗑️ TrashLife
+# TrashLife
 
 > **Point your camera at trash. Get instant insights on decomposition, environmental impact, and disposal tips.**
 
@@ -11,18 +11,18 @@ A web-based real-time object detection app that helps you understand the environ
 
 ---
 
-## ✨ Features
+## Features
 
-- **🎥 Real-Time Detection** — Live bounding boxes powered by TensorFlow.js (COCO-SSD) in the browser
-- **📊 Degradation Database** — 48 trash items with decomposition times, CO₂ emissions, water usage, and toxicity data
-- **🌍 Environmental Impact** — See the real cost of waste at a glance
-- **📝 Waste Diary** — Track your scans over time with a local-first dashboard
-- **⚡ Instant Insights** — Get disposal tips and best practices for each item
-- **🚀 Lightning Fast** — Built with Vite for instant page loads and HMR
+- **Real-Time Detection** — Live bounding boxes powered by TensorFlow.js (COCO-SSD) in the browser
+- **Degradation Database** — 48 trash items with decomposition times, CO₂ emissions, water usage, and toxicity data
+- **Environmental Impact** — See the real cost of waste at a glance
+- **Waste Diary** — Track your scans over time with a local-first dashboard
+- **Instant Insights** — Get disposal tips and best practices for each item
+- **Lightning Fast** — Built with Vite for instant page loads and HMR
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - **Node.js 18+**
@@ -50,7 +50,7 @@ npm run build
 
 ---
 
-## 📱 How It Works
+## How It Works
 
 1. **Open Camera** — App requests camera access
 2. **Point & Scan** — Aim at trash items, real-time detection shows bounding boxes
@@ -66,7 +66,7 @@ For trash-specific detection (styrofoam, cigarette butts, batteries), you can fi
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 Camera Feed
@@ -88,7 +88,7 @@ Save to localStorage + Dashboard
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
@@ -102,7 +102,7 @@ Save to localStorage + Dashboard
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 trashcams/
@@ -133,7 +133,7 @@ trashcams/
 
 ---
 
-## 📊 Degradation Database
+## Degradation Database
 
 Each trash item includes:
 
@@ -146,7 +146,7 @@ Each trash item includes:
 
 ---
 
-## 🎛️ Configuration
+## Configuration
 
 ### Detection Thresholds
 
@@ -163,7 +163,7 @@ Higher confidence = fewer false positives (but might miss items)
 
 ---
 
-## 🤖 Training a Custom Model
+## Training a Custom Model
 
 The bundled model is trained on **COCO** (80 common objects). For trash-specific detection (styrofoam, specific containers, etc.), fine-tune on a trash dataset:
 
@@ -208,7 +208,7 @@ yolo export model=runs/detect/train/weights/best.pt format=tfjs
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 | Issue | Solution |
 |-------|----------|
@@ -219,7 +219,7 @@ yolo export model=runs/detect/train/weights/best.pt format=tfjs
 
 ---
 
-## 📦 Deployment
+## Deployment
 
 ### Render (Pre-configured)
 
@@ -240,7 +240,7 @@ The `dist/` folder is ready for deployment to:
 
 ---
 
-## 🗺️ Roadmap
+## Roadmap
 
 - [x] Web app with real-time detection
 - [x] Degradation database (48 items)
@@ -254,18 +254,18 @@ The `dist/` folder is ready for deployment to:
 
 ---
 
-## 📄 License
+## License
 
 See [LICENSE](LICENSE).
 
 ---
 
-## 👥 Team
+## Team
 
-Built with ❤️ for the hackathon.
+Built for the hackathon.
 
 ---
 
-## 📞 Questions?
+## Questions?
 
 Have an idea? Found a bug? Open an issue or reach out!
