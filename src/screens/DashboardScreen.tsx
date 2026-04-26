@@ -167,24 +167,32 @@ function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
-          {stats.mostWastedCategory && (
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <div>
-                <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Material Focus</p>
+          <div className="flex items-center justify-between border-b border-border pb-3">
+            <div>
+              <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Material Focus</p>
+              {stats.mostWastedCategory ? (
                 <p className="mt-0.5 font-semibold capitalize text-foreground">{stats.mostWastedCategory}</p>
-              </div>
+              ) : (
+                <p className="mt-0.5 font-mono text-xs text-muted-foreground">No data yet</p>
+              )}
+            </div>
+            {stats.mostWastedCategory && (
               <span className="font-mono text-xs text-muted-foreground">{stats.materialBreakdown[stats.mostWastedCategory]}×</span>
-            </div>
-          )}
-          {stats.mostScannedItem && (
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <div>
-                <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Top Item</p>
+            )}
+          </div>
+          <div className="flex items-center justify-between border-b border-border pb-3">
+            <div>
+              <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Top Item</p>
+              {stats.mostScannedItem ? (
                 <p className="mt-0.5 font-semibold text-foreground">{stats.mostScannedItem}</p>
-              </div>
-              <span className="font-mono text-xs text-muted-foreground">{stats.topItems[0]?.count}×</span>
+              ) : (
+                <p className="mt-0.5 font-mono text-xs text-muted-foreground">No data yet</p>
+              )}
             </div>
-          )}
+            {stats.mostScannedItem && (
+              <span className="font-mono text-xs text-muted-foreground">{stats.topItems[0]?.count}×</span>
+            )}
+          </div>
           <div className="flex items-center justify-between">
             <div>
               <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Weekly Trend</p>
@@ -229,19 +237,24 @@ function InsightsTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
 
 
       {/* Frequently scanned */}
-      {stats.topItems.length > 0 && (
-        <Card>
-          <CardHeader><CardTitle>Common Items</CardTitle></CardHeader>
-          <CardContent>
-            {stats.topItems.map((item, idx) => (
+      <Card>
+        <CardHeader><CardTitle>Common Items</CardTitle></CardHeader>
+        <CardContent>
+          {stats.topItems.length === 0 ? (
+            <div className="py-10 text-center">
+              <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">No data yet</p>
+              <p className="mt-2 text-xs text-muted-foreground">Capture your first scan to see your most common items.</p>
+            </div>
+          ) : (
+            stats.topItems.map((item, idx) => (
               <div key={item.name} className={`flex justify-between py-2 ${idx !== stats.topItems.length - 1 ? 'border-b border-border' : ''}`}>
                 <span className="text-sm text-foreground">{item.name}</span>
                 <span className="font-mono text-sm font-bold text-primary">×{item.count}</span>
               </div>
-            ))}
-          </CardContent>
-        </Card>
-      )}
+            ))
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }
@@ -285,7 +298,7 @@ export default function DashboardScreen() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-lg px-4 pb-6 pt-6 space-y-4">
+      <div className="mx-auto max-w-lg px-4 pb-2 pt-6 space-y-4">
         {/* Header */}
         <div className="flex items-end justify-between">
           <div>
