@@ -276,14 +276,15 @@ export default function LeaderboardScreen() {
             </div>
           </div>
 
-          {/* Auth overlay */}
-          {!isAuthed && (
-            <div className="absolute inset-0 flex items-start justify-center pt-8">
-              <AuthGate onAuthed={() => setSession(getSession())} />
-            </div>
-          )}
         </div>
       </div>
+
+      {/* Auth overlay — centered between top of screen and bottom nav */}
+      {!isAuthed && (
+        <div className="fixed inset-x-0 top-0 bottom-20 z-40 flex items-center justify-center px-4">
+          <AuthGate onAuthed={() => setSession(getSession())} />
+        </div>
+      )}
 
       {confirmingSignOut && (
         <SignOutDialog
