@@ -144,6 +144,28 @@ function OverviewTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
         </CardContent>
       </Card>
 
+      {/* Founders */}
+      <Card>
+        <CardHeader><CardTitle>Founders</CardTitle></CardHeader>
+        <CardContent className="space-y-1">
+          {[
+            { name: 'Peter Ma', url: 'https://www.linkedin.com/in/peterzma/' },
+            { name: 'Siddhant Malik', url: 'https://www.linkedin.com/in/siddhant-malik-34b622368/' },
+          ].map((f) => (
+            <a
+              key={f.name}
+              href={f.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-between rounded-lg border border-transparent px-3 py-2.5 hover:border-border hover:bg-muted/30 transition-colors"
+            >
+              <span className="text-sm font-semibold text-foreground">{f.name}</span>
+              <span className="font-mono text-[10px] uppercase tracking-widest text-primary">LinkedIn ↗</span>
+            </a>
+          ))}
+        </CardContent>
+      </Card>
+
       {/* View album CTA */}
       <Button variant="outline" className="w-full h-12" onClick={() => navigate('/album')}>
         View album
