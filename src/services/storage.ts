@@ -2,14 +2,28 @@ import type { ScanResult, DashboardStats, MaterialCategory, EnhancedStats, Weekl
 
 const KEY = 'trashcams:scans'
 
-export async function loadScans(): Promise<ScanResult[]> {
+export const MAX_SCANS = 40
+const MAX_BYTES = 4_000_000  // ~4MB safety budget under typical 5MB localStorage quota
+
+function bytesOf(s: string): number {
+  return new Blob([s]).size
+}
+
+/** Trim newest-first array so it fits within MAX_SCANS and MAX_BYTES. */
+function fitToQuota(scans: ScanResult[]): ScanResult[] {
+  let arr = scans.slice(0, MAX_SCANS)
+  while (arr.length > 1 && bytesOf(JSON.stringify(arr)) > MAX_BYTES) {
+    arr = arr.slice(0, arr.length - 1) // drop oldest (last in newest-first array)
+  }
+  return arr
+}
+
+function rawLoad(): ScanResult[] {
   const raw = localStorage.getItem(KEY)
   if (!raw) return []
   try {
     const data = JSON.parse(raw)
     if (!Array.isArray(data)) return []
-    
-    // Migrate old scans to new format if needed
     return data.map((s) => {
       if (!s) return null
       if (!s.items && s.info) {
@@ -27,13 +41,21 @@ export async function loadScans(): Promise<ScanResult[]> {
   }
 }
 
-const MAX_SCANS = 40
+export async function loadScans(): Promise<ScanResult[]> {
+  const scans = rawLoad()
+  // One-time / on-load cleanup: if existing storage is over budget, prune oldest
+  const trimmed = fitToQuota(scans)
+  if (trimmed.length !== scans.length) {
+    try { localStorage.setItem(KEY, JSON.stringify(trimmed)) } catch { /* ignore */ }
+  }
+  return trimmed
+}
 
 export async function saveScan(scan: ScanResult): Promise<void> {
-  const existing = await loadScans()
-  let next = [scan, ...existing].slice(0, MAX_SCANS)
+  const existing = rawLoad()
+  let next = fitToQuota([scan, ...existing])
 
-  // Retry-on-quota: prune oldest until it fits
+  // Retry-on-quota: keep dropping the oldest until setItem succeeds
   while (next.length > 1) {
     try {
       localStorage.setItem(KEY, JSON.stringify(next))
@@ -43,10 +65,9 @@ export async function saveScan(scan: ScanResult): Promise<void> {
         err instanceof DOMException &&
         (err.name === 'QuotaExceededError' || err.name === 'NS_ERROR_DOM_QUOTA_REACHED')
       if (!isQuota) throw err
-      next = next.slice(0, Math.max(1, Math.floor(next.length * 0.75)))
+      next = next.slice(0, Math.max(1, next.length - 1))
     }
   }
-  // Last-resort: store just the new scan
   localStorage.setItem(KEY, JSON.stringify(next))
 }
 

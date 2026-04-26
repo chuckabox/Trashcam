@@ -4,7 +4,7 @@ import { useYolo } from '../hooks/useYolo'
 import { BoundingBoxOverlay } from '../components/BoundingBoxOverlay'
 import { SNAP_CONFIDENCE_THRESHOLD } from '../services/detection'
 import { lookup } from '../services/degradation'
-import { saveScan, loadScans } from '../services/storage'
+import { saveScan, loadScans, MAX_SCANS } from '../services/storage'
 import { cn } from '../lib/utils'
 import type { ScanResult } from '../types'
 
@@ -36,9 +36,13 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
   const [latestPhoto, setLatestPhoto] = useState<string | null>(null)
   const [videoReady, setVideoReady] = useState(false)
   const [snapError, setSnapError] = useState<string | null>(null)
+  const [scanCount, setScanCount] = useState(0)
 
   useEffect(() => {
-    loadScans().then((scans) => setLatestPhoto(scans[0]?.photoUri ?? null))
+    loadScans().then((scans) => {
+      setLatestPhoto(scans[0]?.photoUri ?? null)
+      setScanCount(scans.length)
+    })
   }, [])
 
   const { detections, bestConfidence, modelLoading, modelError, runInference } = useYolo(videoRef)
@@ -132,6 +136,8 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
         items: liveDetections.map(d => lookup(d.class)),
       }
       await saveScan(scan)
+      const after = await loadScans()
+      setScanCount(after.length)
       navigate('/results', { state: { scan } })
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
@@ -212,6 +218,25 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
         <div className="flex items-center gap-2 rounded-md border border-border bg-white px-3 py-1.5 shadow-sm">
           <span className="h-1.5 w-1.5 rounded-full bg-primary animate-blink" />
           <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-foreground">Live</span>
+        </div>
+        <div
+          className={cn(
+            'flex items-center gap-1.5 rounded-md border px-3 py-1.5 shadow-sm',
+            scanCount >= MAX_SCANS
+              ? 'border-red-300 bg-red-50'
+              : scanCount >= MAX_SCANS * 0.85
+                ? 'border-yellow-300 bg-yellow-50'
+                : 'border-border bg-white',
+          )}
+        >
+          <span
+            className={cn(
+              'font-mono text-[10px] font-bold uppercase tracking-widest',
+              scanCount >= MAX_SCANS ? 'text-red-700' : 'text-foreground',
+            )}
+          >
+            {scanCount}/{MAX_SCANS}
+          </span>
         </div>
       </div>
 
