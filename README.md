@@ -1,4 +1,4 @@
-# TrashLife
+# Trashcam
 
 > **Point your camera at trash. Get instant insights on decomposition, environmental impact, and disposal tips.**
 
