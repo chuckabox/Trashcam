@@ -35,6 +35,7 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
   const [busy, setBusy] = useState(false)
   const [latestPhoto, setLatestPhoto] = useState<string | null>(null)
   const [videoReady, setVideoReady] = useState(false)
+  const [snapError, setSnapError] = useState<string | null>(null)
 
   useEffect(() => {
     loadScans().then((scans) => setLatestPhoto(scans[0]?.photoUri ?? null))
@@ -42,6 +43,10 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
 
   const { detections, bestConfidence, modelLoading, modelError, runInference } = useYolo(videoRef)
   const [ready, setReady] = useState(false)
+
+  // Mirror latest detections in a ref so the snap handler isn't stale
+  const detectionsRef = useRef(detections)
+  useEffect(() => { detectionsRef.current = detections }, [detections])
 
   // Hysteresis - enter ready at threshold, leave only well below to stop flicker
   useEffect(() => {
@@ -57,14 +62,21 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
   }, [stream])
 
   const handleSnap = useCallback(async () => {
-    if (busy || !videoRef.current || !detections.length) return
+    if (busy || !videoRef.current) return
+    const liveDetections = detectionsRef.current
+    if (!liveDetections.length) {
+      setSnapError('No object detected — aim again.')
+      return
+    }
 
     setBusy(true)
+    setSnapError(null)
     try {
       const video = videoRef.current
-      const canvas = document.createElement('canvas')
       const W = video.videoWidth
       const H = video.videoHeight
+      if (!W || !H) throw new Error(`Camera not ready (${W}x${H}). Try again.`)
+      const canvas = document.createElement('canvas')
       canvas.width = W
       canvas.height = H
       const ctx = canvas.getContext('2d')!
@@ -76,7 +88,7 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
       ctx.font = `bold ${fontSize}px sans-serif`
       ctx.textBaseline = 'alphabetic'
 
-      for (const d of detections) {
+      for (const d of liveDetections) {
         const info = lookup(d.class)
         const strong = d.confidence >= 0.6
         const color = strong ? '#10BC79' : '#facc15'
@@ -110,15 +122,18 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         timestamp: Date.now(),
         photoUri,
-        detections: detections,
-        items: detections.map(d => lookup(d.class)),
+        detections: liveDetections,
+        items: liveDetections.map(d => lookup(d.class)),
       }
       await saveScan(scan)
       navigate('/results', { state: { scan } })
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err)
+      setSnapError(msg)
     } finally {
       setBusy(false)
     }
-  }, [busy, detections, navigate])
+  }, [busy, navigate])
 
   const pct = Math.round(bestConfidence * 100)
 
@@ -195,6 +210,15 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
       </div>
 
       {/* Model loading placeholder or silent state */}
+
+      {/* Snap error toast */}
+      {snapError && (
+        <div className="absolute inset-x-0 bottom-[210px] z-30 flex justify-center px-6">
+          <div className="rounded-md border border-red-300 bg-red-50 px-3 py-2 shadow-sm">
+            <p className="font-mono text-[10px] uppercase tracking-widest text-red-700">{snapError}</p>
+          </div>
+        </div>
+      )}
 
       {/* Bottom controls */}
       <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-24 pt-6 gap-6">
