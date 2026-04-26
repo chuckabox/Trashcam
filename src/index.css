@@ -69,10 +69,13 @@ body::after {
   .desktop-only-guide {
     display: flex;
     position: fixed;
-    top: 50%;
-    transform: translateY(-50%);
+    top: 0;
+    height: 100vh;
+    width: calc(50% - 196.5px);
     flex-direction: column;
-    align-items: flex-start;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
     gap: 16px;
     color: #0F1713;
     opacity: 0.5;
@@ -81,20 +84,19 @@ body::after {
     letter-spacing: 0.05em;
     pointer-events: none;
     z-index: 10000;
-    max-width: 140px;
     animation: fade-up 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
   .desktop-only-guide.left {
-    text-align: right;
-    align-items: flex-end;
-    left: calc(50% - 196.5px - 160px);
+    left: 0;
   }
 
   .desktop-only-guide.right {
-    text-align: left;
-    align-items: flex-start;
-    right: calc(50% - 196.5px - 160px);
+    right: 0;
+  }
+
+  .desktop-only-guide span {
+    max-width: 160px;
   }
 
   .desktop-only-guide span:last-child {
