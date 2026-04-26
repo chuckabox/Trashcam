@@ -73,14 +73,20 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
     setSnapError(null)
     try {
       const video = videoRef.current
-      const W = video.videoWidth
-      const H = video.videoHeight
-      if (!W || !H) throw new Error(`Camera not ready (${W}x${H}). Try again.`)
+      const srcW = video.videoWidth
+      const srcH = video.videoHeight
+      if (!srcW || !srcH) throw new Error(`Camera not ready (${srcW}x${srcH}). Try again.`)
+
+      // Downscale so saved photos stay small (localStorage quota is ~5MB total)
+      const MAX_DIM = 540
+      const scale = Math.min(1, MAX_DIM / Math.max(srcW, srcH))
+      const W = Math.round(srcW * scale)
+      const H = Math.round(srcH * scale)
       const canvas = document.createElement('canvas')
       canvas.width = W
       canvas.height = H
       const ctx = canvas.getContext('2d')!
-      ctx.drawImage(video, 0, 0)
+      ctx.drawImage(video, 0, 0, W, H)
 
       // Burn detection boxes + labels into the photo
       const stroke = Math.max(3, Math.round(Math.min(W, H) * 0.006))
@@ -116,7 +122,7 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
         ctx.fillText(text, x + padX, labelY + labelH - padY)
       }
 
-      const photoUri = canvas.toDataURL('image/jpeg', 0.85)
+      const photoUri = canvas.toDataURL('image/jpeg', 0.7)
 
       const scan: ScanResult = {
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,

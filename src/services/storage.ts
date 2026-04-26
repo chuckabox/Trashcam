@@ -27,9 +27,26 @@ export async function loadScans(): Promise<ScanResult[]> {
   }
 }
 
+const MAX_SCANS = 40
+
 export async function saveScan(scan: ScanResult): Promise<void> {
   const existing = await loadScans()
-  const next = [scan, ...existing].slice(0, 500)
+  let next = [scan, ...existing].slice(0, MAX_SCANS)
+
+  // Retry-on-quota: prune oldest until it fits
+  while (next.length > 1) {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(next))
+      return
+    } catch (err) {
+      const isQuota =
+        err instanceof DOMException &&
+        (err.name === 'QuotaExceededError' || err.name === 'NS_ERROR_DOM_QUOTA_REACHED')
+      if (!isQuota) throw err
+      next = next.slice(0, Math.max(1, Math.floor(next.length * 0.75)))
+    }
+  }
+  // Last-resort: store just the new scan
   localStorage.setItem(KEY, JSON.stringify(next))
 }
 
