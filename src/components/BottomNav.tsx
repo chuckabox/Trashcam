@@ -63,7 +63,7 @@ export function BottomNav() {
           <button
             onClick={() => navigate('/dashboard')}
             className={cn(
-              'flex w-20 flex-col items-center justify-center gap-1.5 transition-all duration-200 active:scale-95',
+              'flex w-20 flex-col items-center justify-center gap-0.5 transition-all duration-200 active:scale-95',
               dashActive ? 'text-primary scale-105' : 'text-muted-foreground hover:text-foreground',
             )}
           >
@@ -77,7 +77,7 @@ export function BottomNav() {
           <button
             onClick={() => navigate('/scan')}
             className={cn(
-              'flex w-20 flex-col items-center justify-center gap-1.5 transition-all duration-200 active:scale-95',
+              'flex w-20 flex-col items-center justify-center gap-0.5 transition-all duration-200 active:scale-95',
               scanActive ? 'text-primary scale-105' : 'text-muted-foreground hover:text-foreground',
             )}
           >
@@ -91,7 +91,7 @@ export function BottomNav() {
           <button
             onClick={() => navigate('/leaderboard')}
             className={cn(
-              'flex w-20 flex-col items-center justify-center gap-1.5 transition-all duration-200 active:scale-95',
+              'flex w-20 flex-col items-center justify-center gap-0.5 transition-all duration-200 active:scale-95',
               leaderActive ? 'text-primary scale-105' : 'text-muted-foreground hover:text-foreground',
             )}
           >
