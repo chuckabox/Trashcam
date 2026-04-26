@@ -1,322 +1,271 @@
-# TrashLife
+# 🗑️ TrashLife
 
-**Point your phone at a piece of trash. Real YOLOv8 tells you what it is. The app tells you how long it takes to decompose and how to dispose of it.**
+> **Point your camera at trash. Get instant insights on decomposition, environmental impact, and disposal tips.**
 
-- **Real-time Object Detection** via TensorFlow.js (COCO-SSD) in the browser.
-- **Beautiful UI** using Tailwind CSS + Lucide React.
-- **48-item degradation database** (material, decomposition time, CO₂, water, toxicity, disposal tip).
-- **Local-first** waste diary + dashboard (localStorage).
+A web-based real-time object detection app that helps you understand the environmental footprint of waste. Built for the hackathon.
 
----
-
-## Table of Contents
-
-1. [What You'll See](#what-youll-see)
-2. [Project Structure](#project-structure)
-3. [Tech Stack](#tech-stack)
-4. [Getting Started](#getting-started) ← **READ THIS**
-5. [Troubleshooting](#troubleshooting)
-6. [Roadmap](#roadmap)
-7. [Mobile Version (Native)](#mobile-version-native)
+[![React](https://img.shields.io/badge/React-18-blue?logo=react)](https://react.dev)
+[![Vite](https://img.shields.io/badge/Vite-5-purple?logo=vite)](https://vitejs.dev)
+[![TensorFlow.js](https://img.shields.io/badge/TensorFlow.js-COCO--SSD-orange)](https://www.tensorflow.org/js)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?logo=tailwindcss)](https://tailwindcss.com)
 
 ---
 
-## What You'll See
+## ✨ Features
 
-1. Launch app → camera opens, model loads (~1 sec on first run).
-2. Point at a water bottle / can / banana / laptop — bounding boxes appear in real time with class + confidence.
-3. Confidence ≥ 60% → snap button glows green.
-4. Tap it → capture, save, navigate to results.
-5. Results card shows: photo, material, decomposition time, CO₂/water/toxicity, disposal tip.
-6. Diary + Dashboard aggregate all your scans.
-
-**The live detector uses YOLOv8n pretrained on COCO** (80 classes). Out of the box it works great on `bottle`, `cup`, `banana`, `apple`, `pizza`, `cell phone`, `laptop`, `book`, `toothbrush`, etc. — items that overlap with the trash database. For full trash-specific detection (styrofoam, aluminum cans, cigarette butts, diapers, batteries…) you fine-tune on a trash dataset — see [Training Your Own Trash Model](#training-your-own-trash-model).
+- **🎥 Real-Time Detection** — Live bounding boxes powered by TensorFlow.js (COCO-SSD) in the browser
+- **📊 Degradation Database** — 48 trash items with decomposition times, CO₂ emissions, water usage, and toxicity data
+- **🌍 Environmental Impact** — See the real cost of waste at a glance
+- **📝 Waste Diary** — Track your scans over time with a local-first dashboard
+- **⚡ Instant Insights** — Get disposal tips and best practices for each item
+- **🚀 Lightning Fast** — Built with Vite for instant page loads and HMR
 
 ---
 
-## Architecture
-
-```
-┌─────────────────────────────┐
-│ ScannerScreen               │
-│ vision-camera <Camera> view │
-└────────────┬────────────────┘
-             │ every Nth frame (worklet)
-             ▼
-┌─────────────────────────────────────────┐
-│ useYolo hook                            │
-│  1. resize frame → 640×640 float32 RGB  │ (vision-camera-resize-plugin)
-│  2. model.runSync([input])              │ (react-native-fast-tflite)
-│  3. parseYoloOutput() → NMS             │ (worklet-safe, no sort closures)
-│  4. Worklets.createRunOnJS → React state│
-└────────────┬────────────────────────────┘
-             │ Detection[] on JS thread
-             ▼
-      BoundingBoxOverlay       SnapButton (glows if conf ≥ 0.6)
-                                    │ tap
-                                    ▼
-                           camera.takePhoto()
-                                    │
-                                    ▼
-                            useOcr (stub)
-                                    │
-                                    ▼
-                    lookup(COCO→trash class) → DegradationInfo
-                                    │
-                                    ▼
-                         saveScan → AsyncStorage
-                                    │
-                                    ▼
-                            navigate('Results')
-```
-
----
-
-## Project Structure
-
-```
-```
-trashlife/
-├── src/
-│   ├── main.tsx             # Vite entry point
-│   ├── App.tsx              # Web router & layout
-│   ├── index.css            # Tailwind + Global styles
-│   ├── components/          # UI components (Scanner, Results, etc.)
-│   ├── hooks/               # useYolo (TF.js detection), useScan
-│   ├── services/            # ML processing & logic
-│   ├── data/                # Degradation database (JSON)
-│   └── types/               # TypeScript definitions
-├── public/                  # Static assets
-├── package.json             # Web dependencies & scripts
-├── tailwind.config.js       # Tailwind configuration
-└── vite.config.ts           # Vite configuration
-```
-
----
-
-## Tech Stack
-
-| Layer | Package |
-|---|---|
-| Runtime | React 18 |
-| Build Tool | Vite 5 |
-| ML Runtime | TensorFlow.js + COCO-SSD |
-| Styling | Tailwind CSS |
-| Icons | Lucide React |A
-| Navigation | React Router Dom |
-| Charts | Recharts |
-
----
+## 🚀 Quick Start
 
 ### Prerequisites
+- **Node.js 18+**
+- A modern browser with camera support
 
-- **Node 18+**
-- **npm** (or yarn/pnpm)
-
-### Running Locally
+### Installation
 
 ```bash
-# 1. Install dependencies
+# Clone and install
+git clone <repo>
+cd trashcams
 npm install
 
-# 2. Start development server
+# Start development server
 npm run dev
 ```
 
-The application will be available at `http://localhost:5173`.
+The app will open at `http://localhost:5173`
 
-### Building for Production
+### Build for Production
 
 ```bash
 npm run build
 ```
 
-### Deployment
+---
 
-This project is configured for deployment on **Render** (see `render.yaml`).
-- **Build Command**: `npm install && npm run build`
-- **Publish Directory**: `dist`
-- **Fallback**: Rewrites all routes to `index.html` for SPA support.
+## 📱 How It Works
+
+1. **Open Camera** — App requests camera access
+2. **Point & Scan** — Aim at trash items, real-time detection shows bounding boxes
+3. **Snap** — When confidence ≥ 60%, the snap button glows green
+4. **Get Insights** — See decomposition time, environmental impact, and disposal tips
+5. **Track** — Add to your waste diary, view stats on the dashboard
+
+### Detection Quality
+
+The model works best on everyday items: **bottles, cans, phones, books, food, utensils**, etc. 
+
+For trash-specific detection (styrofoam, cigarette butts, batteries), you can fine-tune the model on a trash dataset (see below).
 
 ---
 
-## Mobile Version (Native)
+## 🏗️ Architecture
 
-The root of this repository contains legacy code for a React Native (Expo) version of TrashLife using YOLOv8n on-device.
-
-To run the mobile version, you would need to:
-1. Re-add native dependencies to `package.json` (`react-native`, `expo`, `react-native-vision-camera`, etc.).
-2. Use `npx expo run:android` or `npx expo run:ios`.
-
-For details on the native YOLO implementation, see the sections below (Legacy Documentation).
-
----
-
-## How Real YOLO Is Wired (Legacy)
-
-The key file is [src/hooks/useYolo.ts](src/hooks/useYolo.ts):
-
-```ts
-const model = useTensorflowModel(require('../../assets/models/yolov8n.tflite'));
-const { resize } = useResizePlugin();
-
-const frameProcessor = useFrameProcessor((frame) => {
-  'worklet';
-  // Throttle: 1 inference per 5 frames (~6 FPS at 30 FPS camera)
-  frameCounter.value = (frameCounter.value + 1) % 5;
-  if (frameCounter.value !== 0) return;
-  if (model.state !== 'loaded') return;
-
-  // Resize 1920×1080 camera frame → 640×640 float32 RGB
-  const resized = resize(frame, {
-    scale: { width: 640, height: 640 },
-    pixelFormat: 'rgb',
-    dataType: 'float32',
-  });
-
-  // Normalize 0..255 → 0..1
-  const input = new Float32Array(resized.length);
-  for (let i = 0; i < resized.length; i++) input[i] = resized[i] / 255.0;
-
-  // Run inference
-  const [output] = model.model!.runSync([input]);
-
-  // Parse + NMS (worklet-safe, all primitive JS)
-  const boxes = parseYoloOutput(output as Float32Array, 0.4);
-
-  // Ship results to JS thread for React state update
-  setDetectionsJS(boxes, bestConfidence);
-}, [model, resize]);
+```
+Camera Feed
+    ↓
+TensorFlow.js (COCO-SSD)
+    ↓
+Real-time Detections + Bounding Boxes
+    ↓
+User Captures Photo
+    ↓
+COCO → Trash Class Mapping
+    ↓
+Degradation DB Lookup
+    ↓
+Results + Environmental Stats
+    ↓
+Save to localStorage + Dashboard
 ```
 
-The YOLO output is `[1, 84, 8400]` (4 bbox coords + 80 class scores × 8400 anchors). The parser in [src/services/detection.ts](src/services/detection.ts) auto-detects layout (some exports transpose to `[1, 8400, 84]`), finds the best class per anchor, applies a confidence threshold, then runs IoU-based NMS.
+---
 
-**Thresholds** (tune in `detection.ts`):
+## 🛠️ Tech Stack
 
-- `DETECTION_CONFIDENCE_THRESHOLD = 0.4` — boxes below this are dropped.
-- `SNAP_CONFIDENCE_THRESHOLD = 0.6` — snap button glows green.
-- `NMS_IOU_THRESHOLD = 0.45` — overlapping duplicate boxes are merged.
+| Layer | Technology |
+|-------|-----------|
+| **Frontend** | React 18 + TypeScript |
+| **Build Tool** | Vite 5 |
+| **ML Runtime** | TensorFlow.js + COCO-SSD |
+| **Styling** | Tailwind CSS + Lucide Icons |
+| **Routing** | React Router |
+| **Charts** | Recharts |
+| **Storage** | localStorage (local-first) |
 
 ---
 
-## COCO → Trash Class Mapping
+## 📂 Project Structure
 
-The bundled YOLOv8n is trained on **COCO** (80 classes — persons, cars, household items, etc.). Many COCO classes map cleanly to trash classes in our degradation DB:
-
-| COCO ID | COCO name | → trash class |
-|---|---|---|
-| 39 | bottle | plastic_bottle |
-| 40 | wine glass | glass_bottle |
-| 41 | cup | plastic_cup |
-| 42–44 | fork / knife / spoon | plastic_utensils |
-| 45 | bowl | plastic_container |
-| 46 | banana | banana_peel |
-| 47 | apple | apple_core |
-| 48–55 | sandwich / orange / broccoli / carrot / hot dog / pizza / donut / cake | food_waste / pizza_box |
-| 63 | laptop | laptop |
-| 65 | remote | remote |
-| 67 | cell phone | phone |
-| 73 | book | magazine |
-| 79 | toothbrush | plastic_toothbrush |
-
-Everything else falls through to the `unknown` entry (which the UI filters out of snaps). Full map in [src/services/cocoClasses.ts](src/services/cocoClasses.ts).
+```
+trashcams/
+├── src/
+│   ├── main.tsx                 # Vite entry point
+│   ├── App.tsx                  # Router & main layout
+│   ├── index.css                # Tailwind + global styles
+│   ├── components/              # UI components
+│   │   ├── ScannerScreen.tsx
+│   │   ├── ResultsScreen.tsx
+│   │   ├── DashboardScreen.tsx
+│   │   └── ...
+│   ├── hooks/                   # Custom React hooks
+│   │   ├── useYolo.ts           # TensorFlow.js detection
+│   │   └── useScan.ts
+│   ├── services/                # Business logic
+│   │   ├── detection.ts         # YOLO parsing + NMS
+│   │   ├── cocoClasses.ts       # COCO class mappings
+│   │   └── degradationDb.ts     # Trash database
+│   ├── data/                    # JSON databases
+│   │   └── degradation.json     # 48-item trash database
+│   └── types/                   # TypeScript definitions
+├── public/                      # Static assets
+├── vite.config.ts              # Vite configuration
+├── tailwind.config.js          # Tailwind configuration
+└── package.json                # Dependencies & scripts
+```
 
 ---
 
-## Training Your Own Trash Model
+## 📊 Degradation Database
 
-COCO doesn't know what "styrofoam", "aluminum can", "cigarette butt", "diaper", or "battery" is. For full trash coverage, fine-tune YOLOv8n on a trash dataset:
+Each trash item includes:
 
-### 1. Install Ultralytics (Python)
+- **Material** — Type of waste (plastic, metal, organic, etc.)
+- **Decomposition Time** — How long it takes to break down
+- **CO₂ Emissions** — Carbon footprint of production
+- **Water Usage** — Water consumed in manufacturing
+- **Toxicity Level** — Environmental hazard rating
+- **Disposal Tip** — Best way to handle it
+
+---
+
+## 🎛️ Configuration
+
+### Detection Thresholds
+
+Edit `src/services/detection.ts` to tune:
+
+```typescript
+const DETECTION_CONFIDENCE_THRESHOLD = 0.4    // Show boxes above this
+const SNAP_CONFIDENCE_THRESHOLD = 0.6         // Snap button glows at this
+const NMS_IOU_THRESHOLD = 0.45               // Remove duplicate boxes
+```
+
+Lower confidence = more detections (but more false positives)
+Higher confidence = fewer false positives (but might miss items)
+
+---
+
+## 🤖 Training a Custom Model
+
+The bundled model is trained on **COCO** (80 common objects). For trash-specific detection (styrofoam, specific containers, etc.), fine-tune on a trash dataset:
+
+### 1. Install Ultralytics
 
 ```bash
 pip install ultralytics
 ```
 
-### 2. Pick a dataset
+### 2. Choose a Dataset
 
-- **[TACO](http://tacodataset.org/)** — 60 classes of litter in the wild, ~1,500 images
-- **[TrashNet](https://github.com/garythung/trashnet)** — 6 material classes, ~2,500 images
-- **[Roboflow Universe - Garbage](https://universe.roboflow.com/search?q=garbage)** — many trash datasets, auto-exports YOLO format
+- **[TACO](http://tacodataset.org/)** — 60 trash classes (~1,500 images)
+- **[TrashNet](https://github.com/garythung/trashnet)** — 6 material types (~2,500 images)
+- **[Roboflow Trash Datasets](https://universe.roboflow.com/search?q=garbage)** — Many options
 
-### 3. Fine-tune
+### 3. Fine-Tune
 
 ```bash
-yolo train \
-    model=assets/models/yolov8n.pt \
-    data=path/to/trash-dataset/data.yaml \
+yolo detect train \
+    model=yolov8n.pt \
+    data=path/to/dataset/data.yaml \
     epochs=50 \
     imgsz=640
 ```
 
-### 4. Export to TFLite
+### 4. Export to Web Format
 
 ```bash
-yolo export model=runs/detect/train/weights/best.pt format=tflite
+# For ONNX (recommended for web)
+yolo export model=runs/detect/train/weights/best.pt format=onnx
+
+# Or TensorFlow.js format
+yolo export model=runs/detect/train/weights/best.pt format=tfjs
 ```
 
-### 5. Swap in
+### 5. Update the App
 
-- Replace `assets/models/yolov8n.tflite` with `best_float32.tflite`.
-- Update [src/services/cocoClasses.ts](src/services/cocoClasses.ts):
-  - Replace `COCO_CLASSES` with your new class list.
-  - Replace `COCO_TO_TRASH` with an identity map if your class names already match `yoloClass` in `degradation.json`.
-- Update `NUM_CLASSES` in `detection.ts`.
-- Rebuild: `npm run android`.
+1. Replace the model in `src/services/`
+2. Update class names in `src/services/cocoClasses.ts`
+3. Update `src/data/degradation.json` with new trash types
+4. Rebuild: `npm run build`
 
 ---
 
-## Troubleshooting
+## 🐛 Troubleshooting
 
-**`yolov8n.tflite` not found at runtime**
-
-- Confirm the file is in `assets/models/`.
-- Confirm `metro.config.js` has `config.resolver.assetExts.push('tflite')`.
-- Clean & rebuild: `npx expo prebuild --clean && npm run android`.
-
-**Black camera screen**
-
-- Check camera permission in phone settings → TrashLife → Permissions.
-- Make sure `isActive={!busy}` toggles back to true after snap.
-
-**Crashes on launch (Android)**
-
-- `Failed to load model`: the TFLite file is corrupt or wasn't bundled. Verify `ls assets/models/yolov8n.tflite` ≈ 3.17 MB. Re-download if needed.
-- `Worklets not installed`: make sure `react-native-worklets-core/plugin` is listed in `babel.config.js` plugins **before** `react-native-reanimated/plugin`.
-
-**NativeWind classes don't apply**
-
-- Make sure `import './global.css'` is at the top of `App.tsx`.
-- Confirm `nativewind/metro` wraps the config in `metro.config.js`.
-- Restart Metro with `npm start -- --reset-cache`.
-
-**Model loads but no detections appear**
-
-- Point at something YOLO knows — a bottle, cup, phone, book. Random objects won't trigger.
-- Lower `DETECTION_CONFIDENCE_THRESHOLD` to `0.25` in `detection.ts` and rebuild to debug.
-- Check Metro logs for `YOLO model failed to load` errors.
-
-**Expo Go doesn't work**
-
-- It won't — you need a dev client. Run `npm run android` (builds + installs the dev client).
+| Issue | Solution |
+|-------|----------|
+| **Camera not working** | Check browser permissions for camera access |
+| **No detections appear** | Point at COCO items (bottle, cup, phone, book). Lower `DETECTION_CONFIDENCE_THRESHOLD` to debug |
+| **Model loads slowly** | First load downloads ~20MB model. Subsequent loads use browser cache |
+| **localStorage full** | Clear your browser data or export diary as CSV |
 
 ---
 
-## Roadmap
+## 📦 Deployment
 
-- [x] Real YOLOv8n TFLite on-device inference
-- [x] shadcn-style UI (NativeWind + reusables)
-- [x] 48-item degradation DB + dashboard + diary
-- [ ] Fine-tuned trash-specific model (TACO / TrashNet)
-- [ ] Real OCR (MLKit text-recognition)
-- [ ] Recycling location lookup (Google Places API)
-- [ ] Firebase sync (diary across devices)
-- [ ] Pro paywall (RevenueCat)
-- [ ] Batch mode
-- [ ] B2B audit CSV export
+### Render (Pre-configured)
+
+```yaml
+# render.yaml is configured for automatic deployment
+Build: npm install && npm run build
+Publish: dist/
+```
+
+Just push to main and Render will deploy automatically.
+
+### Other Platforms
+
+The `dist/` folder is ready for deployment to:
+- **Vercel** — `vercel deploy dist`
+- **Netlify** — Drag & drop `dist/`
+- **GitHub Pages** — Push `dist/` to `gh-pages` branch
 
 ---
 
-## License
+## 🗺️ Roadmap
+
+- [x] Web app with real-time detection
+- [x] Degradation database (48 items)
+- [x] Waste diary + dashboard
+- [x] Beautiful UI with Tailwind
+- [ ] Fine-tuned trash-specific model
+- [ ] Recycling location finder (Google Maps API)
+- [ ] Cloud sync (Firebase)
+- [ ] Export diary as PDF/CSV
+- [ ] Mobile app (React Native)
+
+---
+
+## 📄 License
 
 See [LICENSE](LICENSE).
+
+---
+
+## 👥 Team
+
+Built with ❤️ for the hackathon.
+
+---
+
+## 📞 Questions?
+
+Have an idea? Found a bug? Open an issue or reach out!
