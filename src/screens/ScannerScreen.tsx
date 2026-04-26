@@ -98,7 +98,7 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
 
       {/* Loading veil until first frame */}
       {!videoReady && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-background">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
           <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/40 animate-blink">Starting camera</span>
         </div>
       )}
