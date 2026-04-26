@@ -260,12 +260,6 @@ See [LICENSE](LICENSE).
 
 ---
 
-## Team
-
-Built for the hackathon.
-
----
-
 ## Questions?
 
 Have an idea? Found a bug? Open an issue or reach out!
