@@ -63,10 +63,48 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
     try {
       const video = videoRef.current
       const canvas = document.createElement('canvas')
-      canvas.width = video.videoWidth
-      canvas.height = video.videoHeight
-      canvas.getContext('2d')!.drawImage(video, 0, 0)
-      const photoUri = canvas.toDataURL('image/jpeg', 0.8)
+      const W = video.videoWidth
+      const H = video.videoHeight
+      canvas.width = W
+      canvas.height = H
+      const ctx = canvas.getContext('2d')!
+      ctx.drawImage(video, 0, 0)
+
+      // Burn detection boxes + labels into the photo
+      const stroke = Math.max(3, Math.round(Math.min(W, H) * 0.006))
+      const fontSize = Math.max(14, Math.round(Math.min(W, H) * 0.028))
+      ctx.font = `bold ${fontSize}px sans-serif`
+      ctx.textBaseline = 'alphabetic'
+
+      for (const d of detections) {
+        const info = lookup(d.class)
+        const strong = d.confidence >= 0.6
+        const color = strong ? '#10BC79' : '#facc15'
+        const x = d.bbox.x * W
+        const y = d.bbox.y * H
+        const w = d.bbox.width * W
+        const h = d.bbox.height * H
+
+        // Box outline
+        ctx.lineWidth = stroke
+        ctx.strokeStyle = color
+        ctx.strokeRect(x, y, w, h)
+
+        // Label
+        const text = `${info.emoji} ${info.displayName} ${Math.round(d.confidence * 100)}%`
+        const padX = Math.round(fontSize * 0.5)
+        const padY = Math.round(fontSize * 0.35)
+        const textW = ctx.measureText(text).width
+        const labelH = fontSize + padY * 2
+        let labelY = y - labelH
+        if (labelY < 0) labelY = y // flip below the top edge if it would clip
+        ctx.fillStyle = color
+        ctx.fillRect(x, labelY, textW + padX * 2, labelH)
+        ctx.fillStyle = '#000000'
+        ctx.fillText(text, x + padX, labelY + labelH - padY)
+      }
+
+      const photoUri = canvas.toDataURL('image/jpeg', 0.85)
 
       const scan: ScanResult = {
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
