@@ -185,29 +185,36 @@ export default function LeaderboardScreen() {
 
   const isAuthed = session !== null
 
-  return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-lg px-4 pb-24 pt-6 space-y-4">
-        {/* Header */}
-        <div className="flex items-end justify-between">
-          <div>
-            <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Trashcams</p>
-            <h1 className="text-2xl font-800 text-foreground">Rankings</h1>
-          </div>
-          {isAuthed && (
-            <button
-              onClick={() => setConfirmingSignOut(true)}
-              aria-label="Sign out"
-              className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-colors hover:text-foreground hover:border-primary/50"
-            >
-              <LogOut className="h-4 w-4" />
-            </button>
-          )}
-        </div>
+  useEffect(() => {
+    if (isAuthed) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = prev }
+  }, [isAuthed])
 
-        {/* Gated content */}
+  return (
+    <div className={`min-h-screen bg-background ${isAuthed ? '' : 'h-screen overflow-hidden'}`}>
+      <div className="mx-auto max-w-lg px-4 pb-24 pt-6">
+        {/* Gated content (header included so blur covers it) */}
         <div className="relative">
-          <div className={isAuthed ? '' : 'pointer-events-none select-none blur-md'}>
+          <div className={isAuthed ? 'space-y-4' : 'pointer-events-none select-none blur-md space-y-4'}>
+            {/* Header */}
+            <div className="flex items-end justify-between">
+              <div>
+                <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Trashcam</p>
+                <h1 className="text-2xl font-800 text-foreground">Rankings</h1>
+              </div>
+              {isAuthed && (
+                <button
+                  onClick={() => setConfirmingSignOut(true)}
+                  aria-label="Sign out"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-colors hover:text-foreground hover:border-primary/50"
+                >
+                  <LogOut className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+
             {/* Scope toggle */}
             <div className="flex rounded-lg border border-border bg-card p-1">
               {(['global', 'friends'] as const).map((s) => (
@@ -225,7 +232,7 @@ export default function LeaderboardScreen() {
               ))}
             </div>
 
-            <Card className="mt-4">
+            <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>{scope === 'global' ? 'Global' : 'Friends'}</CardTitle>
@@ -259,7 +266,7 @@ export default function LeaderboardScreen() {
               </CardContent>
             </Card>
 
-            <div className="mt-4 px-2 space-y-1 text-center">
+            <div className="px-2 space-y-1 text-center">
               <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                 Score = items × 50 + CO₂ kg × 10 + years saved × 0.1
               </p>

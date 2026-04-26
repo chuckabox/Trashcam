@@ -48,7 +48,7 @@ export default function AlbumScreen() {
         {/* Header */}
         <div className="flex items-end justify-between">
           <div>
-            <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Trashcams</p>
+            <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Trashcam</p>
             <h1 className="text-2xl font-800 text-foreground">
               Album
               <span className="ml-2 font-mono text-base font-normal text-muted-foreground">({scans.length})</span>
