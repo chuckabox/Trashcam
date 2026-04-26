@@ -132,11 +132,12 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
         playsInline
         muted
         onPlaying={() => setVideoReady(true)}
+        onLoadedData={() => setVideoReady(true)}
       />
 
-      {/* Loading veil until first frame */}
+      {/* Loading veil until first frame - pointer-events-none so it never blocks taps */}
       {!videoReady && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
+        <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-background">
           <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/40 animate-blink">Starting camera</span>
         </div>
       )}
