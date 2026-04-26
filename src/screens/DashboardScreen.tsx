@@ -143,6 +143,11 @@ function OverviewTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
           </ResponsiveContainer>
         </CardContent>
       </Card>
+
+      {/* View album CTA */}
+      <Button variant="outline" className="w-full h-12" onClick={() => navigate('/album')}>
+        View album
+      </Button>
     </div>
   )
 }
