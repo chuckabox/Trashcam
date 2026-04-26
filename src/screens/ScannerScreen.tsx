@@ -34,6 +34,7 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
   const videoRef = useRef<HTMLVideoElement>(null)
   const [busy, setBusy] = useState(false)
   const [latestPhoto, setLatestPhoto] = useState<string | null>(null)
+  const [videoReady, setVideoReady] = useState(false)
 
   useEffect(() => {
     loadScans().then((scans) => setLatestPhoto(scans[0]?.photoUri ?? null))
@@ -49,7 +50,10 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
   }, [bestConfidence, ready])
 
   useEffect(() => {
-    if (videoRef.current) videoRef.current.srcObject = stream
+    if (videoRef.current) {
+      setVideoReady(false)
+      videoRef.current.srcObject = stream
+    }
   }, [stream])
 
   const handleSnap = useCallback(async () => {
@@ -83,7 +87,21 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
   return (
     <div className="relative h-full w-full overflow-hidden bg-background touch-none">
       {/* Camera feed */}
-      <video ref={videoRef} className="h-full w-full object-cover opacity-90" autoPlay playsInline muted />
+      <video
+        ref={videoRef}
+        className="h-full w-full object-cover opacity-90"
+        autoPlay
+        playsInline
+        muted
+        onPlaying={() => setVideoReady(true)}
+      />
+
+      {/* Loading veil until first frame */}
+      {!videoReady && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-background">
+          <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/40 animate-blink">Starting camera</span>
+        </div>
+      )}
 
       {/* Subtle vignette */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.1)_100%)]" />
@@ -91,8 +109,8 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
       {/* Bounding boxes overlay */}
       <BoundingBoxOverlay detections={detections} />
 
-      {/* Targeting reticle */}
-      <div className="pointer-events-none absolute inset-0">
+      {/* Targeting reticle - centered between top of screen and buttons row */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 bottom-[230px]">
         <div className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2">
           {/* Corner brackets */}
           {(['tl', 'tr', 'bl', 'br'] as const).map((pos) => (

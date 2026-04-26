@@ -32,8 +32,8 @@ export default function ResultsScreen() {
   const { items, detections, photoUri } = scan
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-lg px-4 pb-8 pt-6 space-y-4">
+    <div className="bg-background">
+      <div className="mx-auto max-w-lg px-4 pb-2 pt-6 space-y-4">
 
         {/* Back */}
         <button onClick={() => navigate(-1)}
