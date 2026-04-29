@@ -2,7 +2,7 @@
 
 > **Point your camera at trash. Get instant insights on decomposition, environmental impact, and disposal tips.**
 
-A web-based real-time object detection app that helps you understand the environmental footprint of waste. Built for the hackathon.
+A web-based real-time object detection app that helps you understand the environmental footprint of waste. Built for the UQIES x UQ Ventures x Emmanuel College hackathon.
 
 [![React](https://img.shields.io/badge/React-18-blue?logo=react)](https://react.dev)
 [![Vite](https://img.shields.io/badge/Vite-5-purple?logo=vite)](https://vitejs.dev)
