@@ -194,7 +194,7 @@ export default function LeaderboardScreen() {
 
   return (
     <div className={`min-h-screen bg-background ${isAuthed ? '' : 'h-screen overflow-hidden'}`}>
-      <div className="mx-auto max-w-lg px-4 pb-24 pt-6">
+      <div className="mx-auto max-w-lg px-4 pt-6">
         {/* Gated content (header included so blur covers it) */}
         <div className="relative">
           <div className={isAuthed ? 'space-y-4' : 'pointer-events-none select-none blur-md space-y-4'}>

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import ScannerScreen from './screens/ScannerScreen'
 import ResultsScreen from './screens/ResultsScreen'
@@ -12,12 +13,22 @@ const FULLSCREEN_ROUTES = new Set(['/scan'])
 
 function Layout() {
   const { pathname } = useLocation()
+  const scrollRef = useRef<HTMLDivElement>(null)
   const showNav = NAV_ROUTES.has(pathname)
   const isFullscreen = FULLSCREEN_ROUTES.has(pathname)
 
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = 0
+    }
+  }, [pathname])
+
   return (
     <div className="relative h-full w-full max-w-full overflow-hidden bg-background text-foreground">
-      <div className="h-full overflow-y-auto overflow-x-hidden custom-scrollbar">
+      <div 
+        ref={scrollRef}
+        className={`h-full overflow-x-hidden custom-scrollbar ${isFullscreen ? 'overflow-y-hidden' : 'overflow-y-auto'}`}
+      >
         <div className={showNav && !isFullscreen ? 'pb-24' : ''}>
           <Routes>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
