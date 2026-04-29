@@ -151,6 +151,7 @@ function OverviewTab({ stats, navigate }: { stats: EnhancedStats; navigate: Retu
           {[
             { name: 'Peter Ma', url: 'https://www.linkedin.com/in/peterzma/' },
             { name: 'Siddhant Malik', url: 'https://www.linkedin.com/in/siddhant-malik-34b622368/' },
+            { name: 'Adin Sreekesh', url: 'https://www.linkedin.com/in/a-sreekesh/' },
           ].map((f) => (
             <a
               key={f.name}

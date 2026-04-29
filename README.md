@@ -254,9 +254,13 @@ The `dist/` folder is ready for deployment to:
 
 ---
 
-## License
+## Team
 
-See [LICENSE](LICENSE).
+- **Peter Ma** — [LinkedIn](https://www.linkedin.com/in/peterzma/)
+- **Siddhant Malik** — [LinkedIn](https://www.linkedin.com/in/siddhant-malik-34b622368/)
+- **Adin Sreekesh** — [LinkedIn](https://www.linkedin.com/in/a-sreekesh/)
+
+Built for the hackathon.
 
 ---
 
