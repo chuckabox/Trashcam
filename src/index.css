@@ -36,28 +36,24 @@ body::after {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
-/* ── Desktop: render as phone ── */
+/* ── Desktop Environment ── */
 @media (min-width: 640px) {
   body {
     background: #E8EBE6;
-    background-image:
-      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(16, 188, 121, 0.07) 0%, transparent 100%);
+    background: radial-gradient(circle at 50% 50%, #f9fafb 0%, #e2e8f0 100%);
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     min-height: 100vh;
+    padding: 40px 0;
   }
 
   #root {
-    width: 393px;
-    min-height: 100vh;
-    position: relative;
-    background: #FDFDFB;
-    box-shadow:
-      -1px 0 0 rgba(16, 188, 121, 0.07),
-       1px 0 0 rgba(16, 188, 121, 0.07),
-       0 0 80px rgba(0, 0, 0, 0.05);
-    z-index: 10;
+    height: auto;
+    min-height: unset;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 }
 

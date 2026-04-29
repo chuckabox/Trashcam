@@ -45,7 +45,7 @@ export function BottomNav() {
   return (
     /* On desktop, center-align within the 393px phone container */
     <nav
-      className="fixed bottom-0 inset-x-0 z-50 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:w-[393px]"
+      className="absolute bottom-0 inset-x-0 z-50"
       style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 0px)' }}
     >
       <div className="relative border-t-0 border-border bg-white shadow-[0_-8px_24px_rgba(0,0,0,0.04)]">

@@ -5,6 +5,7 @@ import AlbumScreen from './screens/AlbumScreen'
 import DashboardScreen from './screens/DashboardScreen'
 import LeaderboardScreen from './screens/LeaderboardScreen'
 import { BottomNav } from './components/BottomNav'
+import { DeviceFrame } from './components/DeviceFrame'
 
 const NAV_ROUTES = new Set(['/scan', '/album', '/dashboard', '/results', '/leaderboard'])
 const FULLSCREEN_ROUTES = new Set(['/scan'])
@@ -34,7 +35,9 @@ function Layout() {
 export default function App() {
   return (
     <HashRouter>
-      <Layout />
+      <DeviceFrame>
+        <Layout />
+      </DeviceFrame>
     </HashRouter>
   )
 }
