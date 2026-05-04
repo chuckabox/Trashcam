@@ -274,13 +274,13 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
             className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-border bg-white shadow-sm transition-all hover:bg-secondary active:scale-90"
             aria-label="View Album"
           >
-            {latestPhoto ? (
+            {(latestPhoto && !isDemo) ? (
               <img src={latestPhoto} alt="" className="h-full w-full object-cover" />
             ) : (
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary/60">
                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                <circle cx="8.5" cy="8.5" r="1.5" />
-                <polyline points="21 15 16 10 5 21" />
+                <circle cx="9" cy="9" r="2" />
+                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
               </svg>
             )}
           </button>
