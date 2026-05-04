@@ -149,18 +149,31 @@ function CameraActive({ stream, navigate, onFlip }: { stream: MediaStream; navig
 
   const pct = Math.round(bestConfidence * 100)
 
+  const isDemo = new URLSearchParams(window.location.search).get('demo') === 'true'
+
   return (
     <div className="relative h-full w-full overflow-hidden bg-background touch-none">
-      {/* Camera feed */}
-      <video
-        ref={videoRef}
-        className="h-full w-full object-cover opacity-90"
-        autoPlay
-        playsInline
-        muted
-        onPlaying={() => setVideoReady(true)}
-        onLoadedData={() => setVideoReady(true)}
-      />
+      {/* Camera feed or Demo Image */}
+      {isDemo ? (
+        <div className="relative h-full w-full overflow-hidden">
+          <img
+            src="/demo-scan.jpg"
+            className="h-full w-full object-cover opacity-90 scale-[1.8] origin-center"
+            style={{ objectPosition: '50% 45%' }}
+            onLoad={() => setVideoReady(true)}
+          />
+        </div>
+      ) : (
+        <video
+          ref={videoRef}
+          className="h-full w-full object-cover opacity-90"
+          autoPlay
+          playsInline
+          muted
+          onPlaying={() => setVideoReady(true)}
+          onLoadedData={() => setVideoReady(true)}
+        />
+      )}
 
       {/* Loading veil until first frame - pointer-events-none so it never blocks taps */}
       {!videoReady && (
@@ -396,8 +409,10 @@ export default function ScannerScreen() {
 
   const handleFlip = () => setFacingMode((m) => (m === 'environment' ? 'user' : 'environment'))
 
-  if (permState === 'denied') return <PermDenied navigate={navigate} />
-  if (permState === 'pending' || !stream) {
+  const isDemo = new URLSearchParams(window.location.search).get('demo') === 'true'
+
+  if (permState === 'denied' && !isDemo) return <PermDenied navigate={navigate} />
+  if ((permState === 'pending' || !stream) && !isDemo) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
         <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/40 animate-blink">Starting camera</span>
@@ -407,7 +422,7 @@ export default function ScannerScreen() {
 
   return (
     <>
-      <CameraActive stream={stream} navigate={navigate} onFlip={handleFlip} />
+      <CameraActive stream={stream!} navigate={navigate} onFlip={handleFlip} />
       {showOnboarding && <OnboardingModal onDismiss={dismissOnboarding} />}
     </>
   )

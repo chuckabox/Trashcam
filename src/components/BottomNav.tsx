@@ -26,10 +26,17 @@ function TrophyIcon({ active }: { active: boolean }) {
 
 function CameraIcon({ active }: { active: boolean }) {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth={active ? 2 : 1.5} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
-      <circle cx="12" cy="13" r="3" />
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth={active ? 2.5 : 1.5} strokeLinecap="round" strokeLinejoin="round"
+      className="transition-all duration-300"
+    >
+      <path d="M3 7V5a2 2 0 0 1 2-2h2" />
+      <path d="M17 3h2a2 2 0 0 1 2 2v2" />
+      <path d="M21 17v2a2 2 0 0 1-2 2h-2" />
+      <path d="M7 21H5a2 2 0 0 1-2-2v-2" />
+      <circle cx="12" cy="12" r="1" fill="currentColor" />
+      <line x1="12" y1="8" x2="12" y2="16" opacity="0.3" />
+      <line x1="8" y1="12" x2="16" y2="12" opacity="0.3" />
     </svg>
   )
 }
@@ -57,13 +64,13 @@ export function BottomNav() {
         <svg className="absolute bottom-full right-0 text-white" width="24" height="24" viewBox="0 0 24 24" fill="none">
           <path d="M24 24H0C13.2548 24 24 13.2548 24 0V24Z" fill="currentColor"/>
         </svg>
-        <div className="flex items-center justify-between px-6 pt-2 pb-3">
+        <div className="grid grid-cols-3 items-center px-4 pt-2 pb-3">
 
           {/* Home */}
           <button
             onClick={() => navigate('/dashboard')}
             className={cn(
-              'flex w-20 flex-col items-center justify-center gap-0.5 transition-all duration-200 active:scale-95',
+              'flex w-full flex-col items-center justify-center gap-0.5 transition-all duration-200 active:scale-95',
               dashActive ? 'text-primary scale-105' : 'text-muted-foreground hover:text-foreground',
             )}
           >
@@ -77,7 +84,7 @@ export function BottomNav() {
           <button
             onClick={() => navigate('/scan')}
             className={cn(
-              'flex w-20 flex-col items-center justify-center gap-0.5 transition-all duration-200 active:scale-95',
+              'flex w-full flex-col items-center justify-center gap-0.5 transition-all duration-200 active:scale-95',
               scanActive ? 'text-primary scale-105' : 'text-muted-foreground hover:text-foreground',
             )}
           >
@@ -91,7 +98,7 @@ export function BottomNav() {
           <button
             onClick={() => navigate('/leaderboard')}
             className={cn(
-              'flex w-20 flex-col items-center justify-center gap-0.5 transition-all duration-200 active:scale-95',
+              'flex w-full flex-col items-center justify-center gap-0.5 transition-all duration-200 active:scale-95',
               leaderActive ? 'text-primary scale-105' : 'text-muted-foreground hover:text-foreground',
             )}
           >
